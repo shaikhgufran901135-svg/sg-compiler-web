@@ -17,45 +17,20 @@
       align-items: center; 
       color: white; font-size: 24px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
     }
-    header span {
-        font-size: 24px;
-        font-weight: bold;
-    }
+    header span { font-size: 24px; font-weight: bold; }
     .container { display: flex; flex-wrap: wrap; padding: 20px; gap: 20px; max-width: 1200px; margin: 0 auto; }
     .editor, .output { flex: 1 1 450px; background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); min-width: 300px; }
     h3 { margin-top: 0; color: #1b5e20; border-bottom: 2px solid #a5d6a7; padding-bottom: 10px; }
     
-    /* CodeMirror Styling Adjustments */
-    .CodeMirror {
-      height: 350px; 
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 15px;
-      box-sizing: border-box; 
-    }
-    .CodeMirror-scroll {
-        max-height: 350px;
-        overflow-y: auto;
-    }
-    .CodeMirror-lines {
-        padding: 4px 0; 
-    }
+    .CodeMirror { height: 350px; border: 1px solid #ccc; border-radius: 5px; font-size: 15px; box-sizing: border-box; }
+    .CodeMirror-scroll { max-height: 350px; overflow-y: auto; }
+    .CodeMirror-lines { padding: 4px 0; }
 
     .controls { margin-top: 15px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; background: #f1f8e9; padding: 10px; border-radius: 5px; }
-    button { 
-      background-color: #2e7d32; color: white; padding: 10px 20px; border: none; border-radius: 5px; 
-      cursor: pointer; font-size: 15px; font-weight: bold; transition: 0.3s; 
-    }
+    button { background-color: #2e7d32; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 15px; font-weight: bold; transition: 0.3s; }
     button:hover { background-color: #1b5e20; }
     
-    /* Specific Button Styles */
-    #darkModeToggle { 
-      background-color: #fdd835; 
-      color: #000; 
-      padding: 8px 15px; 
-      font-size: 14px; 
-      font-weight: bold;
-    }
+    #darkModeToggle { background-color: #fdd835; color: #000; padding: 8px 15px; font-size: 14px; font-weight: bold; }
     #darkModeToggle:hover { background-color: #fbc02d; }
     #resetDefaultBtn { background-color: #fbc02d; }
     #resetDefaultBtn:hover { background-color: #f9a825; }
@@ -64,19 +39,11 @@
     #copyOutputBtn { background-color: #0288d1; }
     #copyOutputBtn:hover { background-color: #01579b; }
     
-    #languageSelector {
-        padding: 8px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        background-color: #fff;
-        font-size: 15px;
-        cursor: pointer;
-    }
+    #languageSelector { padding: 8px; border-radius: 5px; border: 1px solid #ccc; background-color: #fff; font-size: 15px; cursor: pointer; }
     
     pre { background:#263238; color: #eceff1; padding:15px; border-radius:6px; height:350px; overflow:auto; white-space: pre-wrap; font-family: 'Consolas', monospace; font-size: 14px; }
     .status-bar { margin-top: 10px; font-size: 14px; color: #555; }
 
-    /* 🌑 DARK MODE STYLES */
     .dark-mode { background-color: #121212 !important; color: #e0e0e0 !important; }
     .dark-mode header { background-color: #004d40; color: #fff; }
     .dark-mode .editor, .dark-mode .output { background: #1e1e1e; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
@@ -99,16 +66,15 @@
       <h3>Write Your Code</h3>
       
       <select id="languageSelector" onchange="changeLanguage()">
-    <option value="c">C</option>
-    <option value="python">Python</option>
-    <option value="java">Java</option>
-    
-    <option value="cpp" data-locked="true">C++ 🔒</option>
-    <option value="javascript" data-locked="true">JavaScript 🔒</option>
-    <option value="php" data-locked="true">PHP 🔒</option>
-    <option value="ruby" data-locked="true">Ruby 🔒</option>
-    <option value="go" data-locked="true">Go 🔒</option>
-</select>
+        <option value="c">C</option>
+        <option value="python">Python</option>
+        <option value="java">Java</option>
+        <option value="cpp" data-locked="true">C++ 🔒</option>
+        <option value="javascript" data-locked="true">JavaScript 🔒</option>
+        <option value="php" data-locked="true">PHP 🔒</option>
+        <option value="ruby" data-locked="true">Ruby 🔒</option>
+        <option value="go" data-locked="true">Go 🔒</option>
+      </select>
       
       <textarea id="code"></textarea>
 
@@ -135,10 +101,12 @@
   <script>
     let editor; 
     
-    // Default Codes (Global)
+    // Default Codes
     const defaultCodeC = `#include <stdio.h>\n\nint main() {\n    int num = 10;\n    printf("Hello from C compiler! The number is %d.\\n", num);\n    return 0;\n}`;
     const defaultCodePython = `# Python Example\nprint("Hello from Python!")\nprint("The actual compiler is working now.")`;
     const defaultCodeJava = `// Java Example\nclass Main {\n    public static void main(String[] args) {\n        System.out.println("Hello from Java!");\n    }\n}`;
+    const defaultCodeCpp = `#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Hello from Premium C++ Compiler!" << endl;\n    return 0;\n}`;
+    const defaultCodeJS = `// JavaScript Example\nconsole.log("Hello from Premium JavaScript Compiler!");`;
 
     function toggleDarkMode() {
         const body = document.body;
@@ -158,17 +126,21 @@
             document.body.classList.add('dark-mode');
             document.getElementById('darkModeToggle').innerText = '🌙 Dark';
         }
+        
+        // App se language unlock check karna
+        if (typeof AndroidApp !== "undefined") {
+            AndroidApp.checkLanguageStatus(); 
+        }
+
         const lastLang = localStorage.getItem('selectedLanguage') || 'c';
         const savedCode = localStorage.getItem('sgCompilerCode');
         let initialMode = 'text/x-csrc';
         let initialCode = defaultCodeC;
         
         if (lastLang === 'python') {
-            initialMode = 'text/x-python';
-            initialCode = defaultCodePython;
+            initialMode = 'text/x-python'; initialCode = defaultCodePython;
         } else if (lastLang === 'java') {
-            initialMode = 'text/x-java';
-            initialCode = defaultCodeJava;
+            initialMode = 'text/x-java'; initialCode = defaultCodeJava;
         }
 
         editor = CodeMirror.fromTextArea(document.getElementById('code'), {
@@ -188,25 +160,50 @@
         document.getElementById('languageSelector').value = lastLang;
     }
     
+    // --- NAYA SECRET BRIDGE CODE ---
     function changeLanguage() {
         const selector = document.getElementById('languageSelector');
         const lang = selector.value;
-        let mode;
-        let newCode;
+        const selectedOption = selector.options[selector.selectedIndex];
         
-        if (lang === 'python') {
-            mode = 'text/x-python';
-            newCode = defaultCodePython;
-        } else if (lang === 'java') {
-            mode = 'text/x-java';
-            newCode = defaultCodeJava;
-        } else {
-            mode = 'text/x-csrc';
-            newCode = defaultCodeC;
+        // Check if locked
+        if (selectedOption.getAttribute('data-locked') === 'true') {
+            if (typeof AndroidApp !== "undefined") {
+                // Android app ko ad dikhane ka message bhejo
+                AndroidApp.showRewardedAd(lang);
+            } else {
+                // Agar PC ya browser me khola hai
+                alert("This premium language can only be unlocked by watching a short video ad in the SG Code Compiler App. Download the app to unlock!");
+            }
+            // Code badalne se roko aur wapas C language par set kar do
+            selector.value = 'c'; 
+            return;
         }
+
+        // Agar free hai toh normal load karo
+        let mode = 'text/x-csrc';
+        let newCode = defaultCodeC;
+        
+        if (lang === 'python') { mode = 'text/x-python'; newCode = defaultCodePython; } 
+        else if (lang === 'java') { mode = 'text/x-java'; newCode = defaultCodeJava; }
+        
         editor.setOption('mode', mode);
         editor.setValue(newCode); 
         localStorage.setItem('selectedLanguage', lang); 
+    }
+
+    // Android app idhar se unlock message bhejega
+    function unlockLanguage(langId) {
+        const selector = document.getElementById('languageSelector');
+        for (let i = 0; i < selector.options.length; i++) {
+            if (selector.options[i].value === langId) {
+                let optionText = selector.options[i].text;
+                selector.options[i].text = optionText.replace(' 🔒', ' 🔓');
+                selector.options[i].removeAttribute('data-locked');
+                break;
+            }
+        }
+        alert("Language Unlocked! You can now use it.");
     }
 
     function saveCode() {
@@ -242,7 +239,6 @@
         });
     }
 
-    // --- REAL COMPILER API INTEGRATION ---
     async function runCode() {
         const code = editor.getValue(); 
         const outputBox = document.getElementById('outputBox');
@@ -250,35 +246,25 @@
         
         outputBox.innerText = `Compiling & Running ${lang.toUpperCase()} on Server... Please wait.`;
         
-        // CodeArena / Judge0 Language IDs
         let languageId;
-        if (lang === 'c') languageId = 50;       // C (GCC)
-        else if (lang === 'python') languageId = 71; // Python
-        else if (lang === 'java') languageId = 62;   // Java
+        if (lang === 'c') languageId = 50;
+        else if (lang === 'python') languageId = 71; 
+        else if (lang === 'java') languageId = 62;   
 
         try {
-            // YAHAN AAPKA NAYA RENDER SERVER LINK HAI
             const response = await fetch('https://compiler-backend-4dbz.onrender.com/compile', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    language_id: languageId,
-                    source_code: code,
-                    stdin: "" 
-                })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ language_id: languageId, source_code: code, stdin: "" })
             });
 
             const result = await response.json();
 
-            // API error handle karna
             if (result.error) {
                  outputBox.innerText = "Server Error:\n" + (result.message || "Something went wrong.");
                  return;
             }
 
-            // Output handling
             if (result.compile_output) {
                 outputBox.innerText = "Compilation Error:\n" + result.compile_output;
             } else if (result.stderr) {
