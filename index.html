@@ -160,7 +160,6 @@
         document.getElementById('languageSelector').value = lastLang;
     }
     
-    // --- NAYA SECRET BRIDGE CODE ---
     function changeLanguage() {
         const selector = document.getElementById('languageSelector');
         const lang = selector.value;
@@ -192,18 +191,33 @@
         localStorage.setItem('selectedLanguage', lang); 
     }
 
-    // Android app idhar se unlock message bhejega
+    // --- NAYA 3 ADS COUNTER CODE ---
+    let adWatchCounts = {};
+    const REQUIRED_ADS = 3; 
+
+    // Android app idhar se unlock message bhejega aur yeh ginega
     function unlockLanguage(langId) {
-        const selector = document.getElementById('languageSelector');
-        for (let i = 0; i < selector.options.length; i++) {
-            if (selector.options[i].value === langId) {
-                let optionText = selector.options[i].text;
-                selector.options[i].text = optionText.replace(' 🔒', ' 🔓');
-                selector.options[i].removeAttribute('data-locked');
-                break;
-            }
+        if (!adWatchCounts[langId]) {
+            adWatchCounts[langId] = 0;
         }
-        alert("Language Unlocked! You can now use it.");
+        
+        adWatchCounts[langId]++;
+
+        if (adWatchCounts[langId] >= REQUIRED_ADS) {
+            const selector = document.getElementById('languageSelector');
+            for (let i = 0; i < selector.options.length; i++) {
+                if (selector.options[i].value === langId) {
+                    let optionText = selector.options[i].text;
+                    selector.options[i].text = optionText.replace(' 🔒', ' 🔓');
+                    selector.options[i].removeAttribute('data-locked');
+                    break;
+                }
+            }
+            alert("Congratulations! Aapne 3 Ads poore dekh liye hain. Language Unlocked! 🔓");
+        } else {
+            let remaining = REQUIRED_ADS - adWatchCounts[langId];
+            alert("Ad watched successfully! ✅ Aapne " + adWatchCounts[langId] + "/3 ads dekh liye hain. Unlock karne ke liye " + remaining + " aur Ad dekhein.");
+        }
     }
 
     function saveCode() {
