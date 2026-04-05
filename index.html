@@ -22,19 +22,25 @@
     .editor, .output { flex: 1 1 450px; background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); min-width: 300px; }
     h3 { margin-top: 0; color: #1b5e20; border-bottom: 2px solid #a5d6a7; padding-bottom: 10px; }
     
-    /* --- YAHAN CHANGES KIYE GAYE HAIN --- */
+    /* --- FIX: Line Space Kam Karne Ke Liye --- */
     .CodeMirror { 
         height: 350px; 
         border: 1px solid #ccc; 
         border-radius: 5px; 
         font-size: 15px; 
         box-sizing: border-box; 
-        line-height: 1.5 !important; 
+        line-height: 1.2 !important; 
         margin-top: 12px; 
     }
     .CodeMirror-scroll { max-height: 350px; overflow-y: auto; }
-    .CodeMirror-lines { padding: 10px 0 !important; }
-    /* ------------------------------------ */
+    .CodeMirror-lines { padding: 4px 0 !important; }
+    
+    .CodeMirror pre.CodeMirror-line, 
+    .CodeMirror pre.CodeMirror-line-like {
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
+    }
+    /* ----------------------------------------- */
 
     .controls { margin-top: 15px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; background: #f1f8e9; padding: 10px; border-radius: 5px; }
     button { background-color: #2e7d32; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 15px; font-weight: bold; transition: 0.3s; }
