@@ -22,22 +22,25 @@
     .editor, .output { flex: 1 1 450px; background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); min-width: 300px; }
     h3 { margin-top: 0; color: #1b5e20; border-bottom: 2px solid #a5d6a7; padding-bottom: 10px; }
     
-    /* --- THE SAFE FIX --- */
+    /* --- THE REAL FIX FOR CODEMIRROR --- */
     .CodeMirror { 
         height: 350px; 
         border: 1px solid #ccc; 
         border-radius: 5px; 
         font-size: 15px; 
         box-sizing: border-box; 
-        margin-top: 10px; /* Dropdown se gap ke liye */
-        line-height: 1.4; /* Normal, safe spacing */
+        margin-top: 10px; 
     }
-    .CodeMirror-scroll { 
-        max-height: 350px; 
-        overflow-y: auto; 
+    .CodeMirror-scroll { max-height: 350px; overflow-y: auto; }
+    
+    /* CodeMirror ki har line par perfect spacing ke liye */
+    .CodeMirror pre.CodeMirror-line, 
+    .CodeMirror pre.CodeMirror-line-like {
+        line-height: 1.5 !important;  /* Perfect gap set karne ke liye */
+        padding: 0 4px !important;    /* Upar-neeche ka padding hataya, sirf left-right rakha */
+        margin: 0 !important;         /* Margin zero kiya */
     }
-    /* Maine yahan se saari vo 0 padding/margin wali line hata di hai jisne layout toda tha */
-    /* -------------------- */
+    /* ----------------------------------- */
 
     .controls { margin-top: 15px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; background: #f1f8e9; padding: 10px; border-radius: 5px; }
     button { background-color: #2e7d32; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 15px; font-weight: bold; transition: 0.3s; }
@@ -54,7 +57,19 @@
     
     #languageSelector { padding: 8px; border-radius: 5px; border: 1px solid #ccc; background-color: #fff; font-size: 15px; cursor: pointer; }
     
-    pre { background:#263238; color: #eceff1; padding:15px; border-radius:6px; height:350px; overflow:auto; white-space: pre-wrap; font-family: 'Consolas', monospace; font-size: 14px; }
+    /* Output box as it is (isne problem nahi ki thi) */
+    pre#outputBox { 
+        background:#263238; 
+        color: #eceff1; 
+        padding:15px; 
+        border-radius:6px; 
+        height:350px; 
+        overflow:auto; 
+        white-space: pre-wrap; 
+        font-family: 'Consolas', monospace; 
+        font-size: 14px; 
+        margin: 0; 
+    }
     .status-bar { margin-top: 10px; font-size: 14px; color: #555; }
 
     .dark-mode { background-color: #121212 !important; color: #e0e0e0 !important; }
@@ -114,7 +129,6 @@
   <script>
     let editor; 
     
-    // Default Codes
     const defaultCodeC = `#include <stdio.h>\n\nint main() {\n    int num = 10;\n    printf("Hello from C compiler! The number is %d.\\n", num);\n    return 0;\n}`;
     const defaultCodePython = `# Python Example\nprint("Hello from Python!")\nprint("The actual compiler is working now.")`;
     const defaultCodeJava = `// Java Example\nclass Main {\n    public static void main(String[] args) {\n        System.out.println("Hello from Java!");\n    }\n}`;
@@ -140,7 +154,6 @@
             document.getElementById('darkModeToggle').innerText = '🌙 Dark';
         }
         
-        // App se language unlock check karna
         if (typeof AndroidApp !== "undefined") {
             AndroidApp.checkLanguageStatus(); 
         }
@@ -178,21 +191,16 @@
         const lang = selector.value;
         const selectedOption = selector.options[selector.selectedIndex];
         
-        // Check if locked
         if (selectedOption.getAttribute('data-locked') === 'true') {
             if (typeof AndroidApp !== "undefined") {
-                // Android app ko ad dikhane ka message bhejo
                 AndroidApp.showRewardedAd(lang);
             } else {
-                // Agar PC ya browser me khola hai
                 alert("This premium language can only be unlocked by watching a short video ad in the SG Code Compiler App. Download the app to unlock!");
             }
-            // Code badalne se roko aur wapas C language par set kar do
             selector.value = 'c'; 
             return;
         }
 
-        // Agar free hai toh normal load karo
         let mode = 'text/x-csrc';
         let newCode = defaultCodeC;
         
@@ -204,11 +212,9 @@
         localStorage.setItem('selectedLanguage', lang); 
     }
 
-    // --- NAYA 3 ADS COUNTER CODE ---
     let adWatchCounts = {};
     const REQUIRED_ADS = 3; 
 
-    // Android app idhar se unlock message bhejega aur yeh ginega
     function unlockLanguage(langId) {
         if (!adWatchCounts[langId]) {
             adWatchCounts[langId] = 0;
