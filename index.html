@@ -22,34 +22,22 @@
     .editor, .output { flex: 1 1 450px; background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); min-width: 300px; }
     h3 { margin-top: 0; color: #1b5e20; border-bottom: 2px solid #a5d6a7; padding-bottom: 10px; }
     
-    /* --- FIX: Lines ko ekdum chipkane ke liye (Zero Gap) --- */
+    /* --- THE SAFE FIX --- */
     .CodeMirror { 
         height: 350px; 
         border: 1px solid #ccc; 
         border-radius: 5px; 
         font-size: 15px; 
         box-sizing: border-box; 
-        line-height: 1 !important; /* Gap ko bilkul zero karne ke liye */
-        margin-top: 12px; 
+        margin-top: 10px; /* Dropdown se gap ke liye */
+        line-height: 1.4; /* Normal, safe spacing */
     }
-    
     .CodeMirror-scroll { 
         max-height: 350px; 
         overflow-y: auto; 
     }
-    
-    .CodeMirror-lines { 
-        padding: 0 !important; 
-    }
-    
-    /* Har ek line ki default spacing aur margin ko force zero karna */
-    .CodeMirror pre.CodeMirror-line, 
-    .CodeMirror pre.CodeMirror-line-like {
-        padding: 0 !important;
-        margin: 0 !important;
-        line-height: 1 !important;
-    }
-    /* ----------------------------------------- */
+    /* Maine yahan se saari vo 0 padding/margin wali line hata di hai jisne layout toda tha */
+    /* -------------------- */
 
     .controls { margin-top: 15px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; background: #f1f8e9; padding: 10px; border-radius: 5px; }
     button { background-color: #2e7d32; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 15px; font-weight: bold; transition: 0.3s; }
