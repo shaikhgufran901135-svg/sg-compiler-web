@@ -50,7 +50,7 @@
         #clearEditorBtn { background-color: #d32f2f; } #clearEditorBtn:hover { background-color: #b71c1c; }
         #copyOutputBtn { background-color: #0288d1; } #copyOutputBtn:hover { background-color: #01579b; }
         
-        #languageSelector { padding: 8px; border-radius: 5px; border: 1px solid #ccc; background-color: #fff; font-size: 15px; cursor: pointer; }
+        #languageSelector { padding: 8px; border-radius: 5px; border: 1px solid #ccc; background-color: #fff; font-size: 15px; cursor: pointer; outline: none; }
         
         /* Output Box ki style */
         pre#outputBox { background:#263238; color: #eceff1; padding:15px; border-radius:6px; height:350px; overflow:auto; white-space: pre-wrap; font-family: 'Consolas', monospace; font-size: 14px; margin: 0; }
@@ -102,6 +102,7 @@
         .dark-mode .ad-modal h3 { color: #80cbc4; } .dark-mode .ad-modal p { color: #ccc; }
         .dark-mode .progress-container { background: #333; border-color: #555; }
         .dark-mode .toast-banner { background-color: #f1f8e9; color: #0b3d0b; }
+        .dark-mode #languageSelector { background-color: #333; color: #fff; border-color: #555; }
     </style>
 </head>
 <body onload="initializeEditor()">
@@ -140,13 +141,13 @@
             
             <select id="languageSelector" onchange="changeLanguage()">
                 <option value="c">C</option>
-                <option value="python" data-locked="true">Python 🔒</option>
-                <option value="java" data-locked="true">Java 🔒</option>
-                <option value="cpp" data-locked="true">C++ 🔒</option>
-                <option value="javascript" data-locked="true">JavaScript 🔒</option>
-                <option value="php" data-locked="true">PHP 🔒</option>
-                <option value="ruby" data-locked="true">Ruby 🔒</option>
-                <option value="go" data-locked="true">Go 🔒</option>
+                <option value="python" data-locked="true">Python ✦</option>
+                <option value="java" data-locked="true">Java ✦</option>
+                <option value="cpp" data-locked="true">C++ ✦</option>
+                <option value="javascript" data-locked="true">JavaScript ✦</option>
+                <option value="php" data-locked="true">PHP ✦</option>
+                <option value="ruby" data-locked="true">Ruby ✦</option>
+                <option value="go" data-locked="true">Go ✦</option>
             </select>
             
             <textarea id="code"></textarea>
@@ -185,7 +186,10 @@
             'python': `# Python Example\nprint("Hello from Python!")\nprint("The actual compiler is working now.")`,
             'java': `// Java Example\nclass Main {\n    public static void main(String[] args) {\n        System.out.println("Hello from Java!");\n    }\n}`,
             'cpp': `#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Hello from Premium C++ Compiler!" << endl;\n    return 0;\n}`,
-            'javascript': `// JavaScript Example\nconsole.log("Hello from Premium JavaScript Compiler!");`
+            'javascript': `// JavaScript Example\nconsole.log("Hello from Premium JavaScript Compiler!");`,
+            'php': `<?php\n// PHP Example\necho "Hello from Premium PHP Compiler!";\n?>`,
+            'ruby': `# Ruby Example\nputs "Hello from Premium Ruby Compiler!"`,
+            'go': `// Go Example\npackage main\nimport "fmt"\nfunc main() {\n    fmt.Println("Hello from Premium Go Compiler!")\n}`
         };
 
         /* =========================================
@@ -223,8 +227,9 @@
             const savedLanguage = localStorage.getItem('selectedLanguage') || 'c';
             const savedUserCode = localStorage.getItem('sgCompilerCode');
             
-            let initialMode = (savedLanguage === 'python') ? 'text/x-python' : 
-                              (savedLanguage === 'java') ? 'text/x-java' : 'text/x-csrc';
+            let initialMode = 'text/x-csrc';
+            if (savedLanguage === 'python') initialMode = 'text/x-python';
+            else if (savedLanguage === 'java') initialMode = 'text/x-java';
 
             // Editor create karna
             codeEditorInstance = CodeMirror.fromTextArea(document.getElementById('code'), {
@@ -274,7 +279,8 @@
         // Ad wala box screen par lana
         function openAdModal(langId, langName) {
             currentlySelectedLockedLang = langId; 
-            document.getElementById('adModalTitle').innerText = "Unlock " + langName.replace(' 🔒', '');
+            // Title mein se '✦' hata kar dikhana
+            document.getElementById('adModalTitle').innerText = "Unlock " + langName.replace(' ✦', '');
             document.getElementById('adModalOverlay').style.display = 'flex';
             updateModalProgress(langId); 
         }
@@ -326,10 +332,10 @@
                 setTimeout(() => { 
                     const selector = document.getElementById('languageSelector');
                     
-                    // Dropdown list mein se lock icon hata do
+                    // Dropdown list mein se '✦' hata kar '✓' (Checkmark) laga dena
                     for (let i = 0; i < selector.options.length; i++) {
                         if (selector.options[i].value === langId) {
-                            selector.options[i].text = selector.options[i].text.replace(' 🔒', ' 🔓');
+                            selector.options[i].text = selector.options[i].text.replace(' ✦', ' ✓');
                             selector.options[i].removeAttribute('data-locked');
                             
                             selector.value = langId; 
@@ -366,7 +372,7 @@
                     openAdModal(selectedLanguage, selectedOption.text);
                 } else {
                     // Agar Website (PC/Chrome) Hai -> Alert Dikhao, Modal MAT Kholo
-                    alert("Premium Feature! 🔒\nThis language can only be unlocked by watching short video ads in the SG Code Compiler App. Please download our Android App from the Play Store!");
+                    alert("Premium Feature! ✦\nThis language can only be unlocked by watching short video ads in the SG Code Compiler App. Please download our Android App from the Play Store!");
                 }
                 // ------------------------------------------
 
