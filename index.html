@@ -304,13 +304,13 @@
 
         // Jab user "Watch Ad" dabaye toh app ko signal bhejna
         function triggerAppAd() {
-            showBanner("Loading Advertisement...", "info");
-            
+            // YAHAN STRICT LOGIC HAI: PC PAR AD NAHI CHALEGA
             if (typeof AndroidApp !== "undefined") {
+                showBanner("Loading Advertisement...", "info");
                 AndroidApp.showRewardedAd(currentlySelectedLockedLang);
             } else {
-                // Agar PC pe test kar rahe hain, toh nakli delay de kar ad simulate karo
-                setTimeout(() => { unlockLanguage(currentlySelectedLockedLang); }, 1500);
+                alert("Please download the SG Code Compiler Android App from Play Store to watch ads and unlock premium languages.");
+                closeAdModal();
             }
         }
 
@@ -359,8 +359,17 @@
             
             // Check karna ki language locked hai ya nahi
             if (selectedOption.getAttribute('data-locked') === 'true') {
-                openAdModal(selectedLanguage, selectedOption.text);
                 
+                // --- STRICT LOGIC: App vs Website Check ---
+                if (typeof AndroidApp !== "undefined") {
+                    // Agar App Hai -> Modal Kholo
+                    openAdModal(selectedLanguage, selectedOption.text);
+                } else {
+                    // Agar Website (PC/Chrome) Hai -> Alert Dikhao, Modal MAT Kholo
+                    alert("Premium Feature! 🔒\nThis language can only be unlocked by watching short video ads in the SG Code Compiler App. Please download our Android App from the Play Store!");
+                }
+                // ------------------------------------------
+
                 // Dropdown ko visually wapas purani language pe set karna taaki onchange reset ho sake
                 selector.value = localStorage.getItem('selectedLanguage') || 'c'; 
                 return;
