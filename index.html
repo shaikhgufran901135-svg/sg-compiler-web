@@ -141,13 +141,13 @@
             
             <select id="languageSelector" onchange="changeLanguage()">
                 <option value="c">C</option>
-                <option value="python" data-locked="true">Python ✦ PRO</option>
-                <option value="java" data-locked="true">Java ✦ PRO</option>
-                <option value="cpp" data-locked="true">C++ ✦ PRO</option>
-                <option value="javascript" data-locked="true">JavaScript ✦ PRO</option>
-                <option value="php" data-locked="true">PHP ✦ PRO</option>
-                <option value="ruby" data-locked="true">Ruby ✦ PRO</option>
-                <option value="go" data-locked="true">Go ✦ PRO</option>
+                <option value="python" data-locked="true">Python ✦ ᴾᴿᴼ</option>
+                <option value="java" data-locked="true">Java ✦ ᴾᴿᴼ</option>
+                <option value="cpp" data-locked="true">C++ ✦ ᴾᴿᴼ</option>
+                <option value="javascript" data-locked="true">JavaScript ✦ ᴾᴿᴼ</option>
+                <option value="php" data-locked="true">PHP ✦ ᴾᴿᴼ</option>
+                <option value="ruby" data-locked="true">Ruby ✦ ᴾᴿᴼ</option>
+                <option value="go" data-locked="true">Go ✦ ᴾᴿᴼ</option>
             </select>
             
             <textarea id="code"></textarea>
@@ -279,8 +279,8 @@
         // Ad wala box screen par lana
         function openAdModal(langId, langName) {
             currentlySelectedLockedLang = langId; 
-            // Title mein se '✦ PRO' hata kar dikhana taaki 'Unlock Python' seedha dikhe
-            document.getElementById('adModalTitle').innerText = "Unlock " + langName.replace(' ✦ PRO', '');
+            // Title mein se '✦ ᴾᴿᴼ' hata kar dikhana taaki 'Unlock Python' seedha dikhe
+            document.getElementById('adModalTitle').innerText = "Unlock " + langName.replace(' ✦ ᴾᴿᴼ', '');
             document.getElementById('adModalOverlay').style.display = 'flex';
             updateModalProgress(langId); 
         }
@@ -332,10 +332,10 @@
                 setTimeout(() => { 
                     const selector = document.getElementById('languageSelector');
                     
-                    // Dropdown list mein se '✦ PRO' hata kar '✓' laga dena
+                    // Dropdown list mein se '✦ ᴾᴿᴼ' hata kar '✓' laga dena
                     for (let i = 0; i < selector.options.length; i++) {
                         if (selector.options[i].value === langId) {
-                            selector.options[i].text = selector.options[i].text.replace(' ✦ PRO', ' ✓');
+                            selector.options[i].text = selector.options[i].text.replace(' ✦ ᴾᴿᴼ', ' ✓');
                             selector.options[i].removeAttribute('data-locked');
                             
                             selector.value = langId; 
@@ -372,7 +372,7 @@
                     openAdModal(selectedLanguage, selectedOption.text);
                 } else {
                     // Agar Website (PC/Chrome) Hai -> Alert Dikhao, Modal MAT Kholo
-                    alert("Premium Feature! ✦ PRO\nThis language can only be unlocked by watching short video ads in the SG Code Compiler App. Please download our Android App from the Play Store!");
+                    alert("Premium Feature! ✦ ᴾᴿᴼ\nThis language can only be unlocked by watching short video ads in the SG Code Compiler App. Please download our Android App from the Play Store!");
                 }
                 // ------------------------------------------
 
