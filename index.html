@@ -105,7 +105,7 @@
         /* =========================================
            5. MODAL BOX (Ad UI) & TOAST BANNER
            ========================================= */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; display: none; justify-content: center; align-items: center; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000; display: none; justify-content: center; align-items: center; }
         .ad-modal { background: #ffffff; padding: 25px; border-radius: 15px; text-align: center; max-width: 320px; width: 90%; box-shadow: 0 5px 25px rgba(0,0,0,0.5); }
         .ad-modal h3 { color: #1b5e20; border: none; padding: 0; margin-bottom: 10px; justify-content: center;}
         .progress-container { background: #e0e0e0; border-radius: 10px; height: 18px; margin: 20px 0; overflow: hidden; border: 1px solid #ccc; }
@@ -387,9 +387,15 @@
             const langName = card.getAttribute('data-name');
             const isLocked = card.getAttribute('data-locked') === 'true';
 
-            // 🚀 YAHAN DIRECT POPUP KHULEGA SAARE PRO MODELS KE LIYE
             if (isLocked) {
-                openAdModal(langId, langName);
+                // 🚀 AD WALA DABBA KHULNE SE PEHLE PICHE WALI LIST BAND HO JAYEGI
+                closeLangSheet();
+                
+                if (typeof AndroidApp !== "undefined") {
+                    openAdModal(langId, langName);
+                } else {
+                    alert("Premium Feature! ✦ ᴾᴿᴼ\nThis language can only be unlocked by watching short video ads in the SG Code Compiler App. Please download our Android App from the Play Store!");
+                }
                 return;
             }
 
