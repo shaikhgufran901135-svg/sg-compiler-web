@@ -387,12 +387,9 @@
             const langName = card.getAttribute('data-name');
             const isLocked = card.getAttribute('data-locked') === 'true';
 
+            // 🚀 YAHAN DIRECT POPUP KHULEGA SAARE PRO MODELS KE LIYE
             if (isLocked) {
-                if (typeof AndroidApp !== "undefined") {
-                    openAdModal(langId, langName);
-                } else {
-                    alert("Premium Feature! ✦ ᴾᴿᴼ\nThis language can only be unlocked by watching short video ads in the SG Code Compiler App. Please download our Android App from the Play Store!");
-                }
+                openAdModal(langId, langName);
                 return;
             }
 
