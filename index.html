@@ -1,478 +1,546 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SG Code Compiler - Practice & Demo Tool</title>
-  
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/material-darker.min.css"> 
-  
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SG AI Chat - Premium Features</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    
     <style>
-        /* =========================================
-           1. BASIC LAYOUT & DESIGN
-           ========================================= */
-        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #e8f5e9; color: #0b3d0b; }
-        
-        header { 
-            background-color: #2e7d32; padding: 15px; display: flex; justify-content: space-between; 
-            align-items: center; color: white; font-size: 24px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
-        }
-        
-        .container { display: flex; flex-wrap: wrap; padding: 20px; gap: 20px; max-width: 1200px; margin: 0 auto; }
-        
-        /* Editor aur Output box ki styling */
-        .editor, .output { flex: 1 1 450px; background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); min-width: 300px; }
-        h3 { margin-top: 0; color: #1b5e20; border-bottom: 2px solid #a5d6a7; padding-bottom: 10px; }
-
-        /* =========================================
-           2. CODEMIRROR FIXES (Editor ki lines theek karne ke liye)
-           ========================================= */
-        .CodeMirror { height: 350px; border: 1px solid #ccc; border-radius: 5px; font-size: 15px; box-sizing: border-box; margin-top: 10px; }
-        .CodeMirror-scroll { max-height: 350px; overflow-y: auto; }
-        .CodeMirror pre.CodeMirror-line, .CodeMirror pre.CodeMirror-line-like {
-            line-height: 1.5 !important;  
-            padding: 0 4px !important;    
-            margin: 0 !important;         
+        :root {
+            --bg-body: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --bg-container: rgba(255, 255, 255, 0.95);
+            --text-main: #333;
+            --bg-header: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --text-header: white;
+            --bg-messages: #f8f9fa;
+            --bg-ai-msg: white;
+            --text-ai-msg: #333;
+            --border-ai: 1px solid #e0e0e0;
+            --shadow-ai: 0 2px 10px rgba(0,0,0,0.05);
+            --bg-input-area: white;
+            --border-input-area: 1px solid #eee;
+            --bg-input: white;
+            --text-input: #333;
+            --border-input: 2px solid #e0e0e0;
+            --bg-selector: rgba(255, 255, 255, 0.9);
+            --text-selector: #4facfe;
+            --typing-text: #666;
+            --user-msg-bg: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         }
 
-        /* =========================================
-           3. BUTTONS & CONTROLS
-           ========================================= */
-        .controls { margin-top: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: #f1f8e9; padding: 10px; border-radius: 5px; }
-        button { background-color: #2e7d32; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 15px; font-weight: bold; transition: 0.3s; }
-        button:hover { background-color: #1b5e20; }
-        
-        /* Specific Button Colors */
-        #darkModeToggle { background-color: #fdd835; color: #000; padding: 8px 15px; font-size: 14px; }
-        #darkModeToggle:hover { background-color: #fbc02d; }
-        #resetDefaultBtn { background-color: #fbc02d; } #resetDefaultBtn:hover { background-color: #f9a825; }
-        #clearEditorBtn { background-color: #d32f2f; } #clearEditorBtn:hover { background-color: #b71c1c; }
-        #copyOutputBtn { background-color: #0288d1; } #copyOutputBtn:hover { background-color: #01579b; }
-        
-        #languageSelector { padding: 8px; border-radius: 5px; border: 1px solid #ccc; background-color: #fff; font-size: 15px; cursor: pointer; outline: none; }
-        
-        /* Output Box ki style */
-        pre#outputBox { background:#263238; color: #eceff1; padding:15px; border-radius:6px; height:350px; overflow:auto; white-space: pre-wrap; font-family: 'Consolas', monospace; font-size: 14px; margin: 0; }
+        [data-theme="dark"] {
+            --bg-body: linear-gradient(135deg, #1a1c24 0%, #2d3436 100%);
+            --bg-container: rgba(30, 30, 30, 0.95);
+            --text-main: #e0e0e0;
+            --bg-header: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            --text-header: #ecf0f1;
+            --bg-messages: #121212;
+            --bg-ai-msg: transparent;
+            --text-ai-msg: #e0e0e0;
+            --border-ai: none; 
+            --shadow-ai: none;
+            --bg-input-area: #1e1e1e;
+            --border-input-area: 1px solid #333;
+            --bg-input: #2c2c2c;
+            --text-input: #e0e0e0;
+            --border-input: 2px solid #444;
+            --bg-selector: rgba(30, 30, 30, 0.9);
+            --text-selector: #3498db;
+            --typing-text: #aaa;
+            --user-msg-bg: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
 
-        /* =========================================
-           4. MODAL BOX (Popup UI)
-           ========================================= */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        html, body { overscroll-behavior-y: none; }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: var(--bg-body); height: 100vh; display: flex; 
+            justify-content: center; align-items: center; color: var(--text-main);
+            transition: background 0.5s ease;
+            overflow: hidden; 
+        }
+        
+        .chat-container {
+            width: 90%; max-width: 800px; height: 90vh;
+            background: var(--bg-container); border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            display: flex; flex-direction: column; overflow: hidden; position: relative;
+            transform: translateZ(0); 
+        }
+        
+        .chat-header {
+            background: var(--bg-header); color: var(--text-header);
+            padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); 
+            display: flex; justify-content: space-between; align-items: center; z-index: 10;
+        }
+
+        .title-and-profile { display: flex; align-items: center; gap: 10px; }
+        .profile-pic {
+            width: 40px; height: 40px; border-radius: 50%; background: white;
+            display: flex; justify-content: center; align-items: center; font-size: 24px;
+        }
+        .title-text { display: flex; flex-direction: column; text-align: left; }
+        .title-text h1 { font-size: 1.2rem; margin: 0; font-weight: bold; }
+        .title-text p { font-size: 0.8rem; margin: 0; opacity: 0.9; }
+        
+        .header-controls { display: flex; gap: 8px; align-items: center; }
+        .theme-btn {
+            background: var(--bg-selector); border: 1px solid var(--border-input);
+            border-radius: 50%; width: 38px; height: 38px; cursor: pointer;
+            display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        /* 🚀 NAYA CUSTOM DROPDOWN BUTTON UI */
+        .custom-select-btn {
+            background: var(--bg-selector); padding: 8px 12px;
+            border-radius: 15px; border: 1px solid var(--border-input);
+            font-weight: bold; color: var(--text-selector); cursor: pointer;
+            display: flex; align-items: center; gap: 5px; font-size: 0.9rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s;
+        }
+        .custom-select-btn:active { transform: scale(0.95); }
+
+        .messages { 
+            flex: 1; padding: 20px; overflow-y: scroll; background: var(--bg-messages); 
+            scroll-behavior: smooth; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain;
+        }
+        
+        .message { margin-bottom: 20px; display: flex; animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .message.user { justify-content: flex-end; }
+        .message.ai { justify-content: flex-start; width: 100%; align-items: flex-start; gap: 10px; }
+        .ai-icon { font-size: 1.3rem; margin-top: 8px; flex-shrink: 0; }
+        
+        .message-content { max-width: 75%; padding: 15px 20px; border-radius: 20px; line-height: 1.5; word-wrap: break-word; }
+        .user .message-content { background: var(--user-msg-bg); color: white; border-bottom-right-radius: 5px; }
+        .ai .message-content { background: transparent; color: var(--text-ai-msg); border: none; max-width: 100%; width: 100%; padding: 10px 0px; box-shadow: none; }
+
+        .message-content pre {
+            background: #282c34; border-radius: 10px; padding: 15px; padding-top: 35px;
+            margin: 10px 0; overflow-x: auto; position: relative; max-width: 100%; box-sizing: border-box;
+        }
+        .message-content pre code { font-family: 'Consolas', 'Courier New', Courier, monospace; font-size: 0.9rem; color: #abb2bf; }
+        .copy-code-btn {
+            position: absolute; top: 8px; right: 8px; background: #4facfe; color: white; border: none;
+            border-radius: 5px; padding: 4px 10px; font-size: 0.75rem; cursor: pointer; font-weight: bold; transition: 0.2s;
+        }
+        .copy-code-btn:hover { background: #00f2fe; }
+        .message-content p { margin-bottom: 10px; }
+        .message-content p:last-child { margin-bottom: 0; }
+        
+        .typing-indicator { display: none; padding: 15px 20px; color: var(--typing-text); font-style: italic; background: var(--bg-messages); align-items: center; }
+        .typing-indicator::after {
+            content: ''; display: inline-block; width: 18px; height: 18px;
+            border: 2px solid #555; border-radius: 50%; border-top-color: #3498db; animation: spin 1s linear infinite; margin-left: 10px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .input-area { padding: 20px; background: var(--bg-input-area); border-top: var(--border-input-area); display: flex; gap: 10px; flex-direction: column;}
+        .input-row { display: flex; gap: 10px; width: 100%; }
+        #messageInput { flex: 1; padding: 15px 20px; background: var(--bg-input); color: var(--text-input); border: var(--border-input); border-radius: 25px; outline: none; }
+        #sendBtn { padding: 15px 25px; background: var(--user-msg-bg); color: white; border: none; border-radius: 25px; cursor: pointer; }
+        
+        .chat-counter { font-size: 0.8rem; color: #e74c3c; font-weight: bold; text-align: right; padding-right: 10px; display: none; }
+
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); z-index: 1000;
-            display: none; justify-content: center; align-items: center;
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); z-index: 1000; justify-content: center; align-items: center; flex-direction: column;
         }
-        .ad-modal { background: #ffffff; padding: 25px; border-radius: 10px; text-align: center; max-width: 320px; width: 90%; box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
-        .ad-modal h3 { color: #1b5e20; border: none; padding: 0; margin-bottom: 10px; }
-        
-        /* Progress Bar ki designing */
-        .progress-container { background: #e0e0e0; border-radius: 10px; height: 18px; margin: 20px 0; overflow: hidden; border: 1px solid #ccc; }
-        .progress-bar { background: #fbc02d; height: 100%; width: 0%; transition: width 0.4s ease; }
-        
-        .modal-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
-        .modal-buttons button { font-size: 14px; padding: 10px 15px; }
-        .cancel-btn { background-color: #d32f2f !important; } .cancel-btn:hover { background-color: #b71c1c !important; }
-
-        /* =========================================
-           5. TOAST BANNER (Upar se aane wala message)
-           ========================================= */
-        .toast-banner {
-            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-            background-color: #333; color: #fff; padding: 12px 24px; border-radius: 30px;
-            font-size: 14px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            display: flex; align-items: center; gap: 10px; z-index: 9999;
-            transition: top 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        .ad-modal { background: var(--bg-container); padding: 30px; border-radius: 20px; text-align: center; max-width: 80%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .ad-modal h2 { margin-bottom: 10px; color: var(--text-main); }
+        .ad-modal p { margin-bottom: 20px; color: var(--typing-text); }
+        .ad-progress { font-size: 1.2rem; font-weight: bold; color: #3498db; margin-bottom: 20px; }
+        .watch-ad-btn {
+            background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%); color: white;
+            border: none; padding: 12px 24px; border-radius: 25px; font-size: 1.1rem; cursor: pointer; font-weight: bold;
         }
-        .toast-banner.show { top: 20px; }
-        .toast-success { border-left: 4px solid #4CAF50; }
-        .toast-info { border-left: 4px solid #2196F3; }
+        .cancel-btn { background: none; border: none; color: #e74c3c; margin-top: 15px; cursor: pointer; text-decoration: underline; }
 
-        /* =========================================
-           6. DARK MODE COLORS
-           ========================================= */
-        .dark-mode { background-color: #121212 !important; color: #e0e0e0 !important; }
-        .dark-mode header { background-color: #004d40; color: #fff; }
-        .dark-mode .editor, .dark-mode .output { background: #1e1e1e; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        .dark-mode h3 { color: #80cbc4; border-bottom: 2px solid #004d40; }
-        .dark-mode .controls { background: #212121; }
-        .dark-mode button { background-color: #00695c; } .dark-mode button:hover { background-color: #00897b; }
-        .dark-mode #darkModeToggle { background-color: #64dd17; color: #000; } .dark-mode #darkModeToggle:hover { background-color: #76ff03; }
-        .dark-mode .ad-modal { background: #1e1e1e; border: 1px solid #333; }
-        .dark-mode .ad-modal h3 { color: #80cbc4; } .dark-mode .ad-modal p { color: #ccc; }
-        .dark-mode .progress-container { background: #333; border-color: #555; }
-        .dark-mode .toast-banner { background-color: #f1f8e9; color: #0b3d0b; }
-        .dark-mode #languageSelector { background-color: #333; color: #fff; border-color: #555; }
+        /* 🚀 NAYA BOTTOM SHEET UI (Premium Menu) */
+        .bottom-sheet-overlay {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5); z-index: 900; align-items: flex-end; opacity: 0; transition: opacity 0.3s;
+        }
+        .bottom-sheet {
+            background: var(--bg-container); width: 100%; border-radius: 25px 25px 0 0;
+            padding: 20px 20px 30px 20px; box-shadow: 0 -5px 25px rgba(0,0,0,0.2);
+            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex; flex-direction: column; max-height: 80%;
+        }
+        .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-input); }
+        .sheet-header h3 { color: var(--text-main); margin: 0; font-size: 1.2rem; }
+        .close-sheet { font-size: 1.5rem; color: var(--typing-text); cursor: pointer; background: none; border: none; }
+        .persona-list { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; padding-right: 5px; }
+        
+        .persona-option {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--bg-messages); padding: 15px; border-radius: 15px;
+            cursor: pointer; border: 2px solid transparent; transition: 0.2s;
+        }
+        .persona-option:active { transform: scale(0.98); }
+        .persona-option.active { border-color: #3498db; background: rgba(52, 152, 219, 0.1); }
+        .persona-info { display: flex; align-items: center; gap: 12px; font-weight: bold; color: var(--text-main); font-size: 1rem; }
+        .lock-icon { color: #f1c40f; font-size: 1.1rem; }
+
+        @media (max-width: 600px) { .chat-container { width: 95%; height: 95vh; } .chat-header h1 { font-size: 1.1rem; } }
     </style>
 </head>
-<body onload="initializeEditor()">
-
-    <div id="toastBanner" class="toast-banner">
-        <span id="toastIcon">✅</span>
-        <span id="toastText">Message goes here</span>
-    </div>
-
-    <div id="adModalOverlay" class="modal-overlay">
-        <div class="ad-modal">
-            <h3 id="adModalTitle">Unlock Language</h3>
-            <p style="font-size: 14px; margin: 0;">Watch 3 short video ads to unlock this premium language forever!</p>
-            
-            <div class="progress-container">
-                <div id="adProgressBar" class="progress-bar"></div>
-            </div>
-            
-            <p id="adModalStatus" style="font-weight: bold; color: #d32f2f;">Ads Watched: 0 / 3</p>
-            
-            <div class="modal-buttons">
-                <button id="watchAdBtn" onclick="triggerAppAd()">🎥 Watch Ad</button>
-                <button class="cancel-btn" onclick="closeAdModal()">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <header>
-        <span>SG Code Compiler</span>
-        <button id="darkModeToggle" onclick="toggleDarkMode()">☀️ Light</button> 
-    </header>
-
-    <div class="container">
-        <div class="editor">
-            <h3>Write Your Code</h3>
-            
-            <select id="languageSelector" onchange="changeLanguage()">
-                <option value="c">C</option>
-                <option value="python" data-locked="true">Python ✦ ᴾᴿᴼ</option>
-                <option value="java" data-locked="true">Java ✦ ᴾᴿᴼ</option>
-                <option value="cpp" data-locked="true">C++ ✦ ᴾᴿᴼ</option>
-                <option value="javascript" data-locked="true">JavaScript ✦ ᴾᴿᴼ</option>
-                <option value="php" data-locked="true">PHP ✦ ᴾᴿᴼ</option>
-                <option value="ruby" data-locked="true">Ruby ✦ ᴾᴿᴼ</option>
-                <option value="go" data-locked="true">Go ✦ ᴾᴿᴼ</option>
-            </select>
-            
-            <textarea id="code"></textarea>
-
-            <div class="controls">
-                <button onclick="runCode()">▶ Run Code</button>
-                <button onclick="clearOutput()">Clear Output</button>
-                <button id="resetDefaultBtn" onclick="resetDefaultCode()">🔄 Reset Default</button> 
-                <button id="clearEditorBtn" onclick="clearEditor()">Clear Editor</button>
-            </div>
-            <p style="font-size:12px; color: #1b5e20; margin-top: 5px;">*Code is saved automatically in your browser.</p>
-        </div>
-
-        <div class="output">
-            <h3>Output</h3>
-            <pre id="outputBox">(Output will appear here)</pre>
-            <button id="copyOutputBtn" onclick="copyOutput()">📋 Copy Output</button>
-        </div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/clike/clike.min.js"></script> 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/python/python.min.js"></script> 
-  
-    <script>
-        /* =========================================
-           GLOBAL VARIABLES & DEFAULT CODES
-           ========================================= */
-        let codeEditorInstance; // Editor ka control sambhalne ke liye
-        let adWatchCounts = {}; // Kitne ads dekhe uska record
-        const REQUIRED_ADS_TO_UNLOCK = 3; // Unlock karne ke liye 3 ads zaroori hain
-        let currentlySelectedLockedLang = ""; // Abhi kaunsi locked language select ki hai
+<body data-theme="dark">
+    <div class="chat-container">
         
-        const defaultCodeExamples = {
-            'c': `#include <stdio.h>\n\nint main() {\n    int num = 10;\n    printf("Hello from C compiler! The number is %d.\\n", num);\n    return 0;\n}`,
-            'python': `# Python Example\nprint("Hello from Python!")\nprint("The actual compiler is working now.")`,
-            'java': `// Java Example\nclass Main {\n    public static void main(String[] args) {\n        System.out.println("Hello from Java!");\n    }\n}`,
-            'cpp': `#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Hello from Premium C++ Compiler!" << endl;\n    return 0;\n}`,
-            'javascript': `// JavaScript Example\nconsole.log("Hello from Premium JavaScript Compiler!");`,
-            'php': `<?php\n// PHP Example\necho "Hello from Premium PHP Compiler!";\n?>`,
-            'ruby': `# Ruby Example\nputs "Hello from Premium Ruby Compiler!"`,
-            'go': `// Go Example\npackage main\nimport "fmt"\nfunc main() {\n    fmt.Println("Hello from Premium Go Compiler!")\n}`
+        <div class="modal-overlay" id="adModalOverlay">
+            <div class="ad-modal">
+                <h2 id="modalTitle">Unlock Premium Mode 🔒</h2>
+                <p>Watch 3 short ads to get 5 FREE chats with this premium AI persona!</p>
+                <div class="ad-progress" id="adProgressText">Ads Watched: 0 / 3</div>
+                <button class="watch-ad-btn" onclick="watchAd()">🎬 Watch Ad Now</button>
+                <br>
+                <button class="cancel-btn" onclick="cancelAd()">Cancel & Go Back</button>
+            </div>
+        </div>
+
+        <div class="bottom-sheet-overlay" id="personaSheetOverlay" onclick="closeSheet()">
+            <div class="bottom-sheet" id="personaSheet" onclick="event.stopPropagation()">
+                <div class="sheet-header">
+                    <h3>Select AI Persona</h3>
+                    <button class="close-sheet" onclick="closeSheet()">×</button>
+                </div>
+                <div class="persona-list">
+                    <div class="persona-option active" onclick="handlePersonaClick('general')">
+                        <div class="persona-info">🤖 General Assistant</div>
+                    </div>
+                    <div class="persona-option" onclick="handlePersonaClick('friendly')">
+                        <div class="persona-info">💖 Bestie</div> <div class="lock-icon">🔒</div>
+                    </div>
+                    <div class="persona-option" onclick="handlePersonaClick('professional')">
+                        <div class="persona-info">💼 Professional</div>
+                    </div>
+                    <div class="persona-option" onclick="handlePersonaClick('coder')">
+                        <div class="persona-info">&lt;/&gt; Code Helper</div> <div class="lock-icon">🔒</div>
+                    </div>
+                    <div class="persona-option" onclick="handlePersonaClick('teacher')">
+                        <div class="persona-info">🎓 Teacher Mode</div> <div class="lock-icon">🔒</div>
+                    </div>
+                    <div class="persona-option" onclick="handlePersonaClick('funny')">
+                        <div class="persona-info">😂 Funny Bot</div> <div class="lock-icon">🔒</div>
+                    </div>
+                    <div class="persona-option" onclick="handlePersonaClick('motivator')">
+                        <div class="persona-info">🏆 Motivator</div> <div class="lock-icon">🔒</div>
+                    </div>
+                    <div class="persona-option" onclick="handlePersonaClick('shayari')">
+                        <div class="persona-info">🪶 Shayari Mode</div> <div class="lock-icon">🔒</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-header">
+            <div class="title-and-profile">
+                <div class="profile-pic">🤖</div>
+                <div class="title-text">
+                    <h1>SG AI</h1>
+                    <p>Talk about anything!</p>
+                </div>
+            </div>
+            
+            <div class="header-controls">
+                <button id="themeToggle" class="theme-btn" onclick="toggleTheme()">☀️</button>
+                <div id="currentPersonaBtn" class="custom-select-btn" onclick="openSheet()">
+                    🤖 General Assistant ▾
+                </div>
+            </div>
+        </div>
+        
+        <div class="messages" id="messages">
+            <div class="message ai">
+                <div class="ai-icon">✨</div>
+                <div class="message-content">
+                    👋 Hi! I'm SG AI Assistant. How can I help you today?
+                </div>
+            </div>
+        </div>
+        
+        <div class="typing-indicator" id="typingIndicator">SG AI is typing...</div>
+        
+        <div class="input-area">
+            <div class="chat-counter" id="chatCounter">Premium Chats Left: 5</div>
+            <div class="input-row">
+                <input type="text" id="messageInput" placeholder="Type your message here..." autocomplete="off">
+                <button id="sendBtn" onclick="sendMessage()">Send 🚀</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data mappings for UI
+        const personaDisplayNames = {
+            'general': '🤖 General Assistant',
+            'friendly': '💖 Bestie',
+            'professional': '💼 Professional',
+            'coder': '&lt;/&gt; Code Helper',
+            'teacher': '🎓 Teacher Mode',
+            'funny': '😂 Funny Bot',
+            'motivator': '🏆 Motivator',
+            'shayari': '🪶 Shayari Mode'
         };
 
-        /* =========================================
-           UI & THEME FUNCTIONS
-           ========================================= */
-        
-        // Dark Mode switch karne ka logic
-        function toggleDarkMode() {
-            const body = document.body;
-            const toggleBtn = document.getElementById('darkModeToggle');
-            body.classList.toggle('dark-mode');
+        const premiumModes = ['friendly', 'coder', 'teacher', 'funny', 'motivator', 'shayari'];
+        let previousPersona = 'general';
+        let currentPersona = 'general';
+        let modeTryingToUnlock = '';
+        let adsWatchedCount = 0;
+        let freePremiumChatsLeft = parseInt(localStorage.getItem('premiumChats')) || 0;
+
+        // Bottom Sheet Logic
+        const sheetOverlay = document.getElementById('personaSheetOverlay');
+        const sheet = document.getElementById('personaSheet');
+        const btnText = document.getElementById('currentPersonaBtn');
+
+        function openSheet() {
+            sheetOverlay.style.display = 'flex';
+            setTimeout(() => {
+                sheetOverlay.style.opacity = '1';
+                sheet.style.transform = 'translateY(0)';
+            }, 10);
             
-            if (body.classList.contains('dark-mode')) {
-                toggleBtn.innerText = '🌙 Dark';
-                localStorage.setItem('darkModeEnabled', 'true'); // Browser mein save karna
-            } else {
-                toggleBtn.innerText = '☀️ Light';
-                localStorage.removeItem('darkModeEnabled');
-            }
-        }
-
-        // App start hone par Editor setup karna
-        function initializeEditor() {
-            // Check if user previously had dark mode on
-            if (localStorage.getItem('darkModeEnabled') === 'true') {
-                document.body.classList.add('dark-mode');
-                document.getElementById('darkModeToggle').innerText = '🌙 Dark';
-            }
-            
-            // Android App se connect karne ki koshish (agar app mein chal raha hai)
-            if (typeof AndroidApp !== "undefined") {
-                AndroidApp.checkLanguageStatus(); 
-            }
-
-            const savedLanguage = localStorage.getItem('selectedLanguage') || 'c';
-            const savedUserCode = localStorage.getItem('sgCompilerCode');
-            
-            let initialMode = 'text/x-csrc';
-            if (savedLanguage === 'python') initialMode = 'text/x-python';
-            else if (savedLanguage === 'java') initialMode = 'text/x-java';
-
-            // Editor create karna
-            codeEditorInstance = CodeMirror.fromTextArea(document.getElementById('code'), {
-                mode: initialMode, 
-                theme: 'material-darker',     
-                lineNumbers: true,    
-                indentUnit: 4,        
-                tabSize: 4,
-                indentWithTabs: true,
-                electricChars: true,
-                matchBrackets: true,
-                autoCloseBrackets: true,
-            });
-
-            // Purana code ya default code load karna
-            codeEditorInstance.setValue(savedUserCode || defaultCodeExamples[savedLanguage] || defaultCodeExamples['c']); 
-            
-            // Jab bhi user type kare, code save karo
-            codeEditorInstance.on('change', saveUserCodeLocally);
-            document.getElementById('languageSelector').value = savedLanguage;
-        }
-
-        // Upar se slide hone wala Message Banner
-        function showBanner(message, type = 'info') {
-            const banner = document.getElementById('toastBanner');
-            const text = document.getElementById('toastText');
-            const icon = document.getElementById('toastIcon');
-
-            text.innerText = message;
-            
-            if(type === 'success') {
-                icon.innerText = "🎉";
-                banner.className = "toast-banner toast-success show";
-            } else {
-                icon.innerText = "ℹ️";
-                banner.className = "toast-banner toast-info show";
-            }
-
-            // 3 second baad banner ko wapas hide kar do
-            setTimeout(() => { banner.className = "toast-banner"; }, 3000);
-        }
-        
-        /* =========================================
-           AD MODAL & UNLOCK SYSTEM
-           ========================================= */
-        
-        // Ad wala box screen par lana
-        function openAdModal(langId, langName) {
-            currentlySelectedLockedLang = langId; 
-            // Title mein se '✦ ᴾᴿᴼ' hata kar dikhana taaki 'Unlock Python' seedha dikhe
-            document.getElementById('adModalTitle').innerText = "Unlock " + langName.replace(' ✦ ᴾᴿᴼ', '');
-            document.getElementById('adModalOverlay').style.display = 'flex';
-            updateModalProgress(langId); 
-        }
-
-        // Ad wala box band karna
-        function closeAdModal() {
-            document.getElementById('adModalOverlay').style.display = 'none';
-            currentlySelectedLockedLang = "";
-        }
-
-        // Progress bar (0/3, 1/3) ko update karna
-        function updateModalProgress(langId) {
-            let count = adWatchCounts[langId] || 0;
-            let statusText = document.getElementById('adModalStatus');
-            
-            statusText.innerText = `Ads Watched: ${count} / ${REQUIRED_ADS_TO_UNLOCK}`;
-            
-            // Bar ka width set karna (percentage mein)
-            let percentage = (count / REQUIRED_ADS_TO_UNLOCK) * 100;
-            document.getElementById('adProgressBar').style.width = percentage + "%";
-
-            // Color coding: 0 (Red), 1-2 (Orange), 3 (Green)
-            if(count === 0) statusText.style.color = "#d32f2f"; 
-            else if(count < 3) statusText.style.color = "#f57f17"; 
-            else statusText.style.color = "#2e7d32"; 
-        }
-
-        // Jab user "Watch Ad" dabaye toh app ko signal bhejna
-        function triggerAppAd() {
-            // YAHAN STRICT LOGIC HAI: PC PAR AD NAHI CHALEGA
-            if (typeof AndroidApp !== "undefined") {
-                showBanner("Loading Advertisement...", "info");
-                AndroidApp.showRewardedAd(currentlySelectedLockedLang);
-            } else {
-                alert("Please download the SG Code Compiler Android App from Play Store to watch ads and unlock premium languages.");
-                closeAdModal();
-            }
-        }
-
-        // Jab user ad poora dekh le, tab yeh function chalega
-        function unlockLanguage(langId) {
-            if (!adWatchCounts[langId]) adWatchCounts[langId] = 0;
-            
-            adWatchCounts[langId]++;
-            updateModalProgress(langId);
-
-            // Agar 3 ads poore ho gaye
-            if (adWatchCounts[langId] >= REQUIRED_ADS_TO_UNLOCK) {
-                setTimeout(() => { 
-                    const selector = document.getElementById('languageSelector');
-                    
-                    // Dropdown list mein se '✦ ᴾᴿᴼ' hata kar '✓' laga dena
-                    for (let i = 0; i < selector.options.length; i++) {
-                        if (selector.options[i].value === langId) {
-                            selector.options[i].text = selector.options[i].text.replace(' ✦ ᴾᴿᴼ', ' ✓');
-                            selector.options[i].removeAttribute('data-locked');
-                            
-                            selector.value = langId; 
-                            changeLanguage(); // Ab finally language change kar do
-                            break;
-                        }
-                    }
-                    closeAdModal();
-                    showBanner("Premium Language Unlocked!", "success");
-                }, 500); 
-            } else {
-                // Agar abhi aur ads dekhne baaki hain
-                let remaining = REQUIRED_ADS_TO_UNLOCK - adWatchCounts[langId];
-                showBanner(`Ad Watched! ${remaining} more needed.`, "info");
-            }
-        }
-
-        /* =========================================
-           CORE COMPILER FUNCTIONS
-           ========================================= */
-
-        // Language change hone par Editor update karna
-        function changeLanguage() {
-            const selector = document.getElementById('languageSelector');
-            const selectedLanguage = selector.value;
-            const selectedOption = selector.options[selector.selectedIndex];
-            
-            // Check karna ki language locked hai ya nahi
-            if (selectedOption.getAttribute('data-locked') === 'true') {
-                
-                // --- STRICT LOGIC: App vs Website Check ---
-                if (typeof AndroidApp !== "undefined") {
-                    // Agar App Hai -> Modal Kholo
-                    openAdModal(selectedLanguage, selectedOption.text);
-                } else {
-                    // Agar Website (PC/Chrome) Hai -> Alert Dikhao, Modal MAT Kholo
-                    alert("Premium Feature! ✦ ᴾᴿᴼ\nThis language can only be unlocked by watching short video ads in the SG Code Compiler App. Please download our Android App from the Play Store!");
+            // Highlight active option
+            document.querySelectorAll('.persona-option').forEach(opt => {
+                opt.classList.remove('active');
+                if(opt.getAttribute('onclick').includes(`'${currentPersona}'`)) {
+                    opt.classList.add('active');
                 }
-                // ------------------------------------------
+            });
+        }
 
-                // Dropdown ko visually wapas purani language pe set karna taaki onchange reset ho sake
-                selector.value = localStorage.getItem('selectedLanguage') || 'c'; 
+        function closeSheet() {
+            sheetOverlay.style.opacity = '0';
+            sheet.style.transform = 'translateY(100%)';
+            setTimeout(() => { sheetOverlay.style.display = 'none'; }, 300);
+        }
+
+        function handlePersonaClick(selectedMode) {
+            closeSheet();
+            
+            if (selectedMode === currentPersona) return; // Ignore if already selected
+            
+            if (!premiumModes.includes(selectedMode)) {
+                switchMode(selectedMode);
                 return;
             }
 
-            // Syntax highlighting mode aur default code set karna
-            let mode = 'text/x-csrc';
-            if (selectedLanguage === 'python') mode = 'text/x-python';
-            else if (selectedLanguage === 'java') mode = 'text/x-java';
+            if (premiumModes.includes(selectedMode) && freePremiumChatsLeft > 0) {
+                switchMode(selectedMode);
+                return; 
+            }
+
+            // Requires Ad Unlock
+            modeTryingToUnlock = selectedMode;
+            adsWatchedCount = 0;
+            document.getElementById('adProgressText').innerText = `Ads Watched: 0 / 3`;
             
-            codeEditorInstance.setOption('mode', mode);
-            codeEditorInstance.setValue(defaultCodeExamples[selectedLanguage] || defaultCodeExamples['c']); 
-            localStorage.setItem('selectedLanguage', selectedLanguage); 
+            // Strip HTML like &lt;/&gt; for the alert title
+            let rawTitle = personaDisplayNames[selectedMode].replace(/&lt;\/&gt;/g, '</>').replace(/[^a-zA-Z \u00a9-\u02ff\u1d00-\u1d7f\u2100-\u214f\u2600-\u26ff\u2700-\u27bf\u2800-\u28ff\u2b00-\u2bff\u2c00-\u2cff\u2d00-\u2dff\u2e00-\u2eff\u3000-\u303f\u31c0-\u31ef\u3200-\u32ff\u3300-\u33ff\u3400-\u4dbf\u4dc0-\u4dff\u4e00-\u9fff\ua000-\ua48f\ua490-\ua4cf\uf900-\ufaff\ufe30-\ufe4f\ufe50-\ufe6f\ufe70-\ufeff\uff00-\uffef\U0001f000-\U0001f02f\U0001f030-\U0001f09f\U0001f0a0-\U0001f0ff\U0001f100-\U0001f1ff\U0001f200-\U0001f2ff\U0001f300-\U0001f5ff\U0001f600-\U0001f64f\U0001f650-\U0001f67f\U0001f680-\U0001f6ff\U0001f700-\U0001f77f\U0001f780-\U0001f7ff\U0001f800-\U0001f8ff\U0001f900-\U0001f9ff\U0001fa00-\U0001fa6f\U0001fa70-\U0001faff\U0001fb00-\U0001fbff]/g, "").trim();
+            document.getElementById('modalTitle').innerText = `Unlock ${rawTitle} 🔒`;
+            document.getElementById('adModalOverlay').style.display = 'flex';
         }
 
-        // User ka code browser cache mein save karna
-        function saveUserCodeLocally() {
-            const currentText = codeEditorInstance.getValue(); 
-            localStorage.setItem('sgCompilerCode', currentText);
+        // Rest of your logic
+        function resetAdButton() {
+            let btn = document.querySelector('.watch-ad-btn');
+            if (btn) { btn.innerText = "🎬 Watch Ad Now"; btn.disabled = false; }
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeBtn = document.getElementById('themeToggle');
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme'); themeBtn.innerHTML = '🌙'; 
+            } else {
+                body.setAttribute('data-theme', 'dark'); themeBtn.innerHTML = '☀️';
+            }
+        }
+
+        const messagesEl = document.getElementById('messages');
+        const inputEl = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const typingEl = document.getElementById('typingIndicator');
+        const adModalOverlay = document.getElementById('adModalOverlay');
+        const chatCounter = document.getElementById('chatCounter');
+        
+        const personas = {
+            general: "🤖 You are a helpful AI assistant named SG AI. STRICT RULE: Always reply in the EXACT SAME LANGUAGE as the user's prompt (e.g., if the user types in Hinglish/Roman Hindi, reply in Hinglish. If English, reply in English).",
+            friendly: "💖 You are a close, casual, and highly adaptable best friend (Bestie) named SG AI. STRICT RULES: 1. MIRROR THE USER'S VIBE: If funny, be hilarious. If romantic, respond playfully. If sad, be comforting. 2. Always reply in the EXACT SAME LANGUAGE as the user. 3. Use emojis naturally! 😊",
+            professional: "💼 You are a formal, professional consultant named SG AI. STRICT RULE: Always reply in the EXACT SAME LANGUAGE as the user.",
+            coder: "💻 You are an expert programmer. STRICT RULE: Explain code clearly and always reply in the EXACT SAME LANGUAGE as the user's prompt.",
+            teacher: "🎓 You are a patient, encouraging teacher. STRICT RULE: Explain concepts step-by-step and always reply in the EXACT SAME LANGUAGE as the user's prompt.",
+            funny: "😂 You are a hilarious stand-up comedian AI. STRICT RULE: Make jokes and always reply in the EXACT SAME LANGUAGE as the user's prompt.",
+            motivator: "🏆 You are an energetic motivational coach. STRICT RULE: Inspire the user and always reply in the EXACT SAME LANGUAGE as the user's prompt.",
+            shayari: "🪶 You are a poetic AI. STRICT RULES: 1. Directly output ONLY the Shayari. 2. Write the Shayari strictly in the EXACT SAME LANGUAGE the user asked in."
+        };
+        
+        inputEl.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+        
+        function cancelAd() {
+            adModalOverlay.style.display = 'none';
+        }
+
+        function watchAd() {
+            let btn = document.querySelector('.watch-ad-btn');
+            btn.innerText = "Loading Ad... ⏳";
+            btn.disabled = true;
+
+            if (typeof AndroidBridge !== "undefined") {
+                AndroidBridge.showAd();
+            } else {
+                setTimeout(() => {
+                    alert("⚠️ Premium Mode Locked!\n\nYeh premium features aur Ads sirf App mein chalte hain. Please Google Play Store se hamari App download karein. 🚀");
+                    cancelAd();
+                    resetAdButton();
+                }, 500);
+            }
+        }
+
+        function adWatchedSuccessfully() {
+            let btn = document.querySelector('.watch-ad-btn');
+            adsWatchedCount++;
+            document.getElementById('adProgressText').innerText = `Ads Watched: ${adsWatchedCount} / 3`;
+            btn.innerText = "🎬 Watch Ad Now";
+            btn.disabled = false;
+
+            if (adsWatchedCount >= 3) {
+                alert("🎉 Reward Granted! You unlocked 5 free chats.");
+                document.getElementById('adModalOverlay').style.display = 'none';
+                
+                freePremiumChatsLeft = 5;
+                localStorage.setItem('premiumChats', freePremiumChatsLeft);
+                
+                switchMode(modeTryingToUnlock); 
+            }
+        }
+
+        function switchMode(newMode) {
+            currentPersona = newMode;
+            previousPersona = newMode;
+            
+            // 🚀 UPDATE BUTTON TEXT
+            btnText.innerHTML = personaDisplayNames[newMode] + ' ▾';
+            
+            if (premiumModes.includes(newMode)) {
+                chatCounter.style.display = 'block';
+                chatCounter.innerText = `🔥 Premium Chats Left: ${freePremiumChatsLeft}`;
+                addMessage('SG AI', `Premium Mode Active! You have ${freePremiumChatsLeft} chats remaining. ✨`, 'ai');
+            } else {
+                chatCounter.style.display = 'none';
+                addMessage('SG AI', `Switched to ${personaDisplayNames[newMode]}! 🎉`, 'ai');
+            }
+
+            if (typeof AndroidBridge !== "undefined" && typeof AndroidBridge.showInterstitial === "function") {
+                AndroidBridge.showInterstitial();
+            }
         }
         
-        // Code ko reset karke wapas initial example par lana
-        function resetDefaultCode() {
-            const lang = document.getElementById('languageSelector').value;
-            if (confirm(`Are you sure you want to reset the code to the default ${lang.toUpperCase()} example?`)) {
-                codeEditorInstance.setValue(defaultCodeExamples[lang] || defaultCodeExamples['c']);
-            }
-        }
-
-        // Editor screen saaf karna
-        function clearEditor() {
-            if(confirm("Are you sure you want to clear all code in the editor?")) {
-                codeEditorInstance.setValue(''); 
-                localStorage.removeItem('sgCompilerCode'); 
-            }
-        }
-
-        // Output copy karne ka function
-        function copyOutput() {
-            const outputText = document.getElementById('outputBox').innerText;
-            navigator.clipboard.writeText(outputText).then(() => {
-                alert('Output copied to clipboard!');
-            }).catch(err => {
-                console.error('Failed to copy text: ', err);
-                alert('Could not copy output. Please try manually.');
-            });
-        }
-
-        // Code ko API par bhej kar chalana (Backend integration)
-        async function runCode() {
-            const userCode = codeEditorInstance.getValue(); 
-            const outputBox = document.getElementById('outputBox');
-            const selectedLang = document.getElementById('languageSelector').value; 
+        async function sendMessage() {
+            const message = inputEl.value.trim();
+            if (!message) return;
             
-            outputBox.innerText = `Compiling & Running ${selectedLang.toUpperCase()} on Server... Please wait.`;
+            addMessage('You', message, 'user');
+            inputEl.value = '';
+            sendBtn.disabled = true;
+            typingEl.style.display = 'flex';
+            scrollToBottom();
             
-            // Judge0 API ke hisaab se Language IDs map karna
-            let apiLanguageId = 50; // Default C
-            if (selectedLang === 'python') apiLanguageId = 71; 
-            else if (selectedLang === 'java') apiLanguageId = 62;   
-
             try {
-                // Server ko code bhejna
-                const response = await fetch('https://compiler-backend-4dbz.onrender.com/compile', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ language_id: apiLanguageId, source_code: userCode, stdin: "" })
+                const BACKEND_URL = `https://sg-ai-backend.onrender.com/api/chat`;
+                const personaInstruction = personas[currentPersona] || personas.general;
+                
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message, persona: personaInstruction })
+                });
+                const data = await response.json();
+                if (data.candidates && data.candidates.length > 0) {
+                    addMessage('SG AI', data.candidates[0].content.parts[0].text, 'ai');
+                    
+                    if (premiumModes.includes(currentPersona)) {
+                        freePremiumChatsLeft--;
+                        localStorage.setItem('premiumChats', freePremiumChatsLeft);
+                        chatCounter.innerText = `🔥 Premium Chats Left: ${freePremiumChatsLeft}`;
+                        
+                        if (freePremiumChatsLeft <= 0) {
+                            setTimeout(() => {
+                                alert("⚠️ Your free premium chats are over! Locking mode back.");
+                                chatCounter.style.display = 'none';
+                                switchMode('general'); 
+                            }, 1000);
+                        }
+                    }
+                } else {
+                    addMessage('SG AI', "🚨 Backend Error!", 'ai');
+                }
+            } catch (error) {
+                addMessage('SG AI', "Sorry, error aa gaya.", 'ai');
+            } finally {
+                typingEl.style.display = 'none';
+                sendBtn.disabled = false;
+                inputEl.focus();
+            }
+        }
+        
+        function addMessage(sender, text, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            if (type === 'ai') {
+                const iconDiv = document.createElement('div');
+                iconDiv.className = 'ai-icon';
+                iconDiv.innerHTML = '✨'; 
+                messageDiv.appendChild(iconDiv);
+            }
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            if (type === 'ai') {
+                contentDiv.innerHTML = marked.parse(text);
+                
+                const preTags = contentDiv.querySelectorAll('pre');
+                preTags.forEach((pre) => {
+                    const copyBtn = document.createElement('button');
+                    copyBtn.className = 'copy-code-btn';
+                    copyBtn.innerText = 'Copy';
+                    
+                    copyBtn.onclick = () => {
+                        const codeText = pre.querySelector('code').innerText;
+                        navigator.clipboard.writeText(codeText).then(() => {
+                            copyBtn.innerText = 'Copied! ✔';
+                            setTimeout(() => { copyBtn.innerText = 'Copy'; }, 2000);
+                        });
+                    };
+                    pre.appendChild(copyBtn);
+                });
+                
+                contentDiv.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightElement(block);
                 });
 
-                const result = await response.json();
-
-                // Response ke hisaab se Output box mein result dikhana
-                if (result.error) {
-                     outputBox.innerText = "Server Error:\n" + (result.message || "Something went wrong.");
-                } else if (result.compile_output) {
-                    outputBox.innerText = "Compilation Error:\n" + result.compile_output;
-                } else if (result.stderr) {
-                    outputBox.innerText = "Runtime Error:\n" + result.stderr;
-                } else if (result.stdout !== null && result.stdout !== undefined) {
-                    outputBox.innerText = result.stdout || "Program executed successfully but returned no output.";
-                } else if (result.status && result.status.description) {
-                     outputBox.innerText = "Status:\n" + result.status.description;
-                } else {
-                    outputBox.innerText = "Something went wrong. Please check console.";
-                    console.log(result);
-                }
-
-            } catch (error) {
-                outputBox.innerText = `Network Error: Server is not reachable.\nDetails: ${error.message}`;
-                console.error("Fetch Error:", error);
+            } else {
+                contentDiv.innerText = text;
             }
+            
+            messageDiv.appendChild(contentDiv); 
+            messagesEl.appendChild(messageDiv); 
+            scrollToBottom();
         }
-
-        // Pura output mita dena
-        function clearOutput() {
-            document.getElementById('outputBox').innerText = "(Output cleared)";
-        }
+        
+        function scrollToBottom() { messagesEl.scrollTop = messagesEl.scrollHeight; }
+        
+        window.onload = () => inputEl.focus();
     </script>
 </body>
 </html>
