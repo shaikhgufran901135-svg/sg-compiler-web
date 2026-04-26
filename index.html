@@ -32,7 +32,9 @@
         .CodeMirror { height: 350px; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; box-sizing: border-box; margin-top: 10px; }
         .CodeMirror-scroll { max-height: 350px; overflow-y: auto; }
         .CodeMirror pre.CodeMirror-line, .CodeMirror pre.CodeMirror-line-like {
-            line-height: 1.5 !important;  padding: 0 4px !important; margin: 0 !important;         
+            line-height: 1.5 !important;  
+            padding: 0 4px !important;    
+            margin: 0 !important;         
         }
 
         /* =========================================
@@ -52,78 +54,58 @@
         pre#outputBox { background:#263238; color: #eceff1; padding:15px; border-radius:8px; height:350px; overflow:auto; white-space: pre-wrap; font-family: 'Consolas', monospace; font-size: 14px; margin: 0; }
 
         /* =========================================
-           4. CUSTOM LANGUAGE BUTTON
+           4. CUSTOM LANGUAGE BUTTON & GRID (PRO VIBE)
            ========================================= */
         .custom-lang-btn {
-            background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white;
-            padding: 8px 16px; border-radius: 30px; font-size: 14px; font-weight: bold; 
-            cursor: pointer; display: inline-flex; align-items: center; gap: 8px; 
-            transition: 0.3s; box-shadow: 0 4px 10px rgba(46, 125, 50, 0.3); border: 2px solid transparent;
+            background-color: #fff; padding: 6px 14px; border-radius: 8px; border: 2px solid #ccc;
+            font-size: 15px; font-weight: bold; color: #1b5e20; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 8px; transition: 0.3s;
         }
-        .custom-lang-btn:hover { background: linear-gradient(135deg, #1b5e20, #0a3d0a); }
         .custom-lang-btn:active { transform: scale(0.95); }
 
-        /* =========================================
-           5. 🚀 NAYA "GLASSMORPHISM" CENTER MODAL
-           ========================================= */
-        .glass-overlay {
+        .lang-sheet-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px);
-            z-index: 2000; display: none; justify-content: center; align-items: center;
-            opacity: 0; transition: opacity 0.3s ease;
+            background: rgba(0,0,0,0.6); z-index: 2000; display: none; align-items: flex-end; 
+            opacity: 0; transition: opacity 0.3s ease; backdrop-filter: blur(3px);
         }
-        .glass-modal {
-            background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255,255,255,0.4);
-            border-radius: 20px; width: 90%; max-width: 380px; padding: 25px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            transform: scale(0.85) translateY(20px); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex; flex-direction: column; max-height: 80vh;
+        .lang-sheet {
+            background: #ffffff; width: 100%; border-radius: 25px 25px 0 0; padding: 20px; box-sizing: border-box;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.3); transform: translateY(100%); 
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 85vh; display: flex; flex-direction: column;
         }
-        .glass-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .glass-header h2 { margin: 0; font-size: 1.3rem; color: #1b5e20; }
-        .glass-close { background: #f1f8e9; border: none; color: #d32f2f; font-size: 1.5rem; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s;}
-        .glass-close:hover { background: #d32f2f; color: white; }
-
-        .glass-list { overflow-y: auto; padding-right: 5px; display: flex; flex-direction: column; gap: 10px; }
+        .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; }
+        .sheet-header h3 { margin: 0; border: none; font-size: 1.4rem; padding: 0; }
+        .close-sheet-btn { background: none; border: none; font-size: 2rem; cursor: pointer; color: #888; padding: 0; line-height: 1; box-shadow: none; }
         
-        .glass-row {
-            background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 12px;
-            padding: 12px 15px; display: flex; align-items: center; cursor: pointer;
-            transition: all 0.2s ease; position: relative; overflow: hidden;
-            animation: fadeInRow 0.4s ease forwards; opacity: 0;
+        /* Grid Layout */
+        .lang-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px;
+            overflow-y: auto; padding-bottom: 20px; padding-right: 5px;
         }
-        /* Staggered Animation Logic */
-        .glass-row:nth-child(1) { animation-delay: 0.05s; }
-        .glass-row:nth-child(2) { animation-delay: 0.1s; }
-        .glass-row:nth-child(3) { animation-delay: 0.15s; }
-        .glass-row:nth-child(4) { animation-delay: 0.2s; }
-        .glass-row:nth-child(5) { animation-delay: 0.25s; }
-        .glass-row:nth-child(6) { animation-delay: 0.3s; }
-        .glass-row:nth-child(7) { animation-delay: 0.35s; }
-        .glass-row:nth-child(8) { animation-delay: 0.4s; }
-
-        @keyframes fadeInRow { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
-
-        .glass-row:hover { background: #e8f5e9; border-color: #a5d6a7; transform: translateX(5px); }
-        .glass-row.active { background: #e8f5e9; border-left: 5px solid #2e7d32; border-color: #a5d6a7; }
-        
-        .g-icon { font-size: 1.5rem; margin-right: 15px; width: 30px; text-align: center; }
-        .g-name { font-weight: 700; font-size: 1.05rem; color: #333; }
-        .g-spacer { flex-grow: 1; }
-        
-        /* Golden PRO Tag */
-        .g-pro-tag {
-            background: linear-gradient(45deg, #fbc02d, #f57f17); color: #fff;
-            padding: 3px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 800;
-            letter-spacing: 1px; margin-right: 8px; text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-            box-shadow: 0 2px 5px rgba(245, 127, 23, 0.4);
+        .lang-card {
+            background: #f8f9fa; border: 2px solid #e0e0e0; border-radius: 15px; padding: 20px 10px;
+            cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px;
+            transition: 0.2s; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
-        .g-lock { color: #d32f2f; font-size: 1.1rem; opacity: 0.8; }
+        .lang-card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-color: #a5d6a7; }
+        .lang-card.active { border-color: #2e7d32; background: #e8f5e9; }
+        .lang-icon { font-size: 2.2rem; }
+        .lang-name { font-weight: 800; font-size: 0.95rem; color: #333; }
+        
+        /* Glowing PRO Badge */
+        .pro-badge {
+            position: absolute; top: -10px; right: -8px; background: #000; color: #39ff14; 
+            font-size: 0.65rem; font-weight: 900; padding: 4px 8px; border-radius: 10px;
+            border: 1px solid #39ff14; box-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+            letter-spacing: 0.5px; z-index: 2; animation: pulseGlow 2s infinite;
+        }
+        @keyframes pulseGlow { 0% { box-shadow: 0 0 5px rgba(57,255,20,0.5); } 50% { box-shadow: 0 0 15px rgba(57,255,20,0.9); } 100% { box-shadow: 0 0 5px rgba(57,255,20,0.5); } }
 
         /* =========================================
-           6. MODAL BOX (Ad UI) & TOAST BANNER
+           5. MODAL BOX (Ad UI) & TOAST BANNER
            ========================================= */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000; display: none; justify-content: center; align-items: center; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; display: none; justify-content: center; align-items: center; }
         .ad-modal { background: #ffffff; padding: 25px; border-radius: 15px; text-align: center; max-width: 320px; width: 90%; box-shadow: 0 5px 25px rgba(0,0,0,0.5); }
         .ad-modal h3 { color: #1b5e20; border: none; padding: 0; margin-bottom: 10px; justify-content: center;}
         .progress-container { background: #e0e0e0; border-radius: 10px; height: 18px; margin: 20px 0; overflow: hidden; border: 1px solid #ccc; }
@@ -141,7 +123,7 @@
         .toast-info { border-left: 4px solid #2196F3; }
 
         /* =========================================
-           7. DARK MODE COLORS (Hacker Theme)
+           6. DARK MODE COLORS (Hacker Theme)
            ========================================= */
         .dark-mode { background-color: #121212 !important; color: #e0e0e0 !important; }
         .dark-mode header { background-color: #000; border-bottom: 1px solid #333; }
@@ -152,18 +134,15 @@
         .dark-mode button:hover { background-color: #333; border-color: #00e676; color: #00e676; }
         .dark-mode #darkModeToggle { background-color: #00e676; color: #000; border: none; }
         
-        .dark-mode .custom-lang-btn { background: #000; border-color: #444; color: #00e676; box-shadow: 0 4px 10px rgba(0,230,118,0.2); border: 1px solid #00e676;}
+        .dark-mode .custom-lang-btn { background-color: #000; color: #00e676; border-color: #444; }
+        .dark-mode .custom-lang-btn:hover { background-color: #111; border-color: #00e676; }
         
-        /* Dark Mode Glass Modal */
-        .dark-mode .glass-modal { background: rgba(30, 30, 30, 0.85); border: 1px solid rgba(255,255,255,0.1); }
-        .dark-mode .glass-header h2 { color: #00e676; }
-        .dark-mode .glass-close { background: #333; color: #ff5252; }
-        .dark-mode .glass-close:hover { background: #ff5252; color: white; }
-        
-        .dark-mode .glass-row { background: rgba(0,0,0,0.5); border-color: #444; }
-        .dark-mode .glass-row:hover { background: rgba(0,230,118,0.1); border-color: #00e676; }
-        .dark-mode .glass-row.active { background: rgba(0,230,118,0.15); border-left-color: #00e676; border-color: #00e676; }
-        .dark-mode .g-name { color: #eee; }
+        .dark-mode .lang-sheet { background: #1a1a1a; }
+        .dark-mode .sheet-header { border-bottom-color: #333; }
+        .dark-mode .lang-card { background: #252525; border-color: #444; }
+        .dark-mode .lang-card:hover { border-color: #00e676; box-shadow: 0 8px 20px rgba(0,230,118,0.1); }
+        .dark-mode .lang-card.active { border-color: #00e676; background: rgba(0,230,118,0.1); }
+        .dark-mode .lang-name { color: #eee; }
         
         .dark-mode .ad-modal { background: #1e1e1e; border: 1px solid #444; }
         .dark-mode .ad-modal h3 { color: #00e676; } 
@@ -192,45 +171,45 @@
         </div>
     </div>
 
-    <div id="glassLangOverlay" class="glass-overlay" onclick="closeGlassModal()">
-        <div class="glass-modal" id="glassModal" onclick="event.stopPropagation()">
-            <div class="glass-header">
-                <h2>Select Language</h2>
-                <button class="glass-close" onclick="closeGlassModal()">×</button>
+    <div id="langSheetOverlay" class="lang-sheet-overlay" onclick="closeLangSheet()">
+        <div class="lang-sheet" onclick="event.stopPropagation()">
+            <div class="sheet-header">
+                <h3>Select Environment</h3>
+                <button class="close-sheet-btn" onclick="closeLangSheet()">×</button>
             </div>
             
-            <div class="glass-list" id="glassList">
-                <div class="glass-row active" data-lang="c" data-name="C" data-icon="⚙️" data-locked="false" onclick="handleLangClick(this)">
-                    <div class="g-icon">⚙️</div><div class="g-name">C Compiler</div>
+            <div class="lang-grid" id="langGrid">
+                <div class="lang-card active" data-lang="c" data-name="C" data-icon="⚙️" data-locked="false" onclick="handleLangClick(this)">
+                    <div class="lang-icon">⚙️</div><div class="lang-name">C</div>
                 </div>
                 
-                <div class="glass-row" data-lang="python" data-name="Python" data-icon="🐍" data-locked="true" onclick="handleLangClick(this)">
-                    <div class="g-icon">🐍</div><div class="g-name">Python</div>
-                    <div class="g-spacer"></div><div class="g-pro-tag">PRO</div><div class="g-lock">🔒</div>
+                <div class="lang-card" data-lang="python" data-name="Python" data-icon="🐍" data-locked="true" onclick="handleLangClick(this)">
+                    <div class="pro-badge">PRO</div>
+                    <div class="lang-icon">🐍</div><div class="lang-name">Python</div>
                 </div>
-                <div class="glass-row" data-lang="java" data-name="Java" data-icon="☕" data-locked="true" onclick="handleLangClick(this)">
-                    <div class="g-icon">☕</div><div class="g-name">Java</div>
-                    <div class="g-spacer"></div><div class="g-pro-tag">PRO</div><div class="g-lock">🔒</div>
+                <div class="lang-card" data-lang="java" data-name="Java" data-icon="☕" data-locked="true" onclick="handleLangClick(this)">
+                    <div class="pro-badge">PRO</div>
+                    <div class="lang-icon">☕</div><div class="lang-name">Java</div>
                 </div>
-                <div class="glass-row" data-lang="cpp" data-name="C++" data-icon="🚀" data-locked="true" onclick="handleLangClick(this)">
-                    <div class="g-icon">🚀</div><div class="g-name">C++</div>
-                    <div class="g-spacer"></div><div class="g-pro-tag">PRO</div><div class="g-lock">🔒</div>
+                <div class="lang-card" data-lang="cpp" data-name="C++" data-icon="🚀" data-locked="true" onclick="handleLangClick(this)">
+                    <div class="pro-badge">PRO</div>
+                    <div class="lang-icon">🚀</div><div class="lang-name">C++</div>
                 </div>
-                <div class="glass-row" data-lang="javascript" data-name="JavaScript" data-icon="⚡" data-locked="true" onclick="handleLangClick(this)">
-                    <div class="g-icon">⚡</div><div class="g-name">JavaScript</div>
-                    <div class="g-spacer"></div><div class="g-pro-tag">PRO</div><div class="g-lock">🔒</div>
+                <div class="lang-card" data-lang="javascript" data-name="JavaScript" data-icon="⚡" data-locked="true" onclick="handleLangClick(this)">
+                    <div class="pro-badge">PRO</div>
+                    <div class="lang-icon">⚡</div><div class="lang-name">JavaScript</div>
                 </div>
-                <div class="glass-row" data-lang="php" data-name="PHP" data-icon="🐘" data-locked="true" onclick="handleLangClick(this)">
-                    <div class="g-icon">🐘</div><div class="g-name">PHP</div>
-                    <div class="g-spacer"></div><div class="g-pro-tag">PRO</div><div class="g-lock">🔒</div>
+                <div class="lang-card" data-lang="php" data-name="PHP" data-icon="🐘" data-locked="true" onclick="handleLangClick(this)">
+                    <div class="pro-badge">PRO</div>
+                    <div class="lang-icon">🐘</div><div class="lang-name">PHP</div>
                 </div>
-                <div class="glass-row" data-lang="ruby" data-name="Ruby" data-icon="💎" data-locked="true" onclick="handleLangClick(this)">
-                    <div class="g-icon">💎</div><div class="g-name">Ruby</div>
-                    <div class="g-spacer"></div><div class="g-pro-tag">PRO</div><div class="g-lock">🔒</div>
+                <div class="lang-card" data-lang="ruby" data-name="Ruby" data-icon="💎" data-locked="true" onclick="handleLangClick(this)">
+                    <div class="pro-badge">PRO</div>
+                    <div class="lang-icon">💎</div><div class="lang-name">Ruby</div>
                 </div>
-                <div class="glass-row" data-lang="go" data-name="Go" data-icon="🐹" data-locked="true" onclick="handleLangClick(this)">
-                    <div class="g-icon">🐹</div><div class="g-name">Go</div>
-                    <div class="g-spacer"></div><div class="g-pro-tag">PRO</div><div class="g-lock">🔒</div>
+                <div class="lang-card" data-lang="go" data-name="Go" data-icon="🐹" data-locked="true" onclick="handleLangClick(this)">
+                    <div class="pro-badge">PRO</div>
+                    <div class="lang-icon">🐹</div><div class="lang-name">Go</div>
                 </div>
             </div>
         </div>
@@ -245,7 +224,7 @@
         <div class="editor">
             <h3>
                 <span>Write Your Code</span>
-                <div id="customLangBtn" class="custom-lang-btn" onclick="openGlassModal()">
+                <div id="customLangBtn" class="custom-lang-btn" onclick="openLangSheet()">
                     <span id="btnLangIcon">⚙️</span> <span id="btnLangName">C</span> ▾
                 </div>
             </h3>
@@ -353,17 +332,15 @@
             
             // Sync initial custom UI with saved language
             document.getElementById('languageSelector').value = savedLanguage;
-            const savedRow = document.querySelector(`.glass-row[data-lang="${savedLanguage}"]`);
-            if(savedRow) {
+            const savedCard = document.querySelector(`.lang-card[data-lang="${savedLanguage}"]`);
+            if(savedCard) {
                 // Automatically unlock if it was saved (means user already unlocked it)
-                if (savedRow.getAttribute('data-locked') === 'true') {
-                    savedRow.setAttribute('data-locked', 'false');
-                    let proTag = savedRow.querySelector('.g-pro-tag');
-                    let lockIcon = savedRow.querySelector('.g-lock');
-                    if (proTag) proTag.remove();
-                    if (lockIcon) lockIcon.remove();
+                if (savedCard.getAttribute('data-locked') === 'true') {
+                    savedCard.setAttribute('data-locked', 'false');
+                    let badge = savedCard.querySelector('.pro-badge');
+                    if (badge) badge.remove();
                 }
-                updateUISelection(savedRow);
+                updateUISelection(savedCard);
             }
         }
 
@@ -386,37 +363,29 @@
         }
 
         /* =========================================
-           🚀 NEW CENTER GLASS MODAL LOGIC
+           🚀 NEW BOTTOM SHEET LOGIC
            ========================================= */
-        const glassOverlay = document.getElementById('glassLangOverlay');
-        const glassModal = document.getElementById('glassModal');
+        const sheetOverlay = document.getElementById('langSheetOverlay');
+        const sheet = document.querySelector('.lang-sheet');
 
-        function openGlassModal() {
-            glassOverlay.style.display = 'flex';
+        function openLangSheet() {
+            sheetOverlay.style.display = 'flex';
             setTimeout(() => {
-                glassOverlay.style.opacity = '1';
-                glassModal.style.transform = 'scale(1) translateY(0)';
+                sheetOverlay.style.opacity = '1';
+                sheet.style.transform = 'translateY(0)';
             }, 10);
-            
-            // Re-trigger row animations
-            const rows = document.querySelectorAll('.glass-row');
-            rows.forEach(row => {
-                row.style.animation = 'none';
-                row.offsetHeight; /* trigger reflow */
-                row.style.animation = null; 
-            });
         }
 
-        function closeGlassModal() {
-            glassOverlay.style.opacity = '0';
-            glassModal.style.transform = 'scale(0.85) translateY(20px)';
-            setTimeout(() => { glassOverlay.style.display = 'none'; }, 300);
+        function closeLangSheet() {
+            sheetOverlay.style.opacity = '0';
+            sheet.style.transform = 'translateY(100%)';
+            setTimeout(() => { sheetOverlay.style.display = 'none'; }, 300);
         }
 
-        function handleLangClick(row) {
-            const langId = row.getAttribute('data-lang');
-            const langName = row.getAttribute('data-name');
-            const isLocked = row.getAttribute('data-locked') === 'true';
+        function handleLangClick(card) {
+            const langId = card.getAttribute('data-lang');
+            const langName = card.getAttribute('data-name');
+            const isLocked = card.getAttribute('data-locked') === 'true';
 
             if (isLocked) {
                 if (typeof AndroidApp !== "undefined") {
@@ -427,17 +396,19 @@
                 return;
             }
 
-            updateUISelection(row);
-            closeGlassModal();
+            updateUISelection(card);
+            closeLangSheet();
             changeLanguageInternal(langId);
         }
 
-        function updateUISelection(row) {
-            document.getElementById('btnLangIcon').innerText = row.getAttribute('data-icon');
-            document.getElementById('btnLangName').innerText = row.getAttribute('data-name').replace(' Compiler', '');
+        function updateUISelection(card) {
+            // Update the Top Button
+            document.getElementById('btnLangIcon').innerText = card.getAttribute('data-icon');
+            document.getElementById('btnLangName').innerText = card.getAttribute('data-name');
             
-            document.querySelectorAll('.glass-row').forEach(c => c.classList.remove('active'));
-            row.classList.add('active');
+            // Highlight Grid Card
+            document.querySelectorAll('.lang-card').forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
         }
 
         /* =========================================
@@ -482,17 +453,15 @@
 
             if (adWatchCounts[langId] >= REQUIRED_ADS_TO_UNLOCK) {
                 setTimeout(() => { 
-                    const row = document.querySelector(`.glass-row[data-lang="${langId}"]`);
-                    if(row) {
-                        row.setAttribute('data-locked', 'false');
-                        let proTag = row.querySelector('.g-pro-tag');
-                        let lockIcon = row.querySelector('.g-lock');
-                        if (proTag) proTag.remove();
-                        if (lockIcon) lockIcon.remove();
+                    const card = document.querySelector(`.lang-card[data-lang="${langId}"]`);
+                    if(card) {
+                        card.setAttribute('data-locked', 'false');
+                        let badge = card.querySelector('.pro-badge');
+                        if(badge) badge.remove();
                     }
                     closeAdModal();
                     showBanner("Premium Language Unlocked! 🎉", "success");
-                    handleLangClick(row); 
+                    handleLangClick(card); // Auto-select it after unlocking
                 }, 500); 
             } else {
                 let remaining = REQUIRED_ADS_TO_UNLOCK - adWatchCounts[langId];
