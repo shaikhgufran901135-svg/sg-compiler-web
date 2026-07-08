@@ -956,18 +956,35 @@
                 const upiId = "apnastore@ybl";
                 const name = "Apna Store";
                 const note = "Grocery Order";
-                // Standard UPI Deep link format
-                const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(name)}&tn=${encodeURIComponent(note)}&am=${rawAmount}&cu=INR`;
+                
+                // 1. Use App-Specific URIs instead of generic upi://
+                // This forces the exact app to open instead of an option menu
+                const queryParams = `pa=${upiId}&pn=${encodeURIComponent(name)}&tn=${encodeURIComponent(note)}&am=${rawAmount}&cu=INR`;
+                let upiUrl = "";
+                
+                if (methodName === 'Google Pay') {
+                    upiUrl = `tez://upi/pay?${queryParams}`; // Google pay specific
+                } else if (methodName === 'PhonePe') {
+                    upiUrl = `phonepe://pay?${queryParams}`; // PhonePe specific
+                } else if (methodName === 'Paytm') {
+                    upiUrl = `paytmmp://pay?${queryParams}`; // Paytm specific
+                }
                 
                 icon.className = "fa-solid fa-arrow-up-right-from-square text-emerald-500 text-5xl mb-4";
                 title.textContent = `Opening ${methodName}...`;
                 desc.textContent = "Please complete the payment directly inside the app.";
                 
-                // Attempt to open the App natively
-                window.location.href = upiUrl;
+                // 2. Use a hidden anchor tag with target="_top" 
+                // This is the best way to bypass iframe/preview blocking on mobile browsers
+                const a = document.createElement('a');
+                a.href = upiUrl;
+                a.target = "_top"; 
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
                 
-                // Fallback simulation: If we are in an iframe or on desktop where intent might fail,
-                // we mock the success completion after a delay so the demo flow continues seamlessly.
+                // Fallback simulation: If we are on desktop or if intent fails,
+                // we mock the success completion after a delay so the flow continues.
                 setTimeout(() => {
                     completeOrder(methodName);
                 }, 6000);
