@@ -34,7 +34,7 @@
         }
         .call-pulse { animation: pulse-ring 2s infinite; }
 
-        /* Hide scrollbar for category list */
+        /* Hide scrollbars */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
@@ -46,31 +46,33 @@
 
     <header class="bg-white shadow-sm sticky top-0 z-40">
         <div class="px-4 py-3 flex justify-between items-center max-w-2xl mx-auto">
-            <div class="flex items-center space-x-3 w-3/4">
-                <!-- Secret Admin Tap on Logo -->
-                <div onclick="handleAdminTap()" class="bg-yellow-400 text-yellow-900 rounded-xl p-2 font-bold text-xl leading-none shadow-sm cursor-pointer select-none active:scale-95 transition-transform">
+            <div class="flex items-center space-x-3 w-2/3">
+                <!-- Secret Admin Tap on Logo (5 Taps) -->
+                <div onclick="handleAdminTap()" class="bg-yellow-400 text-yellow-900 rounded-xl p-2 font-bold text-xl leading-none shadow-sm cursor-pointer select-none active:scale-95 transition-transform shrink-0">
                     AS
                 </div>
                 <div class="flex flex-col cursor-pointer truncate" onclick="openAddressModal()">
                     <div class="flex items-center space-x-1">
                         <span class="font-bold text-lg truncate text-gray-900">Delivery in 25 min</span>
-                        <i class="fas fa-chevron-down text-xs text-gray-500"></i>
+                        <i class="fas fa-chevron-down text-xs text-gray-500 shrink-0"></i>
                     </div>
                     <span class="text-xs text-gray-500 truncate" id="topAddressText">Select Location</span>
                 </div>
             </div>
             
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-4 shrink-0">
+                <button onclick="openTracking()" class="text-blue-600 font-bold text-xs uppercase tracking-wider flex items-center hover:text-blue-700">
+                    <i class="fas fa-map-marker-alt mr-1"></i> Track
+                </button>
+                <div class="relative cursor-pointer" onclick="openCart()">
+                    <i class="fas fa-shopping-basket text-2xl text-gray-700 hover:text-green-600 transition-colors"></i>
+                    <span id="navCartBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center hidden border border-white">0</span>
+                </div>
                 <button id="loginNavBtn" onclick="openLoginModal()" class="text-sm font-semibold text-gray-600 hover:text-gray-900 transition">
                     Login
                 </button>
                 <div id="userProfileIcon" class="hidden h-8 w-8 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-700 font-bold border border-yellow-300">
                     <i class="fas fa-user text-sm"></i>
-                </div>
-                <!-- Top Navbar Basket Icon -->
-                <div class="relative cursor-pointer" onclick="openCart()">
-                    <i class="fas fa-shopping-basket text-2xl text-gray-700 hover:text-green-600 transition-colors"></i>
-                    <span id="navCartBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center hidden border border-white">0</span>
                 </div>
             </div>
         </div>
@@ -167,7 +169,7 @@
                     </div>
                     <div class="flex justify-between">
                         <span>Handling Charge <i class="fas fa-info-circle text-gray-400 text-[10px]"></i></span>
-                        <span class="font-medium text-gray-800">₹<span id="billConvenienceFee">0</span></span>
+                        <span class="font-medium text-gray-800" id="billConvenienceFee">₹0</span>
                     </div>
                     <div class="border-t border-gray-100 pt-2 mt-2 flex justify-between font-bold text-gray-900 text-base">
                         <span>Grand Total</span>
@@ -360,25 +362,69 @@
         </div>
     </div>
 
-    <!-- Payment Processing Overlay -->
-    <div id="processingOverlay" class="fixed inset-0 bg-white z-[80] hidden flex flex-col items-center justify-center modal-fade">
-        <div class="w-16 h-16 border-4 border-gray-100 border-t-green-500 rounded-full animate-spin mb-6"></div>
-        <h2 class="text-xl font-bold text-gray-800">Verifying Payment...</h2>
-        <p class="text-gray-500 mt-2 text-sm text-center px-6">Connecting to your bank app. Please do not press back or close this window.</p>
+    <!-- Payment Processing & Honesty Check Overlay -->
+    <div id="processingOverlay" class="fixed inset-0 bg-white z-[80] hidden flex flex-col items-center justify-center modal-fade px-4">
+        <!-- Step 1: Connecting -->
+        <div id="verifyingSpinner" class="flex flex-col items-center">
+            <div class="w-16 h-16 border-4 border-gray-100 border-t-green-500 rounded-full animate-spin mb-6"></div>
+            <h2 class="text-xl font-bold text-gray-800">Verifying Payment...</h2>
+            <p class="text-gray-500 mt-2 text-sm text-center px-6">Connecting to your bank app...</p>
+        </div>
+        
+        <!-- Step 2: Confirmation Box -->
+        <div id="paymentConfirmBox" class="hidden flex flex-col items-center bg-white p-6 w-full max-w-sm rounded-3xl text-center shadow-2xl border border-gray-100">
+            <div class="h-20 w-20 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 text-4xl mb-4">
+                <i class="fas fa-question-circle"></i>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Did your payment succeed?</h2>
+            <p class="text-gray-500 text-sm mb-6">Please confirm if the payment was successful in your UPI app to place the order.</p>
+            <div class="flex space-x-3 w-full">
+                <button onclick="confirmPayment(false)" class="w-1/2 border border-red-200 bg-red-50 text-red-600 py-3 rounded-xl font-bold hover:bg-red-100 transition-colors">No, It Failed</button>
+                <button onclick="confirmPayment(true)" class="w-1/2 bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 shadow-md transition-colors">Yes, Paid</button>
+            </div>
+        </div>
     </div>
 
     <!-- Order Success Full Screen -->
-    <div id="orderSuccess" class="fixed inset-0 bg-green-600 z-[90] hidden flex flex-col items-center justify-center text-white modal-fade">
-        <div class="bg-white text-green-600 h-24 w-24 rounded-full flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(255,255,255,0.4)] scale-0 transition-transform duration-500" id="successIcon">
+    <div id="orderSuccess" class="fixed inset-0 bg-white z-[90] hidden flex flex-col items-center justify-center modal-fade">
+        <div class="bg-green-500 text-white h-24 w-24 rounded-full flex items-center justify-center mb-4 shadow-xl scale-0 transition-transform duration-500" id="successIcon">
             <i class="fas fa-check text-5xl"></i>
         </div>
-        <h1 class="text-3xl font-bold mb-2 text-center px-4">Order Placed!</h1>
-        <p class="text-green-100 mb-8 text-center px-4 font-medium tracking-wide">Sending bill to WhatsApp...</p>
-        <div class="bg-white/10 p-5 rounded-2xl w-3/4 max-w-sm mb-8 text-center backdrop-blur-md border border-white/20 shadow-inner">
-            <p class="text-sm text-green-100 mb-1 font-medium">Total Paid</p>
-            <p class="text-4xl font-black">₹<span id="successTotal">0</span></p>
+        <h1 class="text-3xl font-black mb-2 text-gray-800 text-center px-4">Order Placed!</h1>
+        <p class="text-gray-500 mb-6 text-center px-4 font-medium">Your groceries will arrive in 25 mins.</p>
+        
+        <div class="bg-gray-50 p-5 rounded-2xl w-[85%] max-w-sm mb-8 text-center border border-gray-200">
+            <p class="text-sm text-gray-500 mb-1 font-medium">Total Amount</p>
+            <p class="text-4xl font-black text-gray-900">₹<span id="successTotal">0</span></p>
         </div>
-        <button onclick="resetApp()" class="bg-white text-green-700 px-8 py-3.5 rounded-full font-bold shadow-xl hover:scale-105 transition-transform">Back to Home</button>
+
+        <div class="w-[85%] max-w-sm space-y-3">
+            <button onclick="sendToWhatsApp()" class="w-full bg-[#25D366] text-white px-6 py-4 rounded-xl font-bold shadow-lg flex items-center justify-center space-x-2 hover:bg-[#128C7E] transition-colors">
+                <i class="fab fa-whatsapp text-xl"></i>
+                <span>Send Bill to WhatsApp</span>
+            </button>
+            <button onclick="openTracking()" class="w-full bg-blue-50 text-blue-600 border border-blue-200 px-6 py-4 rounded-xl font-bold shadow-sm flex items-center justify-center space-x-2 hover:bg-blue-100 transition-colors">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Track Order Status</span>
+            </button>
+            <button onclick="resetApp()" class="w-full text-gray-500 py-3 font-semibold text-sm hover:text-gray-800 transition-colors mt-2">
+                Back to Home
+            </button>
+        </div>
+    </div>
+
+    <!-- Live Order Tracking Modal -->
+    <div id="trackingModal" class="fixed inset-0 bg-black/60 z-[100] hidden flex items-end sm:items-center justify-center modal-fade backdrop-blur-sm" onclick="if(event.target === this) closeTracking()">
+        <div class="bg-white w-full sm:w-[400px] rounded-t-2xl sm:rounded-2xl p-6 transform transition-transform shadow-2xl translate-y-full" id="trackingSlide">
+            <div class="flex justify-between items-center mb-6 border-b pb-3">
+                <h2 class="text-lg font-black text-gray-800"><i class="fas fa-motorcycle text-blue-600 mr-2"></i> Live Tracking</h2>
+                <button onclick="closeTracking()" class="text-gray-400 hover:text-gray-600 bg-gray-100 h-8 w-8 rounded-full flex items-center justify-center"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div id="trackingContent" class="mb-4">
+                <!-- Content generated by JS -->
+            </div>
+        </div>
     </div>
 
     <!-- SECRET PIN MODAL (Hidden) -->
@@ -424,7 +470,7 @@
 
     <script>
         // =========================================================================
-        // SYSTEM 1: YAHAN SIRF ITEMS (PRODUCTS) KA DATA HAI (Edit this section)
+        // SYSTEM 1: YAHAN SIRF ITEMS (PRODUCTS) KA DATA HAI
         // =========================================================================
         
         // High Quality Real Images (Unsplash) added
@@ -457,7 +503,7 @@
                 id: 4, 
                 name: "Tata Salt Vacuum Evaporated", 
                 weight: "1 kg", 
-                price: 2, 
+                price: 24, 
                 oldPrice: 28, 
                 img: "https://images.unsplash.com/photo-1621317765103-6902d1d28385?w=300&h=300&fit=crop" 
             },
@@ -496,18 +542,18 @@
         ];
 
         // =========================================================================
-        // SYSTEM 2: YAHAN APP KA BAAKI PURA LOGIC HAI (Do not edit below easily)
+        // SYSTEM 2: YAHAN APP KA BAAKI PURA LOGIC HAI (Settings & State)
         // =========================================================================
 
         // --- MERCHANTS SETTINGS (YOUR DETAILS) ---
         const upiId = "9527652098-3@ybl"; // Apni UPI ID yahan dalein
-        const ownerWhatsAppNumber = "919011354280"; // Apna WhatsApp Number dalein (Country code 91 ke sath)
+        const ownerWhatsAppNumber = "919527652098"; // Apna WhatsApp Number dalein (Country code 91 ke sath)
 
         // --- STATE VARIABLES ---
         let cart = {};
         const FEES = {
-            delivery: 35, // Default delivery
-            freeDeliveryThreshold: 499
+            delivery: 35, // Default delivery fee based on area
+            freeDeliveryThreshold: 0 // Set to 0 to make Delivery Free permanently for all!
         };
         let currentAddress = "Select Location";
         
@@ -517,6 +563,7 @@
         let isConfirmingClear = false;
         let lastSelectedPaymentMethod = "";
         let customerPhone = "";
+        let currentWaLink = "";
 
         // --- RENDER PRODUCTS ---
         function renderProducts() {
@@ -615,23 +662,31 @@
                 `;
             }
 
+            // Check if First Order from History
+            let history = JSON.parse(localStorage.getItem('apnaStoreHistory') || '[]');
+            let isFirstOrder = history.length === 0;
+
             let deliveryFee = 0;
             let convenienceFee = 0;
             let grandTotal = 0;
 
             if (count > 0) {
-                // Fetch dynamic delivery fee based on selected area
-                deliveryFee = itemTotal >= FEES.freeDeliveryThreshold ? 0 : FEES.delivery;
+                deliveryFee = itemTotal > FEES.freeDeliveryThreshold ? FEES.delivery : 0;
                 
-                // Dynamic convenience fee based on order total
-                if (itemTotal <= 200) { convenienceFee = 5; } 
-                else if (itemTotal <= 500) { convenienceFee = 8; } 
-                else { convenienceFee = 10; }
+                // 1st Order Free Handling Fee Logic
+                if (isFirstOrder) {
+                    convenienceFee = 0;
+                } else {
+                    // Dynamic convenience fee
+                    if (itemTotal <= 200) { convenienceFee = 5; } 
+                    else if (itemTotal <= 500) { convenienceFee = 8; } 
+                    else { convenienceFee = 10; }
+                }
                 
                 grandTotal = itemTotal + deliveryFee + convenienceFee;
             }
 
-            // Update all UI elements
+            // Update Counts
             document.getElementById('summaryItemCount').innerText = count;
             document.getElementById('summaryTotal').innerText = itemTotal;
             
@@ -647,69 +702,54 @@
             // Bill UI
             document.getElementById('billItemTotal').innerText = itemTotal;
             document.getElementById('billDeliveryFee').innerHTML = deliveryFee === 0 ? `<span class="text-green-600 bg-green-50 px-1 rounded font-bold">Free</span>` : `₹${deliveryFee}`;
-            document.getElementById('billConvenienceFee').innerText = convenienceFee;
+            
+            // Show Free badge if first order
+            if (isFirstOrder) {
+                document.getElementById('billConvenienceFee').innerHTML = `<span class="text-green-600 bg-green-50 px-1 rounded font-bold">Free (1st Order)</span>`;
+            } else {
+                document.getElementById('billConvenienceFee').innerText = `₹${convenienceFee}`;
+            }
+
             document.getElementById('billGrandTotal').innerText = grandTotal;
             document.getElementById('checkoutBtnTotal').innerText = grandTotal;
             document.getElementById('payModalTotal').innerText = grandTotal;
 
             const summary = document.getElementById('cartSummary');
-            if (count > 0) {
-                summary.classList.remove('hidden');
-            } else {
-                summary.classList.add('hidden');
-                closeCart();
-            }
+            if (count > 0) { summary.classList.remove('hidden'); } 
+            else { summary.classList.add('hidden'); closeCart(); }
         }
 
-        // --- MODALS & UI HELPERS ---
         function openCart() {
-            if(Object.keys(cart).length === 0) {
-                showMessage("Your cart is empty!");
-                return;
-            }
+            if(Object.keys(cart).length === 0) { showMessage("Your cart is empty!"); return; }
             document.getElementById('cartOverlay').classList.remove('hidden');
-            setTimeout(() => {
-                document.getElementById('cartPanel').classList.remove('translate-x-full');
-            }, 10);
+            setTimeout(() => { document.getElementById('cartPanel').classList.remove('translate-x-full'); }, 10);
         }
-
         function closeCart() {
             document.getElementById('cartPanel').classList.add('translate-x-full');
-            setTimeout(() => {
-                document.getElementById('cartOverlay').classList.add('hidden');
-            }, 300);
+            setTimeout(() => { document.getElementById('cartOverlay').classList.add('hidden'); }, 300);
         }
 
-        function openAddressModal() {
-            document.getElementById('addressModal').classList.remove('hidden');
-        }
-
-        function closeAddressModal() {
-            document.getElementById('addressModal').classList.add('hidden');
-        }
+        function openAddressModal() { document.getElementById('addressModal').classList.remove('hidden'); }
+        function closeAddressModal() { document.getElementById('addressModal').classList.add('hidden'); }
 
         function setAddress(addr, fee) {
             currentAddress = addr;
-            FEES.delivery = fee; // Update delivery fee based on Area
+            FEES.delivery = fee;
             document.getElementById('topAddressText').innerText = addr;
-            updateCartUI(); // Recalculate bill
+            updateCartUI();
             closeAddressModal();
-            showMessage(`Location set. Delivery Fee is ₹${fee}.`);
+            showMessage(`Location set. Processing fee updated.`);
         }
 
-        // For Custom Manual Address Typed by User
         function setCustomAddress() {
             const inputVal = document.getElementById('manualAddressInput').value;
-            if (inputVal.trim() === "") {
-                showMessage("Please enter an address first.");
-                return;
-            }
+            if (inputVal.trim() === "") { showMessage("Please enter an address first."); return; }
             currentAddress = inputVal.trim();
-            FEES.delivery = 25; // Default standard delivery fee for custom location
+            FEES.delivery = 25; 
             document.getElementById('topAddressText').innerText = currentAddress;
-            updateCartUI(); // Recalculate bill
+            updateCartUI();
             closeAddressModal();
-            showMessage(`Custom Address saved. Delivery Fee is ₹25.`);
+            showMessage(`Custom Address saved.`);
         }
 
         function showCustomToast(htmlContent) {
@@ -717,105 +757,74 @@
             const toast = document.createElement('div');
             toast.className = 'bg-white rounded-2xl shadow-2xl p-4 m-4 max-w-sm w-full flex items-start space-x-3 border-l-4 border-blue-500 otp-toast';
             toast.innerHTML = htmlContent;
-            
             container.appendChild(toast);
-            
-            setTimeout(() => {
-                if(toast.parentElement) toast.remove();
-            }, 6000);
+            setTimeout(() => { if(toast.parentElement) toast.remove(); }, 6000);
         }
 
         function showMessage(msg) {
-            const html = `
+            showCustomToast(`
                 <div class="bg-gray-100 rounded-full p-2 h-8 w-8 flex items-center justify-center shrink-0"><i class="fas fa-info-circle text-blue-500"></i></div>
                 <div class="flex-1 mt-0.5"><p class="text-sm font-semibold text-gray-800">${msg}</p></div>
-            `;
-            showCustomToast(html);
+            `);
         }
 
-        // --- LOGIN SYSTEM ---
         function openLoginModal() {
             document.getElementById('loginModal').classList.remove('hidden');
             document.getElementById('phoneInput').value = '';
             document.getElementById('sendOtpBtn').disabled = true;
-            document.getElementById('sendOtpBtn').classList.remove('bg-green-600', 'text-white');
-            document.getElementById('sendOtpBtn').classList.add('bg-gray-200', 'text-gray-500');
+            document.getElementById('sendOtpBtn').className = "w-full bg-gray-200 text-gray-500 py-3 rounded-xl font-bold transition-colors";
             document.getElementById('loginStep1').classList.remove('hidden');
             document.getElementById('loginStep2').classList.add('hidden');
         }
 
-        function closeLoginModal() {
-            document.getElementById('loginModal').classList.add('hidden');
-        }
+        function closeLoginModal() { document.getElementById('loginModal').classList.add('hidden'); }
 
         document.getElementById('phoneInput').addEventListener('input', function(e) {
             this.value = this.value.replace(/[^0-9]/g, '');
             const btn = document.getElementById('sendOtpBtn');
-            // Strict 10 digit check
             if (this.value.length === 10) {
                 btn.disabled = false;
-                btn.classList.remove('bg-gray-200', 'text-gray-500');
-                btn.classList.add('bg-green-600', 'text-white');
+                btn.className = "w-full bg-green-600 text-white py-3 rounded-xl font-bold shadow-md transition-colors";
             } else {
                 btn.disabled = true;
-                btn.classList.add('bg-gray-200', 'text-gray-500');
-                btn.classList.remove('bg-green-600', 'text-white');
+                btn.className = "w-full bg-gray-200 text-gray-500 py-3 rounded-xl font-bold transition-colors";
             }
         });
 
         function sendOTP() {
             const phone = document.getElementById('phoneInput').value;
-            // Real Indian Mobile Number Validation (Must start with 6, 7, 8, or 9)
-            if(!/^[6-9]\d{9}$/.test(phone)){
-                showMessage("Please enter a valid 10-digit Indian mobile number.");
-                return;
-            }
-
+            if(!/^[6-9]\d{9}$/.test(phone)){ showMessage("Enter a valid 10-digit mobile number."); return; }
             customerPhone = phone;
             document.getElementById('displayPhone').innerText = "+91 " + phone;
             document.getElementById('loginStep1').classList.add('hidden');
             document.getElementById('loginStep2').classList.remove('hidden');
             
-            document.querySelectorAll('.otp-input').forEach(input => input.value = '');
+            document.querySelectorAll('.otp-input').forEach(i => i.value = '');
             document.querySelectorAll('.otp-input')[0].focus();
 
-            // Real random OTP generation
             generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
-            
-            // Push Notification Simulation
             setTimeout(() => {
-                const smsHtml = `
-                    <div class="bg-blue-100 rounded-full h-10 w-10 flex items-center justify-center shrink-0">
-                        <i class="fas fa-comment-sms text-blue-600"></i>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-0.5">Messages • Now</p>
-                        <p class="text-sm font-bold text-gray-800 leading-tight">Your Apna Store login OTP is <span class="text-blue-600 text-lg">${generatedOTP}</span>. Do not share.</p>
-                    </div>
-                `;
-                showCustomToast(smsHtml);
+                showCustomToast(`
+                    <div class="bg-blue-100 rounded-full h-10 w-10 flex items-center justify-center shrink-0"><i class="fas fa-comment-sms text-blue-600"></i></div>
+                    <div class="flex-1"><p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-0.5">Messages • Now</p><p class="text-sm font-bold text-gray-800 leading-tight">Your Apna Store login OTP is <span class="text-blue-600 text-lg">${generatedOTP}</span>. Do not share.</p></div>
+                `);
             }, 800);
         }
 
-        function backToPhone() {
-            document.getElementById('loginStep2').classList.add('hidden');
-            document.getElementById('loginStep1').classList.remove('hidden');
-        }
+        function backToPhone() { document.getElementById('loginStep2').classList.add('hidden'); document.getElementById('loginStep1').classList.remove('hidden'); }
 
         function moveToNext(current, index) {
             current.value = current.value.replace(/[^0-9]/g, '');
             if (current.value.length >= 1) {
                 const inputs = document.querySelectorAll('.otp-input');
                 if (index < 3) inputs[index + 1].focus();
-                else verifyOTP(); // Auto verify on last digit
+                else verifyOTP();
             }
         }
 
         function verifyOTP() {
-            const inputs = document.querySelectorAll('.otp-input');
             let entered = "";
-            inputs.forEach(input => entered += input.value);
-
+            document.querySelectorAll('.otp-input').forEach(i => entered += i.value);
             if (entered === generatedOTP) {
                 userLoggedIn = true;
                 closeLoginModal();
@@ -823,42 +832,31 @@
                 document.getElementById('userProfileIcon').classList.remove('hidden');
                 showMessage("Logged in successfully!");
             } else {
-                showMessage("Invalid OTP. Check SMS and try again.");
-                inputs.forEach(input => input.value = '');
-                inputs[0].focus();
+                showMessage("Invalid OTP. Check SMS.");
+                document.querySelectorAll('.otp-input').forEach(i => i.value = '');
+                document.querySelectorAll('.otp-input')[0].focus();
             }
         }
 
-        // --- PAYMENT & CHECKOUT SYSTEM ---
         function openPaymentModal() {
-            if (!userLoggedIn) {
-                openLoginModal();
-                return;
-            }
-            if (currentAddress === "Select Location") {
-                openAddressModal();
-                return;
-            }
+            if (!userLoggedIn) { openLoginModal(); return; }
+            if (currentAddress === "Select Location") { openAddressModal(); return; }
             document.getElementById('codAdvanceSection').classList.add('hidden');
             document.getElementById('paymentModal').classList.remove('hidden');
             closeCart();
         }
 
-        function closePaymentModal() {
-            document.getElementById('paymentModal').classList.add('hidden');
-        }
+        function closePaymentModal() { document.getElementById('paymentModal').classList.add('hidden'); }
 
         function showCODAdvance() {
             const total = parseInt(document.getElementById('billGrandTotal').innerText);
             const itemTotal = parseInt(document.getElementById('billItemTotal').innerText);
-            const advance = total - itemTotal; // Delivery + Handling
+            const advance = total - itemTotal; 
             
             document.getElementById('codAdvanceAmt').innerText = advance;
             document.getElementById('codAdvanceBtnAmt').innerText = advance;
             document.getElementById('codCashAmt').innerText = itemTotal;
-            
-            const section = document.getElementById('codAdvanceSection');
-            section.classList.toggle('hidden');
+            document.getElementById('codAdvanceSection').classList.toggle('hidden');
         }
 
         function processUPI(app, isCODAdvance = false) {
@@ -868,30 +866,22 @@
             
             if (isCODAdvance) {
                 const itemTotal = parseInt(document.getElementById('billItemTotal').innerText);
-                amount = amount - itemTotal; // Only charge advance online
+                amount = amount - itemTotal; 
                 lastSelectedPaymentMethod = "COD (Adv. " + app + ")";
             }
 
             const merchantName = encodeURIComponent("Apna Store");
             const transactionRef = "ORD" + Math.floor(Math.random() * 1000000);
             
-            // Standard UPI String
+            // Standard UPI String works best for PhonePe recently to avoid scheme blocking
             const upiString = `upi://pay?pa=${upiId}&pn=${merchantName}&tr=${transactionRef}&am=${amount}&cu=INR`;
             
-            let finalUrl = "";
-            if(app === 'gpay') {
-                finalUrl = upiString.replace("upi://pay", "tez://upi/pay");
-            } else if (app === 'phonepe') {
-                finalUrl = upiString.replace("upi://pay", "phonepe://pay");
-            } else if (app === 'paytm') {
-                finalUrl = upiString.replace("upi://pay", "paytmmp://pay");
-            } else {
-                finalUrl = upiString;
-            }
+            let finalUrl = upiString;
+            if(app === 'gpay') { finalUrl = upiString.replace("upi://pay", "tez://upi/pay"); } 
+            else if (app === 'paytm') { finalUrl = upiString.replace("upi://pay", "paytmmp://pay"); }
 
             paymentAppOpened = true;
             
-            // Bypass security restrictions by opening link via top frame
             try {
                 const link = document.createElement('a');
                 link.href = finalUrl;
@@ -900,22 +890,14 @@
                 link.click();
                 document.body.removeChild(link);
             } catch (e) {
-                console.log("App open blocked, falling back to simulation.");
+                console.log("Fallback");
             }
 
-            // Fallback timer just in case app doesn't exist
-            setTimeout(() => {
-                if(paymentAppOpened) {
-                    verifyPaymentReturn();
-                }
-            }, 6000);
+            setTimeout(() => { if(paymentAppOpened) { verifyPaymentReturn(); } }, 6000);
         }
 
-        // When user comes back from GPay/PhonePe to browser
         document.addEventListener("visibilitychange", function() {
-            if (document.visibilityState === 'visible' && paymentAppOpened) {
-                verifyPaymentReturn();
-            }
+            if (document.visibilityState === 'visible' && paymentAppOpened) { verifyPaymentReturn(); }
         });
 
         function verifyPaymentReturn() {
@@ -923,22 +905,28 @@
             paymentAppOpened = false;
             
             document.getElementById('processingOverlay').classList.remove('hidden');
+            document.getElementById('verifyingSpinner').classList.remove('hidden');
+            document.getElementById('paymentConfirmBox').classList.add('hidden');
             
+            // Wait 2 seconds then show manual confirmation box (Honesty check)
             setTimeout(() => {
-                document.getElementById('processingOverlay').classList.add('hidden');
-                
-                // Real-world Simulation: 70% Success Rate
-                if (Math.random() > 0.3) {
-                    showOrderSuccess();
-                } else {
-                    showMessage("Payment failed or cancelled. Please try again.");
-                    setTimeout(() => openPaymentModal(), 1500);
-                }
-            }, 2500);
+                document.getElementById('verifyingSpinner').classList.add('hidden');
+                document.getElementById('paymentConfirmBox').classList.remove('hidden');
+            }, 2000);
+        }
+
+        function confirmPayment(isSuccess) {
+            document.getElementById('processingOverlay').classList.add('hidden');
+            if(isSuccess) {
+                showOrderSuccess();
+            } else {
+                showMessage("Payment failed or cancelled. Please try again.");
+                setTimeout(() => openPaymentModal(), 1000);
+            }
         }
 
         function showOrderSuccess() {
-            const orderId = saveOrderToHistory(lastSelectedPaymentMethod);
+            const orderInfo = saveOrderToHistory(lastSelectedPaymentMethod);
             
             document.getElementById('successTotal').innerText = document.getElementById('billGrandTotal').innerText;
             const successScreen = document.getElementById('orderSuccess');
@@ -947,100 +935,142 @@
             setTimeout(() => {
                 document.getElementById('successIcon').classList.remove('scale-0');
                 
-                // === FREE WHATSAPP BACKEND SYSTEM ===
                 let waMsg = `🛒 *NEW ORDER RECEIVED!* 🛒\n\n`;
-                waMsg += `🆔 *Order ID:* ${orderId}\n`;
+                waMsg += `🆔 *Order ID:* ${orderInfo.id}\n`;
                 waMsg += `📞 *Customer Phone:* ${customerPhone}\n`;
-                waMsg += `📍 *Delivery Area/Address:* ${currentAddress}\n`;
-                waMsg += `💳 *Payment Mode:* ${lastSelectedPaymentMethod.toUpperCase()}\n\n`;
-                waMsg += `📦 *ORDER ITEMS:*\n`;
+                waMsg += `📍 *Delivery Area:* ${currentAddress}\n`;
                 
-                for(let id in cart) {
-                    waMsg += `▪️ ${cart[id].name} (x${cart[id].quantity})\n`;
+                if(lastSelectedPaymentMethod.includes('gpay') || lastSelectedPaymentMethod.includes('phonepe') || lastSelectedPaymentMethod.includes('paytm')) {
+                    waMsg += `💳 *Payment Mode:* ${lastSelectedPaymentMethod.toUpperCase()}\n`;
+                    waMsg += `⚠️ *ALERT FOR ADMIN: Check your bank app to confirm payment before packing! Customer claimed it was successful.*\n\n`;
+                } else {
+                    waMsg += `💳 *Payment Mode:* ${lastSelectedPaymentMethod.toUpperCase()}\n\n`;
                 }
                 
+                waMsg += `📦 *ORDER ITEMS:*\n`;
+                for(let id in cart) { waMsg += `▪️ ${cart[id].name} (x${cart[id].quantity})\n`; }
+                
                 waMsg += `\n💰 *Total Bill: ₹${document.getElementById('billGrandTotal').innerText}*\n`;
-                waMsg += `\n🚀 _Please prepare for delivery in 25 mins!_`;
+                waMsg += `\n🚀 _Deliver fast!_`;
                 
-                const waLink = `https://wa.me/${ownerWhatsAppNumber}?text=${encodeURIComponent(waMsg)}`;
-                
-                // Open WhatsApp to send receipt
-                setTimeout(() => {
-                    window.open(waLink, '_top');
-                }, 2000);
-
+                currentWaLink = `https://api.whatsapp.com/send?phone=${ownerWhatsAppNumber}&text=${encodeURIComponent(waMsg)}`;
             }, 100);
         }
 
+        function sendToWhatsApp() {
+            if(currentWaLink) { window.open(currentWaLink, '_blank'); }
+        }
+
+        function openTracking() {
+            document.getElementById('trackingModal').classList.remove('hidden');
+            document.getElementById('orderSuccess').classList.add('hidden'); // hide success if open
+            setTimeout(() => { document.getElementById('trackingSlide').classList.remove('translate-y-full'); }, 10);
+            renderTracking();
+        }
+
+        function closeTracking() {
+            document.getElementById('trackingSlide').classList.add('translate-y-full');
+            setTimeout(() => { document.getElementById('trackingModal').classList.add('hidden'); }, 300);
+        }
+
+        function renderTracking() {
+            const history = JSON.parse(localStorage.getItem('apnaStoreHistory') || '[]');
+            const container = document.getElementById('trackingContent');
+            
+            if (history.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-500 py-10"><i class="fas fa-box-open text-5xl mb-4 text-gray-200"></i><p class="font-bold text-gray-800 text-lg">No Active Orders</p></div>`;
+                return;
+            }
+
+            const latestOrder = history[history.length - 1];
+            const elapsedMinutes = (Date.now() - latestOrder.timestamp) / 60000;
+            
+            let step = 1; 
+            if (elapsedMinutes >= 25) step = 4;
+            else if (elapsedMinutes >= 15) step = 3;
+            else if (elapsedMinutes >= 5) step = 2;
+            
+            container.innerHTML = `
+                <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 mb-4 shadow-sm">
+                    <div class="flex justify-between items-center mb-5 border-b border-gray-200 pb-3">
+                        <div><p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Order ID</p><p class="font-bold text-gray-800">#${latestOrder.id}</p></div>
+                        <div class="text-right"><p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Amount</p><p class="font-bold text-green-600">₹${latestOrder.grandTotal}</p></div>
+                    </div>
+                    <div class="relative pl-6 space-y-6">
+                        <div class="absolute left-[11px] top-2 bottom-2 w-0.5 bg-gray-200 rounded"></div>
+                        <div class="absolute left-[11px] top-2 w-0.5 bg-green-500 rounded transition-all duration-1000" style="height: ${step === 1 ? '10%' : step === 2 ? '40%' : step === 3 ? '70%' : '100%'}"></div>
+
+                        <div class="relative z-10 flex items-center">
+                            <div class="h-6 w-6 rounded-full flex items-center justify-center ${step >= 1 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'} border-2 border-white absolute -left-6 shadow-sm"><i class="fas fa-check text-[10px]"></i></div>
+                            <div class="ml-4"><p class="font-bold text-sm ${step >= 1 ? 'text-gray-800' : 'text-gray-400'}">Order Placed</p><p class="text-xs text-gray-500">Received your order</p></div>
+                        </div>
+                        <div class="relative z-10 flex items-center">
+                            <div class="h-6 w-6 rounded-full flex items-center justify-center ${step >= 2 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'} border-2 border-white absolute -left-6 shadow-sm"><i class="fas fa-box text-[10px]"></i></div>
+                            <div class="ml-4"><p class="font-bold text-sm ${step >= 2 ? 'text-gray-800' : 'text-gray-400'}">Order Packed</p><p class="text-xs text-gray-500">Items ready</p></div>
+                        </div>
+                        <div class="relative z-10 flex items-center">
+                            <div class="h-6 w-6 rounded-full flex items-center justify-center ${step >= 3 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'} border-2 border-white absolute -left-6 shadow-sm"><i class="fas fa-motorcycle text-[10px]"></i></div>
+                            <div class="ml-4"><p class="font-bold text-sm ${step >= 3 ? 'text-gray-800' : 'text-gray-400'}">Out for Delivery</p><p class="text-xs text-gray-500">Partner on the way</p></div>
+                        </div>
+                        <div class="relative z-10 flex items-center">
+                            <div class="h-6 w-6 rounded-full flex items-center justify-center ${step >= 4 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'} border-2 border-white absolute -left-6 shadow-sm"><i class="fas fa-home text-[10px]"></i></div>
+                            <div class="ml-4"><p class="font-bold text-sm ${step >= 4 ? 'text-gray-800' : 'text-gray-400'}">Delivered</p><p class="text-xs text-gray-500">Enjoy your groceries!</p></div>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="renderTracking()" class="w-full bg-green-50 hover:bg-green-100 text-green-700 py-3 rounded-xl font-bold border border-green-200 transition-colors"><i class="fas fa-sync-alt mr-2"></i> Refresh Status</button>
+            `;
+        }
+
         function resetApp() {
-            cart = {};
-            renderProducts();
-            updateCartUI();
+            cart = {}; renderProducts(); updateCartUI();
             document.getElementById('orderSuccess').classList.add('hidden');
             document.getElementById('successIcon').classList.add('scale-0');
             window.scrollTo(0,0);
         }
 
-        // --- ADMIN HISAAB (SETTLEMENT) SYSTEM ---
-        const ADMIN_PIN = "9999"; // Aap apna secret 4 digit PIN yahan set kar sakte hain
-        let adminTapCount = 0;
-        let adminTapTimer;
-
-        // 5 baar logo par tap karne ki logic
+        let adminTapCount = 0; let adminTapTimer;
         function handleAdminTap() {
-            adminTapCount++;
-            clearTimeout(adminTapTimer);
-            
-            // Agar 5 baar tap kar diya gaya
+            adminTapCount++; clearTimeout(adminTapTimer);
             if(adminTapCount === 5) {
                 adminTapCount = 0;
                 document.getElementById('pinModal').classList.remove('hidden');
-                setTimeout(() => {
-                    document.getElementById('pinBox').classList.remove('scale-95');
-                    document.getElementById('pinBox').classList.add('scale-100');
-                }, 10);
+                setTimeout(() => { document.getElementById('pinBox').classList.remove('scale-95'); document.getElementById('pinBox').classList.add('scale-100'); }, 10);
                 document.getElementById('adminPinInput').value = '';
                 document.getElementById('adminPinInput').focus();
                 return;
             }
-
-            // Reset tap count agar 2 second tak agla tap nahi hua
-            adminTapTimer = setTimeout(() => {
-                adminTapCount = 0;
-            }, 2000); 
+            adminTapTimer = setTimeout(() => { adminTapCount = 0; }, 2000); 
         }
 
         function closePinModal() {
-            document.getElementById('pinBox').classList.remove('scale-100');
-            document.getElementById('pinBox').classList.add('scale-95');
-            setTimeout(() => {
-                document.getElementById('pinModal').classList.add('hidden');
-            }, 200);
+            document.getElementById('pinBox').classList.remove('scale-100'); document.getElementById('pinBox').classList.add('scale-95');
+            setTimeout(() => { document.getElementById('pinModal').classList.add('hidden'); }, 200);
         }
 
         function verifyAdminPin() {
-            const entered = document.getElementById('adminPinInput').value;
-            if(entered === ADMIN_PIN) {
-                closePinModal();
-                openHisaab(); // Pin sahi hone par Hisaab khulega
-            } else {
-                showMessage("Incorrect Admin PIN!");
-                document.getElementById('adminPinInput').value = '';
-            }
+            if(document.getElementById('adminPinInput').value === "9999") { closePinModal(); openHisaab(); } 
+            else { showMessage("Incorrect Admin PIN!"); document.getElementById('adminPinInput').value = ''; }
         }
 
         function saveOrderToHistory(paymentMethod) {
             let history = JSON.parse(localStorage.getItem('apnaStoreHistory') || '[]');
             
             const itemTotal = parseInt(document.getElementById('billItemTotal').innerText);
-            let deliveryFee = parseInt(document.getElementById('billDeliveryFee').innerText.replace('₹', '')) || 0;
-            const convenienceFee = parseInt(document.getElementById('billConvenienceFee').innerText);
-            const grandTotal = parseInt(document.getElementById('billGrandTotal').innerText);
             
+            // Extracting Delivery and Convenience safely, accounting for the "Free" text
+            let delText = document.getElementById('billDeliveryFee').innerText;
+            const deliveryFee = delText.includes('Free') ? 0 : parseInt(delText.replace('₹', '')) || 0;
+            
+            let convText = document.getElementById('billConvenienceFee').innerText;
+            const convenienceFee = convText.includes('Free') ? 0 : parseInt(convText.replace('₹', '')) || 0;
+            
+            const grandTotal = parseInt(document.getElementById('billGrandTotal').innerText);
             const generatedId = 'ORD' + Math.floor(100000 + Math.random() * 900000);
 
             const newOrder = {
                 id: generatedId,
+                timestamp: Date.now(),
                 time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
                 date: new Date().toLocaleDateString(),
                 itemTotal: itemTotal,
@@ -1052,29 +1082,22 @@
             
             history.push(newOrder);
             localStorage.setItem('apnaStoreHistory', JSON.stringify(history));
-            
-            return generatedId;
+            return newOrder;
         }
 
         function openHisaab() {
             document.getElementById('hisaabModal').classList.remove('hidden');
-            setTimeout(() => {
-                document.getElementById('hisaabSlide').classList.remove('translate-y-full');
-            }, 10);
+            setTimeout(() => { document.getElementById('hisaabSlide').classList.remove('translate-y-full'); }, 10);
             renderHisaab();
-            
             isConfirmingClear = false;
             const btn = document.getElementById('clearHisaabBtn');
             btn.innerText = "Clear Today's Hisaab";
-            btn.classList.add('bg-red-50', 'text-red-600');
-            btn.classList.remove('bg-red-600', 'text-white', 'border-red-600');
+            btn.className = "w-full bg-red-50 text-red-600 border border-red-200 font-bold py-3.5 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm";
         }
 
         function closeHisaab() {
             document.getElementById('hisaabSlide').classList.add('translate-y-full');
-            setTimeout(() => {
-                document.getElementById('hisaabModal').classList.add('hidden');
-            }, 300);
+            setTimeout(() => { document.getElementById('hisaabModal').classList.add('hidden'); }, 300);
         }
 
         function renderHisaab() {
@@ -1082,20 +1105,11 @@
             const container = document.getElementById('hisaabContent');
             
             if (history.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center text-gray-500 mt-24 flex flex-col items-center">
-                        <div class="bg-white shadow-sm h-24 w-24 rounded-full flex items-center justify-center mb-5 border border-gray-100">
-                            <i class="fas fa-receipt text-4xl text-gray-300"></i>
-                        </div>
-                        <p class="font-bold text-gray-800 text-xl mb-1">No Orders Yet</p>
-                        <p class="text-sm text-gray-500">Your daily collections will appear here.</p>
-                    </div>`;
+                container.innerHTML = `<div class="text-center text-gray-500 mt-24 flex flex-col items-center"><div class="bg-white shadow-sm h-24 w-24 rounded-full flex items-center justify-center mb-5 border border-gray-100"><i class="fas fa-receipt text-4xl text-gray-300"></i></div><p class="font-bold text-gray-800 text-xl mb-1">No Orders Yet</p></div>`;
                 return;
             }
 
-            let totalCollection = 0;
-            let vendorShare = 0;
-            let myProfit = 0;
+            let totalCollection = 0; let vendorShare = 0; let myProfit = 0;
             let historyHTML = `<h3 class="font-bold text-gray-800 mb-3 text-sm flex items-center px-1"><i class="fas fa-history text-gray-400 mr-2"></i> Recent Orders</h3>`;
             
             for (let i = history.length - 1; i >= 0; i--) {
@@ -1104,91 +1118,47 @@
                 vendorShare += order.itemTotal;
                 myProfit += (order.deliveryFee + order.convenienceFee);
 
-                // Modern Ticket Style Card for Orders
                 historyHTML += `
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-3 relative overflow-hidden transition-all hover:shadow-md">
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-3 transition-all hover:shadow-md">
                         <div class="flex justify-between items-center border-b border-gray-50 pb-3 mb-3">
-                            <div class="flex items-center space-x-3">
-                                <div class="bg-blue-50 text-blue-600 h-10 w-10 rounded-full flex items-center justify-center font-bold text-sm shadow-inner"><i class="fas fa-box"></i></div>
-                                <div>
-                                    <span class="font-bold text-gray-900 block text-sm tracking-tight">#${order.id}</span>
-                                    <span class="text-gray-400 text-xs font-medium">${order.time}</span>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <span class="font-black text-gray-900 block text-lg">₹${order.grandTotal}</span>
-                                <span class="text-[9px] uppercase font-bold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200 mt-1 inline-block">${order.method}</span>
-                            </div>
+                            <div class="flex items-center space-x-3"><div class="bg-blue-50 text-blue-600 h-10 w-10 rounded-full flex items-center justify-center font-bold text-sm shadow-inner"><i class="fas fa-box"></i></div><div><span class="font-bold text-gray-900 block text-sm tracking-tight">#${order.id}</span><span class="text-gray-400 text-xs font-medium">${order.time}</span></div></div>
+                            <div class="text-right"><span class="font-black text-gray-900 block text-lg">₹${order.grandTotal}</span><span class="text-[9px] uppercase font-bold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200 mt-1 inline-block">${order.method}</span></div>
                         </div>
                         <div class="flex justify-between items-center text-xs bg-gray-50/80 p-2.5 rounded-lg border border-gray-100">
                             <span class="text-gray-500 flex items-center"><i class="fas fa-store text-orange-400 mr-1.5"></i>Vendor: <strong class="text-gray-800 ml-1">₹${order.itemTotal}</strong></span>
                             <span class="text-gray-500 flex items-center"><i class="fas fa-plus-circle text-green-500 mr-1.5"></i>App Fee: <strong class="text-green-600 ml-1">+₹${order.deliveryFee + order.convenienceFee}</strong></span>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             }
 
-            // Sleek Fintech Dark Dashboard
-            const dashboardHTML = `
+            container.innerHTML = `
                 <div class="bg-gray-900 text-white p-6 rounded-3xl shadow-xl mb-6 relative overflow-hidden">
-                    <!-- Background aesthetic circles -->
                     <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-500 rounded-full blur-3xl opacity-20"></div>
                     <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-green-500 rounded-full blur-3xl opacity-20"></div>
-                    
                     <p class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">Total Collection (Dhanda)</p>
-                    <div class="flex items-baseline space-x-1 mb-5">
-                        <span class="text-2xl font-medium text-gray-300">₹</span>
-                        <h2 class="text-4xl font-black tracking-tight text-white">${totalCollection}</h2>
-                    </div>
-                    
+                    <div class="flex items-baseline space-x-1 mb-5"><span class="text-2xl font-medium text-gray-300">₹</span><h2 class="text-4xl font-black tracking-tight text-white">${totalCollection}</h2></div>
                     <div class="grid grid-cols-2 gap-3">
-                        <div class="bg-white/10 rounded-2xl p-3.5 backdrop-blur-md border border-white/10 flex flex-col justify-between">
-                            <p class="text-orange-300 text-[10px] font-bold uppercase tracking-wide mb-2 flex items-center"><i class="fas fa-store mr-1.5"></i> Dukan Wale Ka</p>
-                            <p class="text-xl font-bold text-white">₹${vendorShare}</p>
-                        </div>
-                        <div class="bg-gradient-to-br from-green-500/20 to-blue-500/20 rounded-2xl p-3.5 backdrop-blur-md border border-white/10 flex flex-col justify-between">
-                            <p class="text-green-300 text-[10px] font-bold uppercase tracking-wide mb-2 flex items-center"><i class="fas fa-wallet mr-1.5"></i> Mera Profit</p>
-                            <p class="text-xl font-bold text-white">₹${myProfit}</p>
-                        </div>
+                        <div class="bg-white/10 rounded-2xl p-3.5 backdrop-blur-md border border-white/10 flex flex-col justify-between"><p class="text-orange-300 text-[10px] font-bold uppercase tracking-wide mb-2 flex items-center"><i class="fas fa-store mr-1.5"></i> Dukan Wale Ka</p><p class="text-xl font-bold text-white">₹${vendorShare}</p></div>
+                        <div class="bg-gradient-to-br from-green-500/20 to-blue-500/20 rounded-2xl p-3.5 backdrop-blur-md border border-white/10 flex flex-col justify-between"><p class="text-green-300 text-[10px] font-bold uppercase tracking-wide mb-2 flex items-center"><i class="fas fa-wallet mr-1.5"></i> Mera Profit</p><p class="text-xl font-bold text-white">₹${myProfit}</p></div>
                     </div>
-                </div>
-            `;
-
-            container.innerHTML = dashboardHTML + historyHTML;
+                </div>` + historyHTML;
         }
 
-        // Custom double-click to confirm clear (Replaces browser confirm popup)
         function clearHisaab() {
             const btn = document.getElementById('clearHisaabBtn');
             if(!isConfirmingClear) {
                 isConfirmingClear = true;
                 btn.innerText = "Are you sure? Click again to delete";
-                btn.classList.remove('bg-red-50', 'text-red-600');
-                btn.classList.add('bg-red-600', 'text-white', 'border-red-600');
-                
-                setTimeout(() => {
-                    if(isConfirmingClear) {
-                        isConfirmingClear = false;
-                        btn.innerText = "Clear Today's Hisaab";
-                        btn.classList.add('bg-red-50', 'text-red-600');
-                        btn.classList.remove('bg-red-600', 'text-white', 'border-red-600');
-                    }
-                }, 3000);
+                btn.className = "w-full bg-red-600 text-white border border-red-600 font-bold py-3.5 rounded-xl transition-all shadow-sm";
+                setTimeout(() => { if(isConfirmingClear) { isConfirmingClear = false; btn.innerText = "Clear Today's Hisaab"; btn.className = "w-full bg-red-50 text-red-600 border border-red-200 font-bold py-3.5 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm"; } }, 3000);
             } else {
-                localStorage.removeItem('apnaStoreHistory');
-                isConfirmingClear = false;
-                btn.innerText = "Clear Today's Hisaab";
-                btn.classList.add('bg-red-50', 'text-red-600');
-                btn.classList.remove('bg-red-600', 'text-white', 'border-red-600');
-                renderHisaab();
-                showMessage("Hisaab cleared successfully.");
+                localStorage.removeItem('apnaStoreHistory'); isConfirmingClear = false;
+                btn.innerText = "Clear Today's Hisaab"; btn.className = "w-full bg-red-50 text-red-600 border border-red-200 font-bold py-3.5 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm";
+                renderHisaab(); showMessage("Hisaab cleared successfully."); updateCartUI(); // Refresh UI to reset "1st order Free" logic
             }
         }
 
-        // Initialize App
-        window.onload = () => {
-            renderProducts();
-        };
+        window.onload = () => { renderProducts(); };
     </script>
 </body>
 </html>
