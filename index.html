@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FreshCart Grocery</title>
+    <title>Apna Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -60,9 +60,44 @@
             transform: scale(1);
             transition: all 0.3s ease-out;
         }
+
+        /* NEW ANIMATIONS FOR SMS */
+        @keyframes slideDownSms {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .sms-notification {
+            animation: slideDownSms 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
     </style>
 </head>
 <body class="text-gray-800 antialiased overflow-x-hidden">
+
+    <!-- Fake SMS Notification (Hidden initially) -->
+    <div id="smsBanner" class="fixed top-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 p-4 z-[100] hidden items-start gap-3 transition-all">
+        <div class="bg-blue-500 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0">
+            <i class="fa-solid fa-message text-white"></i>
+        </div>
+        <div class="flex-1">
+            <div class="flex justify-between items-center mb-1">
+                <span class="text-xs font-bold text-gray-500">Messages • Now</span>
+                <button onclick="closeSmsBanner()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-times text-sm"></i></button>
+            </div>
+            <p class="text-sm text-gray-900 font-medium leading-tight">Your Apna Store login OTP is <span id="dynamicOtpDisplay" class="font-bold text-emerald-600 text-lg"></span>. Do not share this with anyone.</p>
+        </div>
+    </div>
+
+    <!-- Verifying Payment Overlay -->
+    <div id="paymentVerifyingOverlay" class="fixed inset-0 bg-white/95 z-[100] hidden flex-col items-center justify-center text-center p-6 backdrop-blur-sm transition-opacity opacity-0">
+        <div class="relative w-20 h-20 mb-6">
+            <div class="absolute inset-0 border-4 border-gray-100 rounded-full"></div>
+            <div class="absolute inset-0 border-4 border-emerald-500 rounded-full border-t-transparent animate-spin"></div>
+            <i class="fa-solid fa-building-columns absolute inset-0 m-auto text-emerald-500 text-2xl flex items-center justify-center"></i>
+        </div>
+        <h3 class="text-2xl font-black text-gray-900 mb-2">Verifying Payment</h3>
+        <p class="text-gray-500 font-medium">Please wait while we confirm with your bank...</p>
+        <p class="text-xs text-gray-400 mt-4 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">Do not press back or close the app</p>
+    </div>
 
     <!-- Navigation -->
     <nav class="bg-white shadow-sm sticky top-0 z-40">
@@ -71,13 +106,13 @@
                 <!-- Logo -->
                 <div class="flex-shrink-0 flex items-center cursor-pointer">
                     <i class="fa-solid fa-basket-shopping text-emerald-500 text-2xl mr-2"></i>
-                    <span class="font-bold text-xl tracking-tight text-gray-900 hidden sm:block">Fresh<span class="text-emerald-500">Cart</span></span>
+                    <span class="font-bold text-xl tracking-tight text-gray-900 hidden sm:block">Apna<span class="text-emerald-500">Store</span></span>
                 </div>
                 
                 <!-- Delivery Location (New Blinkit Style) -->
                 <div class="flex flex-col cursor-pointer hover:bg-gray-50 p-1.5 rounded-lg transition border border-gray-100 shadow-sm px-3" onclick="openAddressModal()">
                     <div class="flex items-center text-xs font-extrabold text-gray-900 uppercase tracking-wide">
-                        <span>Delivery in 10 min</span>
+                        <span>Delivery under 25 min</span>
                         <i class="fa-solid fa-chevron-down text-[10px] ml-1 text-emerald-600"></i>
                     </div>
                     <div class="text-xs text-gray-500 truncate w-32 md:w-56 mt-0.5" id="displayAddress">Select Location</div>
@@ -94,10 +129,10 @@
                 </div>
 
                 <!-- Icons -->
-                <div class="flex items-center space-x-6">
-                    <button class="text-gray-500 hover:text-emerald-500 transition hidden md:block">
-                        <i class="fa-regular fa-user text-xl"></i>
-                    </button>
+                <div class="flex items-center space-x-4 sm:space-x-6">
+                    <div id="authContainer" class="flex items-center">
+                        <button onclick="openLoginModal()" class="text-gray-900 font-bold hover:text-emerald-600 transition text-sm sm:text-base border border-gray-200 px-4 py-1.5 rounded-full">Login</button>
+                    </div>
                     <button onclick="toggleCart()" class="text-gray-500 hover:text-emerald-500 transition relative">
                         <i class="fa-solid fa-cart-shopping text-xl"></i>
                         <span id="cartBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center opacity-0 transition-opacity">0</span>
@@ -206,28 +241,28 @@
                 <div class="space-y-2 mb-3">
                     <div class="flex justify-between text-xs text-gray-600">
                         <p>Item Total</p>
-                        <p id="itemTotal">$0.00</p>
+                        <p id="itemTotal">₹0</p>
                     </div>
                     <div class="flex justify-between text-xs text-gray-600">
-                        <p>Delivery Fee (10 mins)</p>
-                        <p id="deliveryFeeCalc">$0.00</p>
+                        <p>Delivery Fee (25 mins)</p>
+                        <p id="deliveryFeeCalc">₹0</p>
                     </div>
                     <div class="flex justify-between text-xs text-gray-600">
                         <p>Handling Charge</p>
-                        <p id="handlingFeeCalc">$0.00</p>
+                        <p id="handlingFeeCalc">₹0</p>
                     </div>
                 </div>
                 <div class="border-t border-dashed border-gray-300 pt-2">
                     <div class="flex justify-between text-sm font-bold text-gray-900">
                         <p>Grand Total</p>
-                        <p id="grandTotal">$0.00</p>
+                        <p id="grandTotal">₹0</p>
                     </div>
                 </div>
             </div>
             
             <button id="checkoutBtn" onclick="openPaymentModal()" class="w-full bg-emerald-600 border border-transparent rounded-xl shadow-sm py-3 px-4 text-base font-bold text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition disabled:opacity-50 disabled:cursor-not-allowed flex justify-between items-center" disabled>
                 <div class="flex flex-col items-start leading-tight">
-                    <span id="btnTotal" class="text-lg">$0.00</span>
+                    <span id="btnTotal" class="text-lg">₹0</span>
                     <span class="text-[10px] font-normal opacity-90 text-white uppercase tracking-wider">Total</span>
                 </div>
                 <span class="flex items-center text-lg tracking-wide">Proceed to Pay <i class="fa-solid fa-caret-right ml-2"></i></span>
@@ -280,7 +315,7 @@
             <div class="p-6 overflow-y-auto flex-1">
                 <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 mb-6 flex justify-between items-center">
                     <span class="text-sm text-emerald-800 font-bold">Amount to pay</span>
-                    <span class="text-2xl font-black text-emerald-700" id="paymentModalTotal">$0.00</span>
+                    <span class="text-2xl font-black text-emerald-700" id="paymentModalTotal">₹0</span>
                 </div>
 
                 <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">UPI Options</h4>
@@ -334,16 +369,44 @@
             </div>
             
             <!-- Payment Processing Overlay -->
-            <div id="paymentProcessing" class="absolute inset-0 bg-white/95 z-[90] hidden flex-col items-center justify-center">
-                <i class="fa-solid fa-circle-notch fa-spin text-emerald-500 text-5xl mb-4"></i>
-                <h3 class="text-xl font-bold text-gray-900 mb-1">Processing Payment</h3>
-                <p class="text-sm text-gray-500">Please do not close this window or hit back.</p>
+            <div id="paymentProcessing" class="absolute inset-0 bg-white/95 z-[90] hidden flex-col items-center justify-center text-center p-6">
+                <i class="fa-solid fa-circle-notch fa-spin text-emerald-500 text-5xl mb-4" id="processingIcon"></i>
+                <h3 class="text-xl font-bold text-gray-900 mb-1" id="processingTitle">Processing Payment</h3>
+                <p class="text-sm text-gray-500" id="processingDesc">Please do not close this window or hit back.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModalOverlay" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-[90] hidden items-center justify-center transition-opacity opacity-0 p-4">
+        <div id="loginModal" class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 transform scale-95 transition-all duration-300">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-900">Login to Apna Store</h3>
+                <button onclick="closeLoginModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-times text-xl"></i></button>
+            </div>
+            
+            <!-- Step 1: Phone -->
+            <div id="loginStep1">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                <div class="flex shadow-sm rounded-lg">
+                    <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm font-bold">+91</span>
+                    <input type="tel" id="phoneInput" maxlength="10" class="flex-1 block w-full rounded-none rounded-r-lg border border-gray-300 px-3 py-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none sm:text-sm font-medium tracking-wide" placeholder="Enter mobile number">
+                </div>
+                <button onclick="sendOTP()" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl mt-6 hover:bg-emerald-700 transition shadow-md">Get OTP</button>
+            </div>
+
+            <!-- Step 2: OTP -->
+            <div id="loginStep2" class="hidden">
+                <p class="text-sm text-gray-600 mb-4">OTP sent to <span id="displayPhone" class="font-bold text-gray-900"></span> <button onclick="resetLogin()" class="text-emerald-600 ml-2 font-medium text-xs hover:underline">Edit</button></p>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Enter 4-digit OTP</label>
+                <input type="text" id="otpInput" maxlength="4" class="block w-full rounded-lg border border-gray-300 px-3 py-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none sm:text-lg text-center tracking-[0.5em] font-black" placeholder="••••">
+                <button onclick="verifyOTP()" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl mt-6 hover:bg-emerald-700 transition shadow-md">Verify & Login</button>
             </div>
         </div>
     </div>
 
     <!-- Toast Notification Container -->
-    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-[100] flex flex-col gap-2 pointer-events-none"></div>
 
     <!-- Footer -->
     <footer class="bg-white border-t border-gray-200 mt-auto">
@@ -366,10 +429,10 @@
                 <div class="mt-8 md:mt-0 md:order-1 flex flex-col items-center md:items-start">
                     <div class="flex items-center cursor-pointer mb-4">
                         <i class="fa-solid fa-basket-shopping text-emerald-500 text-xl mr-2"></i>
-                        <span class="font-bold text-lg text-gray-900">Fresh<span class="text-emerald-500">Cart</span></span>
+                        <span class="font-bold text-lg text-gray-900">Apna<span class="text-emerald-500">Store</span></span>
                     </div>
                     <p class="text-center md:text-left text-sm text-gray-500">
-                        &copy; 2026 FreshCart Grocery Inc. All rights reserved.<br>
+                        &copy; 2026 Apna Store. All rights reserved.<br>
                         Providing fresh, quality groceries to your neighborhood.
                     </p>
                 </div>
@@ -390,18 +453,18 @@
         ];
 
         const products = [
-            { id: 1, name: 'Organic Bananas', price: 1.99, unit: 'lb', category: 'fruits', image: 'https://placehold.co/400x400/fef08a/854d0e?text=Bananas' },
-            { id: 2, name: 'Red Apples', price: 2.49, unit: 'lb', category: 'fruits', image: 'https://placehold.co/400x400/fecaca/b91c1c?text=Apples' },
-            { id: 3, name: 'Fresh Broccoli', price: 2.50, unit: 'head', category: 'vegetables', image: 'https://placehold.co/400x400/bbf7d0/166534?text=Broccoli' },
-            { id: 4, name: 'Whole Milk', price: 3.29, unit: 'gallon', category: 'dairy', image: 'https://placehold.co/400x400/f1f5f9/475569?text=Milk' },
-            { id: 5, name: 'Sourdough Bread', price: 4.50, unit: 'loaf', category: 'bakery', image: 'https://placehold.co/400x400/fed7aa/9a3412?text=Bread' },
-            { id: 6, name: 'Chicken Breast', price: 7.99, unit: 'lb', category: 'meat', image: 'https://placehold.co/400x400/ffedd5/9a3412?text=Chicken' },
-            { id: 7, name: 'Large Brown Eggs', price: 4.99, unit: 'dozen', category: 'dairy', image: 'https://placehold.co/400x400/fef3c7/b45309?text=Eggs' },
-            { id: 8, name: 'Orange Juice', price: 4.25, unit: 'bottle', category: 'beverages', image: 'https://placehold.co/400x400/fef08a/a16207?text=Juice' },
-            { id: 9, name: 'Fresh Carrots', price: 1.50, unit: 'lb', category: 'vegetables', image: 'https://placehold.co/400x400/fed7aa/c2410c?text=Carrots' },
-            { id: 10, name: 'Ground Beef', price: 6.49, unit: 'lb', category: 'meat', image: 'https://placehold.co/400x400/fecaca/991b1b?text=Beef' },
-            { id: 11, name: 'Strawberries', price: 3.99, unit: 'box', category: 'fruits', image: 'https://placehold.co/400x400/fecaca/991b1b?text=Strawberries' },
-            { id: 12, name: 'Sparkling Water', price: 5.99, unit: '12-pack', category: 'beverages', image: 'https://placehold.co/400x400/bae6fd/0369a1?text=Water' }
+            { id: 1, name: 'Fresh Bananas', price: 60, unit: 'dozen', category: 'fruits', image: 'https://placehold.co/400x400/fef08a/854d0e?text=Bananas' },
+            { id: 2, name: 'Kashmiri Apples', price: 150, unit: 'kg', category: 'fruits', image: 'https://placehold.co/400x400/fecaca/b91c1c?text=Apples' },
+            { id: 3, name: 'Fresh Broccoli', price: 80, unit: 'pc', category: 'vegetables', image: 'https://placehold.co/400x400/bbf7d0/166534?text=Broccoli' },
+            { id: 4, name: 'Amul Taaza Milk', price: 66, unit: '1L', category: 'dairy', image: 'https://placehold.co/400x400/f1f5f9/475569?text=Milk' },
+            { id: 5, name: 'Whole Wheat Bread', price: 50, unit: 'pack', category: 'bakery', image: 'https://placehold.co/400x400/fed7aa/9a3412?text=Bread' },
+            { id: 6, name: 'Chicken Breast', price: 250, unit: '500g', category: 'meat', image: 'https://placehold.co/400x400/ffedd5/9a3412?text=Chicken' },
+            { id: 7, name: 'Farm Fresh Eggs', price: 85, unit: 'dozen', category: 'dairy', image: 'https://placehold.co/400x400/fef3c7/b45309?text=Eggs' },
+            { id: 8, name: 'Mixed Fruit Juice', price: 110, unit: '1L', category: 'beverages', image: 'https://placehold.co/400x400/fef08a/a16207?text=Juice' },
+            { id: 9, name: 'Fresh Carrots', price: 40, unit: 'kg', category: 'vegetables', image: 'https://placehold.co/400x400/fed7aa/c2410c?text=Carrots' },
+            { id: 10, name: 'Fresh Paneer', price: 90, unit: '200g', category: 'dairy', image: 'https://placehold.co/400x400/fecaca/991b1b?text=Paneer' },
+            { id: 11, name: 'Strawberries', price: 120, unit: 'box', category: 'fruits', image: 'https://placehold.co/400x400/fecaca/991b1b?text=Strawberries' },
+            { id: 12, name: 'Mineral Water', price: 20, unit: '1L', category: 'beverages', image: 'https://placehold.co/400x400/bae6fd/0369a1?text=Water' }
         ];
 
         // --- STATE ---
@@ -409,12 +472,14 @@
         let searchQuery = '';
         let cart = []; // Array of { product, quantity }
         let isCartOpen = false;
+        let currentUser = null; // { phone: string }
+        let generatedOTP = null; // Store dynamic OTP
 
         // New State for Address and Fees
         const FEES = {
-            delivery: 2.99,
-            convenience: 1.50,
-            freeDeliveryThreshold: 35.00
+            delivery: 35,
+            convenience: 15,
+            freeDeliveryThreshold: 499
         };
         let currentAddress = "Select Location";
 
@@ -448,12 +513,16 @@
         const paymentModal = document.getElementById('paymentModal');
         const paymentModalTotal = document.getElementById('paymentModalTotal');
         const paymentProcessing = document.getElementById('paymentProcessing');
+        const loginModalOverlay = document.getElementById('loginModalOverlay');
+        const loginModal = document.getElementById('loginModal');
+        const authContainer = document.getElementById('authContainer');
 
         // --- INITIALIZATION ---
         function init() {
             renderCategories();
             renderProducts();
             setupEventListeners();
+            loadUser();
             loadCart();
             loadAddress();
         }
@@ -511,7 +580,7 @@
                         <h3 class="font-semibold text-gray-900 leading-tight mb-2">${product.name}</h3>
                         <div class="mt-auto flex items-center justify-between">
                             <div class="flex flex-col">
-                                <span class="font-bold text-lg text-emerald-600">$${product.price.toFixed(2)}</span>
+                                <span class="font-bold text-lg text-emerald-600">₹${product.price}</span>
                                 <span class="text-xs text-gray-400">/ ${product.unit}</span>
                             </div>
                             <button onclick="addToCart(${product.id})" class="bg-gray-100 hover:bg-emerald-500 hover:text-white text-gray-700 w-10 h-10 rounded-full flex items-center justify-center transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
@@ -622,117 +691,225 @@
             }
 
             // Update Bill Details
-            itemTotalEl.textContent = `$${itemTotal.toFixed(2)}`;
+            itemTotalEl.textContent = `₹${itemTotal}`;
             
-            if (deliveryFee === 0 && count > 0) {
-                deliveryFeeCalcEl.innerHTML = `<span class="line-through text-gray-400 mr-2">$${FEES.delivery.toFixed(2)}</span><span class="text-emerald-600 font-bold">FREE</span>`;
-            } else {
-                deliveryFeeCalcEl.textContent = `$${deliveryFee.toFixed(2)}`;
-            }
-            
-            handlingFeeCalcEl.textContent = `$${convenienceFee.toFixed(2)}`;
-            grandTotalEl.textContent = `$${grandTotal.toFixed(2)}`;
-            btnTotalEl.textContent = `$${grandTotal.toFixed(2)}`;
+            deliveryFeeCalcEl.textContent = deliveryFee === 0 && count > 0 ? 'FREE' : `₹${deliveryFee}`;
+            handlingFeeCalcEl.textContent = `₹${convenienceFee}`;
+            grandTotalEl.textContent = `₹${grandTotal}`;
+            btnTotalEl.textContent = `₹${grandTotal}`;
 
-            // Enable/Disable checkout
-            checkoutBtn.disabled = cart.length === 0;
-
-            // Render Items
+            // Update Cart Items UI
             if (cart.length === 0) {
                 cartItemsContainer.innerHTML = '';
                 cartItemsContainer.appendChild(emptyCartMessage);
                 emptyCartMessage.classList.remove('hidden');
+                checkoutBtn.disabled = true;
             } else {
                 emptyCartMessage.classList.add('hidden');
-                
+                checkoutBtn.disabled = false;
                 cartItemsContainer.innerHTML = cart.map(item => `
-                    <div class="flex py-5 border-b border-gray-100 last:border-0 relative">
-                        <div class="h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl border border-gray-200">
-                            <img src="${item.product.image}" alt="${item.product.name}" class="h-full w-full object-cover object-center">
+                    <div class="flex items-center gap-4 py-4 border-b border-gray-50 last:border-0">
+                        <img src="${item.product.image}" alt="${item.product.name}" class="w-16 h-16 rounded-xl object-cover bg-gray-50 border border-gray-100">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-sm font-bold text-gray-900 truncate">${item.product.name}</h4>
+                            <p class="text-xs text-gray-500 mb-2">${item.product.unit}</p>
+                            <div class="font-bold text-gray-900">₹${item.product.price * item.quantity}</div>
                         </div>
-                        <div class="ml-4 flex flex-1 flex-col">
-                            <div>
-                                <div class="flex justify-between text-base font-medium text-gray-900">
-                                    <h3 class="line-clamp-2 leading-tight text-sm">${item.product.name}</h3>
-                                </div>
-                                <p class="mt-1 text-xs text-gray-500">${item.product.unit}</p>
-                            </div>
-                            <div class="flex flex-1 items-end justify-between text-sm mt-2">
-                                <div class="font-bold text-emerald-600">$${(item.product.price * item.quantity).toFixed(2)}</div>
-                                <div class="flex items-center bg-emerald-50 border border-emerald-600 rounded-lg overflow-hidden h-8 shadow-sm">
-                                    <button onclick="updateCartQuantity(${item.product.id}, -1)" class="w-8 h-full flex items-center justify-center text-emerald-700 hover:bg-emerald-600 hover:text-white transition focus:outline-none"><i class="fa-solid ${item.quantity === 1 ? 'fa-trash-can' : 'fa-minus'} text-[10px]"></i></button>
-                                    <span class="w-6 font-bold text-center text-emerald-800 text-xs">${item.quantity}</span>
-                                    <button onclick="updateCartQuantity(${item.product.id}, 1)" class="w-8 h-full flex items-center justify-center text-emerald-700 hover:bg-emerald-600 hover:text-white transition focus:outline-none"><i class="fa-solid fa-plus text-[10px]"></i></button>
-                                </div>
-                            </div>
+                        <div class="flex items-center border border-emerald-500 rounded-lg bg-emerald-50 text-emerald-600 shadow-sm h-8">
+                            <button onclick="updateCartQuantity(${item.product.id}, -1)" class="w-8 flex items-center justify-center hover:bg-emerald-100 transition rounded-l-lg"><i class="fa-solid ${item.quantity === 1 ? 'fa-trash text-xs text-red-500' : 'fa-minus text-xs'}"></i></button>
+                            <span class="w-6 text-center text-sm font-bold text-emerald-700">${item.quantity}</span>
+                            <button onclick="updateCartQuantity(${item.product.id}, 1)" class="w-8 flex items-center justify-center hover:bg-emerald-100 transition rounded-r-lg"><i class="fa-solid fa-plus text-xs"></i></button>
                         </div>
                     </div>
                 `).join('');
             }
         }
 
+        function saveCart() {
+            localStorage.setItem('apnastore_cart', JSON.stringify(cart));
+        }
+
+        function loadCart() {
+            const savedCart = localStorage.getItem('apnastore_cart');
+            if (savedCart) {
+                cart = JSON.parse(savedCart);
+            }
+            updateCartUI();
+        }
+
         function toggleCart() {
             isCartOpen = !isCartOpen;
-            
             if (isCartOpen) {
                 cartOverlay.classList.remove('hidden');
-                // Small delay to allow display:block to apply before changing opacity
                 setTimeout(() => {
                     cartOverlay.classList.remove('opacity-0');
                     cartSidebar.classList.remove('translate-x-full');
                 }, 10);
-                document.body.style.overflow = 'hidden'; // Prevent background scrolling
             } else {
                 cartOverlay.classList.add('opacity-0');
                 cartSidebar.classList.add('translate-x-full');
                 setTimeout(() => {
                     cartOverlay.classList.add('hidden');
-                }, 300); // Match transition duration
-                document.body.style.overflow = '';
-            }
-        }
-
-        function saveCart() {
-            localStorage.setItem('freshcart_data', JSON.stringify(cart));
-        }
-
-        function loadCart() {
-            const saved = localStorage.getItem('freshcart_data');
-            if (saved) {
-                try {
-                    cart = JSON.parse(saved);
-                    updateCartUI();
-                } catch(e) {
-                    console.error("Could not parse cart data");
-                    cart = [];
-                }
-            } else {
-                updateCartUI();
+                }, 300);
             }
         }
 
         function showToast(message) {
             const toast = document.createElement('div');
-            toast.className = 'bg-gray-900 text-white px-6 py-3 rounded-xl shadow-lg flex items-center space-x-3 toast';
-            toast.innerHTML = `
-                <i class="fa-solid fa-check-circle text-emerald-400"></i>
-                <span class="font-medium text-sm">${message}</span>
-            `;
-            
+            toast.className = 'toast bg-gray-900 text-white px-4 py-3 rounded-lg shadow-xl font-medium text-sm flex items-center gap-2';
+            toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-500"></i> ${message}`;
             toastContainer.appendChild(toast);
             
-            // Remove after animation completes
             setTimeout(() => {
-                if (toastContainer.contains(toast)) {
-                    toastContainer.removeChild(toast);
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
                 }
             }, 3000);
         }
+            
+        // --- NEW FEATURES (ADDRESS & PAYMENT & AUTH) ---
 
-        // --- NEW FEATURES (ADDRESS & PAYMENT) ---
+        // AUTHENTICATION LOGIC
+        function loadUser() {
+            const saved = localStorage.getItem('apnastore_user');
+            if (saved) {
+                currentUser = JSON.parse(saved);
+                updateAuthUI();
+            }
+        }
+
+        function updateAuthUI() {
+            if (currentUser) {
+                // Show User Profile dropdown toggle instead of Login button
+                authContainer.innerHTML = `
+                    <div class="relative group cursor-pointer">
+                        <div class="flex items-center gap-2 bg-emerald-50 pl-1 pr-3 py-1 rounded-full border border-emerald-100 hover:border-emerald-300 transition">
+                            <div class="w-8 h-8 bg-emerald-200 rounded-full flex items-center justify-center text-emerald-800 font-bold shadow-sm">
+                                <i class="fa-solid fa-user text-sm"></i>
+                            </div>
+                            <span class="text-sm font-bold text-emerald-900 hidden sm:block">${currentUser.phone}</span>
+                        </div>
+                        <div class="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden transform origin-top-right group-hover:scale-100 scale-95">
+                            <div class="px-4 py-3 border-b border-gray-50 bg-gray-50">
+                                <p class="text-xs text-gray-500">Logged in as</p>
+                                <p class="text-sm font-bold text-gray-900 truncate">+91 ${currentUser.phone}</p>
+                            </div>
+                            <button onclick="logout()" class="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 font-bold flex items-center transition">
+                                <i class="fa-solid fa-arrow-right-from-bracket mr-2"></i> Logout
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                authContainer.innerHTML = `<button onclick="openLoginModal()" class="text-gray-900 font-bold hover:text-emerald-600 transition text-sm sm:text-base border border-gray-200 px-5 py-1.5 rounded-full shadow-sm">Login</button>`;
+            }
+        }
+
+        function openLoginModal() {
+            loginModalOverlay.classList.remove('hidden');
+            loginModalOverlay.classList.add('flex');
+            setTimeout(() => {
+                loginModalOverlay.classList.remove('opacity-0');
+                loginModal.classList.remove('scale-95');
+            }, 10);
+            resetLogin();
+        }
+
+        function closeLoginModal() {
+            loginModalOverlay.classList.add('opacity-0');
+            loginModal.classList.add('scale-95');
+            setTimeout(() => {
+                loginModalOverlay.classList.add('hidden');
+                loginModalOverlay.classList.remove('flex');
+            }, 300);
+        }
+
+        function sendOTP() {
+            const phone = document.getElementById('phoneInput').value;
+            
+            // 1. Real Indian Phone Number Validation (10 digits, starts with 6-9)
+            const phoneRegex = /^[6-9]\d{9}$/;
+            if (!phoneRegex.test(phone)) {
+                showToast("Enter a valid 10-digit Indian mobile number");
+                return;
+            }
+            
+            showToast("Generating OTP...");
+            document.getElementById('sendOTPBtn')?.setAttribute('disabled', 'true');
+            
+            setTimeout(() => {
+                // 2. Generate Random 4-digit OTP
+                generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
+                
+                document.getElementById('loginStep1').classList.add('hidden');
+                document.getElementById('loginStep2').classList.remove('hidden');
+                document.getElementById('displayPhone').textContent = "+91 " + phone;
+                document.getElementById('otpInput').value = '';
+                document.getElementById('otpInput').focus();
+                
+                // 3. Show Fake SMS Notification at top
+                showSmsBanner(generatedOTP);
+                
+            }, 800);
+        }
+
+        function showSmsBanner(otp) {
+            const banner = document.getElementById('smsBanner');
+            document.getElementById('dynamicOtpDisplay').textContent = otp;
+            banner.classList.remove('hidden');
+            banner.classList.add('flex', 'sms-notification');
+            
+            // Auto hide after 8 seconds
+            setTimeout(closeSmsBanner, 8000);
+        }
+
+        function closeSmsBanner() {
+            const banner = document.getElementById('smsBanner');
+            banner.classList.add('hidden');
+            banner.classList.remove('flex', 'sms-notification');
+        }
+
+        function verifyOTP() {
+            const otpInput = document.getElementById('otpInput').value;
+            if (otpInput.length !== 4) {
+                showToast("Please enter a 4-digit OTP");
+                return;
+            }
+            
+            // 4. Verify against dynamically generated OTP
+            if (otpInput !== generatedOTP) {
+                showToast("Incorrect OTP! Please check your messages.");
+                document.getElementById('otpInput').value = ''; 
+                return;
+            }
+            
+            const phone = document.getElementById('phoneInput').value;
+            currentUser = { phone: phone };
+            localStorage.setItem('apnastore_user', JSON.stringify(currentUser));
+            
+            updateAuthUI();
+            closeLoginModal();
+            closeSmsBanner();
+            showToast("Logged in successfully!");
+        }
+
+        function resetLogin() {
+            document.getElementById('loginStep1').classList.remove('hidden');
+            document.getElementById('loginStep2').classList.add('hidden');
+            document.getElementById('phoneInput').value = '';
+            document.getElementById('otpInput').value = '';
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('apnastore_user');
+            updateAuthUI();
+            showToast("Logged out successfully");
+        }
+
 
         function loadAddress() {
-            const savedAddr = localStorage.getItem('freshcart_address');
+            const savedAddr = localStorage.getItem('apnastore_address');
             if (savedAddr) {
                 currentAddress = savedAddr;
                 displayAddressEl.textContent = currentAddress;
@@ -785,12 +962,19 @@
             
             currentAddress = `${house}, ${area}`;
             displayAddressEl.textContent = currentAddress;
-            localStorage.setItem('freshcart_address', currentAddress);
+            localStorage.setItem('apnastore_address', currentAddress);
             closeAddressModal();
             showToast("Delivery address updated");
         }
 
         function openPaymentModal() {
+            if (!currentUser) {
+                toggleCart();
+                openLoginModal();
+                showToast("Please login to place your order");
+                return;
+            }
+
             if (currentAddress === "Select Location") {
                 openAddressModal();
                 showToast("Please select a delivery address first");
@@ -827,18 +1011,122 @@
         }
 
         function processUPI(methodName) {
+            const rawAmount = grandTotalEl.textContent.replace('₹', '');
+            
             paymentProcessing.classList.remove('hidden');
             paymentProcessing.classList.add('flex');
             
-            // Simulate Payment Gateway UI / Delay
-            setTimeout(() => {
-                paymentProcessing.classList.add('hidden');
-                paymentProcessing.classList.remove('flex');
-                closePaymentModal();
+            const icon = document.getElementById('processingIcon');
+            const title = document.getElementById('processingTitle');
+            const desc = document.getElementById('processingDesc');
+            
+            if (['Google Pay', 'PhonePe', 'Paytm'].includes(methodName)) {
+                // Setup deep link intent for mobile devices
+                const upiId = "apnastore@ybl";
+                const name = "Apna Store";
+                const note = "Grocery Order";
                 
+                // 1. Use App-Specific URIs instead of generic upi://
+                // This forces the exact app to open instead of an option menu
+                const queryParams = `pa=${upiId}&pn=${encodeURIComponent(name)}&tn=${encodeURIComponent(note)}&am=${rawAmount}&cu=INR`;
+                let upiUrl = "";
+                
+                if (methodName === 'Google Pay') {
+                    upiUrl = `tez://upi/pay?${queryParams}`; // Google pay specific
+                } else if (methodName === 'PhonePe') {
+                    upiUrl = `phonepe://pay?${queryParams}`; // PhonePe specific
+                } else if (methodName === 'Paytm') {
+                    upiUrl = `paytmmp://pay?${queryParams}`; // Paytm specific
+                }
+                
+                icon.className = "fa-solid fa-arrow-up-right-from-square text-emerald-500 text-5xl mb-4";
+                title.textContent = `Opening ${methodName}...`;
+                desc.innerHTML = "Please complete the payment inside the app.<br><span class='block mt-3 text-xs text-red-500 font-bold bg-red-50 p-2 rounded-lg'>If it shows an error, please open this website directly in Google Chrome.</span>";
+                
+                // More reliable deep-linking method
+                try {
+                    // Mark that payment went to UPI app
+                    sessionStorage.setItem('pendingPaymentMode', methodName);
+                    window.top.location.href = upiUrl;
+                } catch (e) {
+                    window.location.href = upiUrl;
+                }
+                
+                // Failsafe: Check if user actually left the app after 3 seconds
+                setTimeout(() => {
+                    if (sessionStorage.getItem('pendingPaymentMode')) {
+                        // They never left the app! The UPI app is probably not installed.
+                        sessionStorage.removeItem('pendingPaymentMode');
+                        paymentProcessing.classList.add('hidden');
+                        paymentProcessing.classList.remove('flex');
+                        
+                        showCustomDialog(
+                            "App Not Found",
+                            `We couldn't open ${methodName}. It might not be installed on this device. Please try another method.`,
+                            "error"
+                        );
+                    }
+                }, 3000);
+                
+            } else {
+                // Standard UI for Card / COD
+                icon.className = "fa-solid fa-circle-notch fa-spin text-emerald-500 text-5xl mb-4";
+                title.textContent = "Processing Payment";
+                desc.textContent = "Please do not close this window or hit back.";
+                
+                setTimeout(() => {
+                    completeOrder(methodName, true);
+                }, 2500);
+            }
+        }
+
+        // --- NEW REALISTIC PAYMENT RETURN LOGIC ---
+        // When user comes back from PhonePe/GPay to our App
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                const pendingPayment = sessionStorage.getItem('pendingPaymentMode');
+                if (pendingPayment) {
+                    sessionStorage.removeItem('pendingPaymentMode'); // Clear it so it doesn't run again
+                    verifyPaymentStatus(pendingPayment);
+                }
+            }
+        });
+
+        function verifyPaymentStatus(methodName) {
+            // Close the initial payment processing UI
+            paymentProcessing.classList.add('hidden');
+            paymentProcessing.classList.remove('flex');
+            closePaymentModal();
+            
+            // Show real-looking bank verification UI
+            const verifyingOverlay = document.getElementById('paymentVerifyingOverlay');
+            verifyingOverlay.classList.remove('hidden');
+            verifyingOverlay.classList.add('flex');
+            setTimeout(() => verifyingOverlay.classList.remove('opacity-0'), 10);
+            
+            // Simulate 3 seconds of server/bank verification
+            setTimeout(() => {
+                verifyingOverlay.classList.add('opacity-0');
+                setTimeout(() => {
+                    verifyingOverlay.classList.add('hidden');
+                    verifyingOverlay.classList.remove('flex');
+                    
+                    // Randomly succeed or fail to show both flows in demo (70% success rate)
+                    const isSuccess = Math.random() > 0.3;
+                    completeOrder(methodName, isSuccess);
+                }, 300);
+            }, 3000);
+        }
+
+        function completeOrder(methodName, isSuccess) {
+            paymentProcessing.classList.add('hidden');
+            paymentProcessing.classList.remove('flex');
+            closePaymentModal();
+            
+            if (isSuccess) {
                 showCustomDialog(
-                    "Order Placed Successfully!", 
-                    `Paid successfully via ${methodName}. Your fresh groceries are being packed and will arrive in 10 minutes at <strong>${currentAddress}</strong>.`, 
+                    "Order Placed Successfully! 🎉", 
+                    `Payment via <strong>${methodName}</strong> received. Your fresh groceries are being packed and will arrive in under 25 minutes at <strong>${currentAddress}</strong>.`, 
                     "success"
                 );
                 
@@ -846,35 +1134,52 @@
                 cart = [];
                 saveCart();
                 updateCartUI();
-            }, 2500);
-        }
-
-        // --- (Deprecated old checkout) ---
-        function checkout() {
-            openPaymentModal();
+            } else {
+                showCustomDialog(
+                    "Payment Failed / Cancelled 😔", 
+                    `We didn't receive the payment from <strong>${methodName}</strong>. If amount was deducted, it will be refunded in 3-5 days.`, 
+                    "error"
+                );
+            }
         }
 
         function showCustomDialog(title, text, type) {
             // Create backdrop
             const backdrop = document.createElement('div');
-            backdrop.className = 'fixed inset-0 bg-gray-900 bg-opacity-75 z-[60] flex items-center justify-center p-4 opacity-0 transition-opacity duration-300';
+            backdrop.className = 'fixed inset-0 bg-gray-900 bg-opacity-75 z-[150] flex items-center justify-center p-4 opacity-0 transition-opacity duration-300';
             
             // Create modal
             const modal = document.createElement('div');
             modal.className = 'bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 transform scale-95 opacity-0 transition-all duration-300';
             
-            const iconColor = type === 'success' ? 'text-emerald-500' : 'text-blue-500';
-            const iconClass = type === 'success' ? 'fa-circle-check' : 'fa-circle-info';
+            let iconColor, iconClass, bgColor, btnText;
+            
+            if (type === 'success') {
+                iconColor = 'text-emerald-500';
+                iconClass = 'fa-circle-check';
+                bgColor = 'bg-emerald-100';
+                btnText = 'Continue Shopping';
+            } else if (type === 'error') {
+                iconColor = 'text-red-500';
+                iconClass = 'fa-circle-xmark';
+                bgColor = 'bg-red-100';
+                btnText = 'Retry Payment';
+            } else {
+                iconColor = 'text-blue-500';
+                iconClass = 'fa-circle-info';
+                bgColor = 'bg-blue-100';
+                btnText = 'Okay';
+            }
             
             modal.innerHTML = `
                 <div class="text-center">
-                    <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-${type === 'success' ? 'emerald' : 'blue'}-100 mb-4">
-                        <i class="fa-regular ${iconClass} ${iconColor} text-3xl"></i>
+                    <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full ${bgColor} mb-4">
+                        <i class="fa-solid ${iconClass} ${iconColor} text-3xl"></i>
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 mb-2">${title}</h3>
-                    <p class="text-gray-500 mb-6">${text}</p>
-                    <button id="closeDialogBtn" class="w-full inline-flex justify-center rounded-full border border-transparent px-4 py-2 bg-emerald-600 text-base font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 sm:text-sm transition">
-                        Continue Shopping
+                    <p class="text-gray-500 mb-6 text-sm">${text}</p>
+                    <button id="closeDialogBtn" class="w-full inline-flex justify-center rounded-full border border-transparent px-4 py-3 ${type === 'error' ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-600 hover:bg-emerald-700'} text-base font-bold text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-${type === 'error' ? 'red' : 'emerald'}-500 transition shadow-md">
+                        ${btnText}
                     </button>
                 </div>
             `;
@@ -895,13 +1200,14 @@
                 modal.classList.add('scale-95', 'opacity-0');
                 setTimeout(() => {
                     document.body.removeChild(backdrop);
+                    if (type === 'error') {
+                        // Re-open payment modal if retry is clicked
+                        openPaymentModal();
+                    }
                 }, 300);
             };
             
             closeBtn.addEventListener('click', closeDialog);
-            backdrop.addEventListener('click', (e) => {
-                if (e.target === backdrop) closeDialog();
-            });
         }
 
         // Start app
