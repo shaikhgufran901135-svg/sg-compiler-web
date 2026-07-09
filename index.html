@@ -478,7 +478,6 @@
         // New State for Address and Fees
         const FEES = {
             delivery: 35,
-            convenience: 15,
             freeDeliveryThreshold: 499
         };
         let currentAddress = "Select Location";
@@ -678,7 +677,16 @@
             if (count > 0) {
                 // Blinkit style fee logic
                 deliveryFee = itemTotal >= FEES.freeDeliveryThreshold ? 0 : FEES.delivery;
-                convenienceFee = FEES.convenience;
+                
+                // Dynamic convenience fee based on order total (₹5 to ₹10)
+                if (itemTotal <= 200) {
+                    convenienceFee = 5;
+                } else if (itemTotal <= 500) {
+                    convenienceFee = 8;
+                } else {
+                    convenienceFee = 10;
+                }
+                
                 grandTotal = itemTotal + deliveryFee + convenienceFee;
             }
 
@@ -1113,20 +1121,31 @@
                     
                     // Randomly succeed or fail to show both flows in demo (70% success rate)
                     const isSuccess = Math.random() > 0.3;
-                    completeOrder(methodName, isSuccess);
+                    
+                    // Check if it was a COD advance payment (Note has 'Advance')
+                    const isCod = sessionStorage.getItem('pendingPaymentMode') && sessionStorage.getItem('pendingPaymentMode').includes('Advance');
+                    
+                    completeOrder(methodName, isSuccess, isCod);
                 }, 300);
             }, 3000);
         }
 
-        function completeOrder(methodName, isSuccess) {
+        function completeOrder(methodName, isSuccess, isCod = false) {
             paymentProcessing.classList.add('hidden');
             paymentProcessing.classList.remove('flex');
             closePaymentModal();
             
             if (isSuccess) {
+                let successMessage = `Payment via <strong>${methodName.replace(' Advance', '')}</strong> received. Your fresh groceries are being packed and will arrive in under 25 minutes at <strong>${currentAddress}</strong>.`;
+                
+                if (isCod) {
+                    const itemsCost = itemTotalEl.textContent;
+                    successMessage = `Advance fee paid successfully! Your order is confirmed. Please keep <strong>${itemsCost} in cash</strong> ready at the time of delivery at <strong>${currentAddress}</strong>.`;
+                }
+
                 showCustomDialog(
-                    "Order Placed Successfully! 🎉", 
-                    `Payment via <strong>${methodName}</strong> received. Your fresh groceries are being packed and will arrive in under 25 minutes at <strong>${currentAddress}</strong>.`, 
+                    "Order Confirmed! 🎉", 
+                    successMessage, 
                     "success"
                 );
                 
@@ -1137,7 +1156,7 @@
             } else {
                 showCustomDialog(
                     "Payment Failed / Cancelled 😔", 
-                    `We didn't receive the payment from <strong>${methodName}</strong>. If amount was deducted, it will be refunded in 3-5 days.`, 
+                    `We didn't receive the payment from <strong>${methodName.replace(' Advance', '')}</strong>. If amount was deducted, it will be refunded in 3-5 days.`, 
                     "error"
                 );
             }
