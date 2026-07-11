@@ -11,6 +11,9 @@
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- FREE REAL-TIME SERVER (MQTT) - No Setup Required! -->
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -45,7 +48,6 @@
 </head>
 <body class="bg-gradient-to-br from-pink-50 to-purple-100 dark:from-gray-950 dark:to-gray-900 text-gray-800 dark:text-white min-h-screen transition-colors duration-300 flex flex-col">
 
-    <!-- Header -->
     <header class="p-4 flex justify-between items-center bg-white/30 dark:bg-black/30 backdrop-blur-md sticky top-0 z-50 shadow-sm">
         <div class="flex items-center gap-2">
             <i class="fa-solid fa-heart text-pink-500 text-xl"></i>
@@ -58,12 +60,12 @@
         </button>
     </header>
 
-    <!-- Main Content Area -->
     <main class="max-w-md mx-auto p-4 flex flex-col flex-1 w-full relative">
         
         <!-- Loading Screen -->
-        <div id="loading-screen" class="absolute inset-0 flex items-center justify-center bg-pink-50/90 dark:bg-gray-900/90 z-40 backdrop-blur-sm">
-            <i class="fa-solid fa-heart text-pink-500 text-5xl animate-bounce"></i>
+        <div id="loading-screen" class="absolute inset-0 flex flex-col items-center justify-center bg-pink-50/90 dark:bg-gray-900/90 z-40 backdrop-blur-sm">
+            <i class="fa-solid fa-heart text-pink-500 text-5xl animate-bounce mb-4"></i>
+            <p class="text-sm text-pink-600 font-semibold">Connecting to global server...</p>
         </div>
 
         <!-- Pairing Screen (Hidden by default) -->
@@ -118,7 +120,7 @@
                         <i class="fa-regular fa-copy"></i>
                     </button>
                     <div class="w-px h-4 bg-gray-300 dark:bg-gray-600"></div>
-                    <button id="disconnect-btn" class="text-gray-500 hover:text-red-500 transition-colors" title="Disconnect">
+                    <button id="disconnect-btn" class="text-gray-500 hover:text-red-500 transition-colors" title="Disconnect & Exit">
                         <i class="fa-solid fa-arrow-right-from-bracket"></i>
                     </button>
                 </div>
@@ -147,7 +149,7 @@
             </div>
 
             <!-- Input Tools Area -->
-            <div class="mt-auto bg-white/80 dark:bg-gray-900/80 rounded-3xl p-2 backdrop-blur-xl border border-white/40 dark:border-gray-700 shadow-xl flex-1 flex flex-col min-h-[220px]">
+            <div class="mt-auto bg-white/80 dark:bg-gray-900/80 rounded-3xl p-2 backdrop-blur-xl border border-white/40 dark:border-gray-700 shadow-xl flex flex-col min-h-[220px]">
                 
                 <!-- Tabs -->
                 <div class="flex p-1 bg-gray-100/50 dark:bg-black/50 rounded-2xl mb-4 shrink-0">
@@ -163,12 +165,12 @@
                 </div>
 
                 <!-- Tab Contents -->
-                <div class="p-2 flex-1 flex flex-col w-full h-full">
+                <div class="p-2 flex-1 flex flex-col w-full h-full relative">
                     
                     <!-- Text Tab -->
-                    <div id="content-note" class="tab-content flex flex-col flex-1 gap-3 w-full h-full">
+                    <div id="content-note" class="tab-content flex-col flex-1 gap-3 w-full h-full" style="display: flex;">
                         <textarea id="note-input" placeholder="Write a sweet note... it appears instantly! ✨" 
-                            class="w-full flex-1 bg-transparent resize-none outline-none text-lg p-2 placeholder:text-gray-400" maxlength="100"></textarea>
+                            class="w-full h-24 bg-transparent resize-none outline-none text-lg p-2 placeholder:text-gray-400" maxlength="100"></textarea>
                         <div class="flex items-center justify-between mt-auto shrink-0">
                             <div id="emoji-bar" class="flex gap-2">
                                 <button class="emoji-btn text-xl hover:scale-125 transition-transform">❤️</button>
@@ -176,7 +178,6 @@
                                 <button class="emoji-btn text-xl hover:scale-125 transition-transform">🥺</button>
                                 <button class="emoji-btn text-xl hover:scale-125 transition-transform">😍</button>
                                 <button class="emoji-btn text-xl hover:scale-125 transition-transform">✨</button>
-                                <button class="emoji-btn text-xl hover:scale-125 transition-transform">🔥</button>
                             </div>
                             <button id="clear-note-btn" class="px-4 py-2 bg-pink-100 dark:bg-gray-800 text-pink-600 dark:text-pink-400 rounded-full hover:bg-pink-200 transition-colors text-sm font-semibold">
                                 Clear
@@ -185,8 +186,8 @@
                     </div>
 
                     <!-- Draw Tab -->
-                    <div id="content-draw" class="tab-content hidden flex-col items-center gap-3 w-full h-full">
-                        <div class="w-full h-32 flex-1 bg-gray-50 dark:bg-gray-800 rounded-2xl border-2 border-dashed border-pink-200 dark:border-pink-900/50 overflow-hidden touch-none relative">
+                    <div id="content-draw" class="tab-content flex-col items-center gap-3 w-full h-full" style="display: none;">
+                        <div class="w-full min-h-[160px] flex-1 bg-gray-50 dark:bg-gray-800 rounded-2xl border-2 border-dashed border-pink-200 dark:border-pink-900/50 overflow-hidden touch-none relative">
                             <canvas id="draw-canvas" class="w-full h-full cursor-crosshair absolute inset-0 z-10"></canvas>
                             <div class="absolute inset-0 pointer-events-none flex items-center justify-center opacity-10 z-0">
                                 <i class="fa-solid fa-pen-nib text-5xl"></i>
@@ -201,10 +202,10 @@
                     </div>
 
                     <!-- Daily Tab -->
-                    <div id="content-daily" class="tab-content hidden flex-col items-center justify-center w-full h-full gap-4 text-center">
+                    <div id="content-daily" class="tab-content flex-col items-center justify-center w-full h-full gap-4 text-center" style="display: none;">
                         <p class="text-sm text-gray-600 dark:text-gray-300">Send a random, carefully curated love quote to brighten their day.</p>
                         <button id="send-daily-btn" class="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-full font-bold hover:scale-105 active:scale-95 transition-all shadow-lg shadow-purple-500/30 flex items-center gap-2">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i> Send Daily Love
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Send Love
                         </button>
                     </div>
 
@@ -214,27 +215,21 @@
     </main>
 
     <!-- Application Logic -->
-    <script type="module">
-        // Import Firebase via standard ES Module CDN
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteField, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        // Global State
-        let appUser = null;
+    <script>
+        // ----------------------------------------------------------------
+        // 1. GLOBAL STATE & USER SETUP
+        // ----------------------------------------------------------------
+        
+        // Generate a random ID for this specific phone/browser to identify who is sending messages
+        let myUserId = localStorage.getItem('lovenote_uid');
+        if (!myUserId) {
+            myUserId = Math.random().toString(36).substring(2, 10);
+            localStorage.setItem('lovenote_uid', myUserId);
+        }
+        
         let currentPairCode = null;
-        let activeTab = 'note';
         let currentRoomData = null;
         
-        // Setup config from platform or fallback to empty
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'lovenote-html-id';
-        
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
         // Daily Quotes
         const DAILY_QUOTES = [
             "I love you not only for what you are, but for what I am when I am with you.",
@@ -244,7 +239,9 @@
             "If I know what love is, it is because of you."
         ];
 
-        // DOM Elements
+        // ----------------------------------------------------------------
+        // 2. DOM ELEMENTS
+        // ----------------------------------------------------------------
         const el = {
             themeToggle: document.getElementById('theme-toggle'),
             themeIcon: document.getElementById('theme-icon'),
@@ -296,7 +293,9 @@
             sendDailyBtn: document.getElementById('send-daily-btn')
         };
 
-        // Theme Management
+        // ----------------------------------------------------------------
+        // 3. THEME MANAGEMENT
+        // ----------------------------------------------------------------
         let theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         const applyTheme = () => {
             document.documentElement.classList.toggle('dark', theme === 'dark');
@@ -306,85 +305,119 @@
         applyTheme();
         el.themeToggle.onclick = () => { theme = theme === 'dark' ? 'light' : 'dark'; applyTheme(); };
 
-        // Auth Logic
-        const initAuth = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Auth Error:", error);
+        // ----------------------------------------------------------------
+        // 4. NETWORKING (HYBRID: GLOBAL + LOCAL FALLBACK)
+        // ----------------------------------------------------------------
+        let mqttClient = null;
+        let isLocalMode = false;
+        
+        // BroadcastChannel for cross-tab sync when Canvas blocks WebSockets
+        const localChannel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('lovenote_sync') : null;
+
+        const checkSavedCode = () => {
+            const savedCode = localStorage.getItem('lovenote_paircode');
+            if (savedCode) {
+                connectToRoom(savedCode);
+            } else {
+                showScreen('pairing');
             }
         };
-        initAuth();
 
-        let profileUnsubscribe = null;
-        let roomUnsubscribe = null;
-
-        onAuthStateChanged(auth, (user) => {
-            appUser = user;
-            if (user) {
-                listenToProfile(user.uid);
-            }
-        });
-
-        // Listen to private profile for pair code
-        function listenToProfile(uid) {
-            const profileRef = doc(db, 'artifacts', appId, 'users', uid);
-            if (profileUnsubscribe) profileUnsubscribe();
+        const enableLocalMode = () => {
+            if(isLocalMode) return;
+            isLocalMode = true;
+            console.log("Canvas restricted external servers. Using Local Sync Mode.");
+            el.loadingScreen.classList.add('hidden');
+            checkSavedCode();
             
-            profileUnsubscribe = onSnapshot(profileRef, (docSnap) => {
-                if (docSnap.exists() && docSnap.data().pairCode) {
-                    const newCode = docSnap.data().pairCode;
-                    if (newCode !== currentPairCode) {
-                        currentPairCode = newCode;
-                        showScreen('dashboard');
-                        el.displayCode.innerText = `Code: ${currentPairCode}`;
-                        listenToRoom(currentPairCode);
+            if (localChannel) {
+                localChannel.onmessage = (e) => {
+                    if (e.data.room === currentPairCode) {
+                        currentRoomData = e.data.payload;
+                        updateWidgetUI();
                     }
-                } else {
-                    currentPairCode = null;
-                    if(roomUnsubscribe) { roomUnsubscribe(); roomUnsubscribe = null; }
-                    showScreen('pairing');
-                }
-                el.loadingScreen.classList.add('hidden');
-            }, (err) => {
-                console.error("Profile listen error:", err);
-                el.loadingScreen.classList.add('hidden');
-            });
-        }
+                };
+            }
+        };
 
-        // Listen to shared room updates
-        function listenToRoom(pairCode) {
-            const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', pairCode);
-            if (roomUnsubscribe) roomUnsubscribe();
-            
-            roomUnsubscribe = onSnapshot(roomRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    currentRoomData = docSnap.data();
+        try {
+            // Attempt to connect to the global server
+            mqttClient = mqtt.connect('wss://broker.emqx.io:8084/mqtt');
+
+            mqttClient.on('connect', () => {
+                console.log("Connected to Free Global Server!");
+                el.loadingScreen.classList.add('hidden');
+                checkSavedCode();
+            });
+
+            mqttClient.on('error', (err) => {
+                console.warn("Connection error, falling back to local.", err);
+                enableLocalMode();
+            });
+
+            mqttClient.on('message', (topic, message) => {
+                try {
+                    const data = JSON.parse(message.toString());
+                    currentRoomData = data;
                     updateWidgetUI();
-                }
+                } catch (e) { }
             });
+        } catch (error) {
+            // If Canvas CSP immediately blocks the WebSocket creation
+            enableLocalMode();
         }
 
-        // UI Navigation
+        const connectToRoom = (code) => {
+            currentPairCode = code;
+            localStorage.setItem('lovenote_paircode', code);
+            
+            if (!isLocalMode && mqttClient) {
+                mqttClient.subscribe(`lovenote_room_${code}`);
+            }
+            
+            showScreen('dashboard');
+            el.displayCode.innerText = `Code: ${code}`;
+        };
+
+        const syncToServer = (type, content) => {
+            if (!currentPairCode) return;
+            
+            const payloadObj = {
+                type: type,
+                content: content,
+                updatedBy: myUserId,
+                timestamp: Date.now()
+            };
+
+            if (isLocalMode && localChannel) {
+                // Sync locally across browser tabs (Canvas Preview)
+                localChannel.postMessage({
+                    room: currentPairCode,
+                    payload: payloadObj
+                });
+            } else if (mqttClient) {
+                // Sync globally across different phones
+                mqttClient.publish(`lovenote_room_${currentPairCode}`, JSON.stringify(payloadObj), { retain: true });
+            }
+        };
+
+        // ----------------------------------------------------------------
+        // 5. UI NAVIGATION & UPDATES
+        // ----------------------------------------------------------------
         function showScreen(screen) {
             el.pairingScreen.classList.add('hidden');
             el.dashboardScreen.classList.add('hidden');
             if (screen === 'pairing') el.pairingScreen.classList.remove('hidden');
             if (screen === 'dashboard') {
                 el.dashboardScreen.classList.remove('hidden');
-                setupCanvas(); // Ensure canvas is sized correctly when shown
+                setTimeout(setupCanvas, 100); // Wait for DOM layout
             }
         }
 
-        // Widget UI Update
         function updateWidgetUI() {
             if (!currentRoomData) return;
             
-            const isPartner = currentRoomData.updatedBy !== appUser?.uid;
+            const isPartner = currentRoomData.updatedBy !== myUserId;
             el.widgetTitle.innerText = isPartner ? "Partner's Widget" : "Your Widget";
             
             if (isPartner) {
@@ -395,97 +428,69 @@
             }
 
             if (currentRoomData.type === 'drawing') {
+                // Show Drawing UI
                 el.widgetContainer.className = "aspect-square w-full rounded-[2rem] p-6 flex items-center justify-center overflow-hidden transition-all duration-500 relative bg-white dark:bg-gray-900 widget-shadow border border-white/20";
                 el.widgetImage.src = currentRoomData.content;
                 el.widgetImage.classList.remove('hidden');
                 el.widgetText.classList.add('hidden');
             } else {
+                // Show Text UI
                 el.widgetContainer.className = "aspect-square w-full rounded-[2rem] p-6 flex items-center justify-center overflow-hidden transition-all duration-500 relative bg-gradient-to-br from-pink-400 to-purple-600 text-white widget-shadow border border-white/20";
                 el.widgetText.classList.remove('hidden');
                 el.widgetImage.classList.add('hidden');
                 
                 const isActivelyTyping = document.activeElement === el.noteInput;
                 
-                // CRITICAL FIX: Update screen from database ONLY if partner sent it,
-                // OR if I am not currently typing. (Prevents text from jumping while typing)
+                // Prevent jumping text if you are currently typing
                 if (isPartner || !isActivelyTyping) {
                     el.widgetText.innerText = currentRoomData.content || "Waiting for a note...";
                 }
                 
-                // If the update came from partner, update our input box too (unless we are typing)
                 if (isPartner && !isActivelyTyping) {
                     el.noteInput.value = currentRoomData.content;
                 }
             }
         }
 
-        // Pairing Actions
-        const generateCode = () => Math.random().toString(36).substring(2, 8).toUpperCase();
-
-        el.generateBtn.onclick = async () => {
-            if (!appUser) return;
-            el.generateText.innerText = "Generating...";
-            const newCode = generateCode();
-            try {
-                const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', newCode);
-                await setDoc(roomRef, {
-                    creatorId: appUser.uid,
-                    createdAt: serverTimestamp(),
-                    type: 'text',
-                    content: 'Welcome to LoveNote! ❤️',
-                    updatedBy: appUser.uid
-                });
-                const profileRef = doc(db, 'artifacts', appId, 'users', appUser.uid);
-                await setDoc(profileRef, { pairCode: newCode }, { merge: true });
-            } catch (err) {
-                console.error(err);
-                el.pairError.innerText = "Failed to generate code.";
-                el.pairError.classList.remove('hidden');
-            }
-            el.generateText.innerText = "Create New Invite Code";
+        // ----------------------------------------------------------------
+        // 6. PAIRING LOGIC (Generate / Join / Disconnect)
+        // ----------------------------------------------------------------
+        el.generateBtn.onclick = () => {
+            const newCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+            // Instantly send a welcome message to initialize the room
+            currentPairCode = newCode;
+            syncToServer('text', 'Welcome to LoveNote! ❤️');
+            connectToRoom(newCode);
         };
 
-        el.joinBtn.onclick = async () => {
+        el.joinBtn.onclick = () => {
             const code = el.joinInput.value.trim().toUpperCase();
             if (code.length !== 6) {
                 el.pairError.innerText = "Enter a valid 6-character code.";
                 el.pairError.classList.remove('hidden');
                 return;
             }
-            try {
-                const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', code);
-                const roomSnap = await getDoc(roomRef);
-                if (!roomSnap.exists()) {
-                    el.pairError.innerText = "Invalid invite code. Room not found.";
-                    el.pairError.classList.remove('hidden');
-                    return;
-                }
-                const profileRef = doc(db, 'artifacts', appId, 'users', appUser.uid);
-                await setDoc(profileRef, { pairCode: code }, { merge: true });
-            } catch (err) {
-                console.error(err);
-            }
+            connectToRoom(code);
         };
 
         el.joinInput.oninput = () => el.pairError.classList.add('hidden');
 
-        // Disconnect
-        el.disconnectBtn.onclick = async () => {
-            if (!appUser) return;
-            try {
-                const profileRef = doc(db, 'artifacts', appId, 'users', appUser.uid);
-                // CRITICAL FIX: Use setDoc instead of updateDoc to prevent errors if profile is missing
-                await setDoc(profileRef, { pairCode: deleteField() }, { merge: true });
-            } catch(e) { console.error(e); }
+        // Disconnect & Exit Button
+        el.disconnectBtn.onclick = () => {
+            if (currentPairCode) {
+                mqttClient.unsubscribe(`lovenote_room_${currentPairCode}`); // Stop listening to this room
+            }
+            currentPairCode = null;
+            localStorage.removeItem('lovenote_paircode'); // Delete saved code
+            el.joinInput.value = ''; // Clear input box
+            showScreen('pairing'); // Go back to invite screen
         };
 
-        // Copy Code
+        // Copy Invite Code
         el.copyCodeBtn.onclick = () => {
             if (!currentPairCode) return;
             const temp = document.createElement('textarea');
             temp.value = currentPairCode;
-            temp.style.position = 'fixed';
-            temp.style.opacity = '0';
             document.body.appendChild(temp);
             temp.select();
             document.execCommand('copy');
@@ -496,31 +501,30 @@
             setTimeout(() => el.displayCode.innerHTML = originalHtml, 2000);
         };
 
-        // Tab Management
+        // ----------------------------------------------------------------
+        // 7. TAB MANAGEMENT (Switching between Note, Draw, Daily)
+        // ----------------------------------------------------------------
         const switchTab = (tabId) => {
             Object.values(el.tabs).forEach(t => {
                 t.classList.remove('bg-white', 'dark:bg-gray-800', 'shadow-sm', 'text-pink-500');
                 t.classList.add('text-gray-500');
             });
             
-            // Hide all contents completely
-            el.contents.note.classList.add('hidden');
-            el.contents.note.classList.remove('flex');
-            el.contents.draw.classList.add('hidden');
-            el.contents.draw.classList.remove('flex');
-            el.contents.daily.classList.add('hidden');
-            el.contents.daily.classList.remove('flex');
+            // Hide all tab content completely
+            el.contents.note.style.display = 'none';
+            el.contents.draw.style.display = 'none';
+            el.contents.daily.style.display = 'none';
             
-            // Show Active Tab
+            // Highlight selected tab
             el.tabs[tabId].classList.remove('text-gray-500');
             el.tabs[tabId].classList.add('bg-white', 'dark:bg-gray-800', 'shadow-sm', 'text-pink-500');
             
-            el.contents[tabId].classList.remove('hidden');
-            el.contents[tabId].classList.add('flex');
+            // Show selected content
+            el.contents[tabId].style.display = 'flex';
             
-            // Re-setup canvas size if switching to draw
+            // Handle Canvas resize issue properly
             if (tabId === 'draw') {
-                setTimeout(setupCanvas, 50);
+                setTimeout(setupCanvas, 100);
             }
         };
 
@@ -528,32 +532,20 @@
         el.tabs.draw.onclick = () => switchTab('draw');
         el.tabs.daily.onclick = () => switchTab('daily');
 
-        // Note Logic (Live Sync)
-        let noteTimeout;
-        const syncNote = (text) => {
-            if (!currentPairCode || !appUser) return;
-            const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', currentPairCode);
-            setDoc(roomRef, {
-                type: 'text',
-                content: text,
-                updatedBy: appUser.uid,
-                timestamp: serverTimestamp()
-            }, { merge: true }).catch(console.error);
-        };
-
+        // ----------------------------------------------------------------
+        // 8. TEXT NOTE LOGIC (100% Instant Typing)
+        // ----------------------------------------------------------------
         const handleNoteInput = () => {
             const val = el.noteInput.value;
             
-            // CRITICAL FIX: Force UI to Text Mode instantly locally (even if it was a drawing)
+            // Instantly change screen to text mode locally
             el.widgetImage.classList.add('hidden');
             el.widgetText.classList.remove('hidden');
             el.widgetContainer.className = "aspect-square w-full rounded-[2rem] p-6 flex items-center justify-center overflow-hidden transition-all duration-500 relative bg-gradient-to-br from-pink-400 to-purple-600 text-white widget-shadow border border-white/20";
-            
-            // Immediate UI update
             el.widgetText.innerText = val || "Waiting for a note...";
             
-            clearTimeout(noteTimeout);
-            noteTimeout = setTimeout(() => syncNote(val), 200);
+            // Send to partner over MQTT
+            syncToServer('text', val);
         };
 
         el.noteInput.addEventListener('input', handleNoteInput);
@@ -572,14 +564,16 @@
             handleNoteInput();
         };
 
-        // Canvas Logic
+        // ----------------------------------------------------------------
+        // 9. CANVAS (DRAWING) LOGIC
+        // ----------------------------------------------------------------
         const ctx = el.canvas.getContext('2d');
         let isDrawing = false;
-        let drawTimeout;
 
         function setupCanvas() {
             const rect = el.canvas.parentElement.getBoundingClientRect();
-            // Handle high DPI displays
+            if(rect.width === 0 || rect.height === 0) return; // Prevent zero-size bug
+            
             const dpr = window.devicePixelRatio || 1;
             el.canvas.width = rect.width * dpr;
             el.canvas.height = rect.height * dpr;
@@ -588,8 +582,9 @@
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
             ctx.lineWidth = 4;
-            ctx.strokeStyle = '#ec4899'; // pink-500
+            ctx.strokeStyle = '#ec4899'; // Pink color
         }
+        
         window.addEventListener('resize', () => {
             if(!el.dashboardScreen.classList.contains('hidden') && !el.contents.draw.classList.contains('hidden')) {
                setupCanvas(); 
@@ -620,26 +615,20 @@
             ctx.stroke();
         };
 
-        const syncDrawing = () => {
-            if (!currentPairCode || !appUser) return;
-            clearTimeout(drawTimeout);
-            drawTimeout = setTimeout(() => {
-                const dataUrl = el.canvas.toDataURL('image/png');
-                const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', currentPairCode);
-                setDoc(roomRef, {
-                    type: 'drawing',
-                    content: dataUrl,
-                    updatedBy: appUser.uid,
-                    timestamp: serverTimestamp()
-                }, { merge: true });
-            }, 300);
-        };
-
         const stopDraw = () => {
             if (isDrawing) {
                 ctx.closePath();
                 isDrawing = false;
-                syncDrawing();
+                
+                // Get Image Data and Sync
+                const dataUrl = el.canvas.toDataURL('image/png', 0.8);
+                syncToServer('drawing', dataUrl);
+                
+                // Instantly update our own widget UI
+                el.widgetContainer.className = "aspect-square w-full rounded-[2rem] p-6 flex items-center justify-center overflow-hidden transition-all duration-500 relative bg-white dark:bg-gray-900 widget-shadow border border-white/20";
+                el.widgetImage.src = dataUrl;
+                el.widgetImage.classList.remove('hidden');
+                el.widgetText.classList.add('hidden');
             }
         };
 
@@ -648,26 +637,33 @@
         el.canvas.addEventListener('mouseup', stopDraw);
         el.canvas.addEventListener('mouseout', stopDraw);
         
+        // Touch support for mobiles
         el.canvas.addEventListener('touchstart', startDraw, {passive: false});
         el.canvas.addEventListener('touchmove', doDraw, {passive: false});
         el.canvas.addEventListener('touchend', stopDraw);
 
         el.clearCanvasBtn.onclick = () => {
             ctx.clearRect(0, 0, el.canvas.width / (window.devicePixelRatio || 1), el.canvas.height / (window.devicePixelRatio || 1));
-            syncDrawing();
+            // Send a blank drawing
+            const dataUrl = el.canvas.toDataURL('image/png');
+            syncToServer('drawing', dataUrl);
+            
+            // Instantly clear local screen
+            el.widgetImage.src = dataUrl;
         };
 
-        // Daily Love Logic
+        // ----------------------------------------------------------------
+        // 10. DAILY LOVE QUOTE
+        // ----------------------------------------------------------------
         el.sendDailyBtn.onclick = () => {
-            if (!currentPairCode || !appUser) return;
             const quote = DAILY_QUOTES[Math.floor(Math.random() * DAILY_QUOTES.length)];
-            const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', currentPairCode);
-            setDoc(roomRef, {
-                type: 'text',
-                content: quote,
-                updatedBy: appUser.uid,
-                timestamp: serverTimestamp()
-            }, { merge: true });
+            syncToServer('text', quote);
+            
+            // Instantly update locally
+            el.widgetImage.classList.add('hidden');
+            el.widgetText.classList.remove('hidden');
+            el.widgetContainer.className = "aspect-square w-full rounded-[2rem] p-6 flex items-center justify-center overflow-hidden transition-all duration-500 relative bg-gradient-to-br from-pink-400 to-purple-600 text-white widget-shadow border border-white/20";
+            el.widgetText.innerText = quote;
         };
 
     </script>
