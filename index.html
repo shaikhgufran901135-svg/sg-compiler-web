@@ -1,676 +1,675 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { initializeApp } from 'firebase/app';
-import { 
-  getAuth, 
-  signInAnonymously, 
-  signInWithCustomToken, 
-  onAuthStateChanged 
-} from 'firebase/auth';
-import { 
-  getFirestore, 
-  doc, 
-  setDoc, 
-  getDoc, 
-  updateDoc,
-  deleteField,
-  onSnapshot, 
-  collection,
-  serverTimestamp
-} from 'firebase/firestore';
-import { 
-  Heart, 
-  PenTool, 
-  Image as ImageIcon, 
-  MessageSquare, 
-  Sun, 
-  Moon, 
-  Send, 
-  Copy,
-  RefreshCw,
-  Trash2,
-  Sparkles,
-  LogOut
-} from 'lucide-react';
-
-// Initialize Firebase using environment variables provided by the platform
-const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'lovenote-default-id';
-
-const generateInviteCode = () => {
-  return Math.random().toString(36).substring(2, 8).toUpperCase();
-};
-
-const DAILY_QUOTES = [
-  "I love you not only for what you are, but for what I am when I am with you.",
-  "You are my today and all of my tomorrows.",
-  "In all the world, there is no heart for me like yours.",
-  "I swear I couldn't love you more than I do right now, and yet I know I will tomorrow.",
-  "If I know what love is, it is because of you."
-];
-
-export default function App() {
-  const [user, setUser] = useState(null);
-  const [theme, setTheme] = useState('light');
-  const [pairCode, setPairCode] = useState(null);
-  const [roomData, setRoomData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  
-  // Initialize Theme
-  useEffect(() => {
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setTheme('dark');
-    }
-  }, []);
-
-  useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [theme]);
-
-  useEffect(() => {
-    const initAuth = async () => {
-      try {
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(auth, __initial_auth_token);
-        } else {
-          await signInAnonymously(auth);
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LoveNote</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        pink: {
+                            50: '#fdf2f8', 100: '#fce7f3', 200: '#fbcfe8',
+                            300: '#f9a8d4', 400: '#f472b6', 500: '#ec4899',
+                            600: '#db2777', 900: '#831843',
+                        }
+                    }
+                }
+            }
         }
-      } catch (error) {
-        console.error("Auth Error:", error);
-      }
-    };
-    initAuth();
-
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    if (!user) return;
-
-    // Listen to private user profile to see if they are already paired
-    const profileRef = doc(db, 'artifacts', appId, 'users', user.uid);
-    
-    const unsubscribe = onSnapshot(profileRef, (docSnap) => {
-      if (docSnap.exists() && docSnap.data().pairCode) {
-        setPairCode(docSnap.data().pairCode);
-      } else {
-        setPairCode(null);
-      }
-      setLoading(false);
-    }, (error) => {
-      console.error("Error fetching profile:", error);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [user]);
-
-  useEffect(() => {
-    if (!user || !pairCode) return;
-
-    // Listen to the public shared room for real-time updates
-    const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', pairCode);
-    
-    const unsubscribe = onSnapshot(roomRef, (docSnap) => {
-      if (docSnap.exists()) {
-        setRoomData(docSnap.data());
-      }
-    }, (error) => {
-      console.error("Error fetching room data:", error);
-    });
-
-    return () => unsubscribe();
-  }, [user, pairCode]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-pink-50 dark:bg-gray-900">
-        <Heart className="animate-bounce text-pink-500 w-12 h-12" />
-      </div>
-    );
-  }
-
-  return (
-    <div className={`min-h-screen transition-colors duration-300 font-sans ${theme === 'dark' ? 'dark bg-gray-950 text-white' : 'bg-gradient-to-br from-pink-50 to-purple-100 text-gray-800'}`}>
-      
-      {/* Header */}
-      <header className="p-4 flex justify-between items-center bg-white/30 dark:bg-black/30 backdrop-blur-md sticky top-0 z-50 shadow-sm">
-        <div className="flex items-center gap-2">
-          <Heart className="text-pink-500 fill-pink-500 w-6 h-6" />
-          <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-purple-600">
-            LoveNote
-          </h1>
-        </div>
-        <button 
-          onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-          className="p-2 rounded-full hover:bg-white/50 dark:hover:bg-gray-800 transition-colors"
-        >
-          {theme === 'light' ? <Moon className="w-5 h-5 text-purple-600" /> : <Sun className="w-5 h-5 text-yellow-400" />}
-        </button>
-      </header>
-
-      {/* Main Content Area */}
-      <main className="max-w-md mx-auto p-4 flex flex-col min-h-[calc(100vh-70px)]">
-        {!pairCode ? (
-          <PairingScreen user={user} theme={theme} />
-        ) : (
-          <Dashboard user={user} roomData={roomData} pairCode={pairCode} />
-        )}
-      </main>
-    </div>
-  );
-}
-
-function PairingScreen({ user, theme }) {
-  const [joinCode, setJoinCode] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleGenerate = async () => {
-    setIsGenerating(true);
-    const newCode = generateInviteCode();
-    
-    try {
-      // Create new shared room
-      const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', newCode);
-      await setDoc(roomRef, {
-        creatorId: user.uid,
-        createdAt: serverTimestamp(),
-        type: 'text',
-        content: 'Welcome to LoveNote! ❤️',
-        updatedBy: user.uid
-      });
-
-      // Save code to private profile
-      const profileRef = doc(db, 'artifacts', appId, 'users', user.uid);
-      await setDoc(profileRef, { pairCode: newCode }, { merge: true });
-      
-    } catch (err) {
-      console.error(err);
-      setError('Failed to generate code.');
-    }
-    setIsGenerating(false);
-  };
-
-  const handleJoin = async () => {
-    if (!joinCode || joinCode.length !== 6) {
-      setError('Please enter a valid 6-character code.');
-      return;
-    }
-
-    try {
-      // Check if room exists
-      const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', joinCode.toUpperCase());
-      const roomSnap = await getDoc(roomRef);
-      
-      if (!roomSnap.exists()) {
-        setError('Invalid invite code. Room not found.');
-        return;
-      }
-
-      // Save code to private profile
-      const profileRef = doc(db, 'artifacts', appId, 'users', user.uid);
-      await setDoc(profileRef, { pairCode: joinCode.toUpperCase() }, { merge: true });
-
-    } catch (err) {
-      console.error(err);
-      setError('Failed to join room.');
-    }
-  };
-
-  return (
-    <div className="flex-1 flex flex-col items-center justify-center gap-8 py-8">
-      <div className="text-center space-y-2">
-        <div className="inline-block p-4 rounded-full bg-pink-100 dark:bg-pink-900/30 mb-4">
-          <Heart className="w-12 h-12 text-pink-500 fill-pink-500 animate-pulse" />
-        </div>
-        <h2 className="text-2xl font-bold">Connect with your Love</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          Generate a code to invite them, or enter their code to connect.
-        </p>
-      </div>
-
-      <div className="w-full space-y-6 bg-white/60 dark:bg-gray-900/60 p-6 rounded-3xl shadow-xl backdrop-blur-md border border-white/20 dark:border-gray-800">
+    </script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Custom scrollbar hidden */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
         
-        {/* Join Section */}
-        <div className="space-y-3">
-          <label className="text-sm font-medium ml-1">Enter Invite Code</label>
-          <div className="flex gap-2">
-            <input 
-              type="text"
-              value={joinCode}
-              onChange={(e) => {
-                setJoinCode(e.target.value);
-                setError('');
-              }}
-              placeholder="e.g. A1B2C3"
-              className="flex-1 px-4 py-3 rounded-2xl bg-white dark:bg-gray-800 border-none shadow-inner focus:ring-2 focus:ring-pink-500 outline-none uppercase font-mono tracking-widest text-center"
-              maxLength={6}
-            />
-            <button 
-              onClick={handleJoin}
-              className="px-6 py-3 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-pink-500/30"
-            >
-              Join
-            </button>
-          </div>
-          {error && <p className="text-red-500 text-xs text-center">{error}</p>}
-        </div>
+        .widget-shadow {
+            box-shadow: 0 20px 50px -12px rgba(236, 72, 153, 0.5);
+        }
+        .dark .widget-shadow {
+            box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-pink-50 to-purple-100 dark:from-gray-950 dark:to-gray-900 text-gray-800 dark:text-white min-h-screen transition-colors duration-300 flex flex-col">
 
-        <div className="relative flex items-center py-2">
-          <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
-          <span className="flex-shrink-0 mx-4 text-gray-400 text-sm">OR</span>
-          <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
+    <!-- Header -->
+    <header class="p-4 flex justify-between items-center bg-white/30 dark:bg-black/30 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <div class="flex items-center gap-2">
+            <i class="fa-solid fa-heart text-pink-500 text-xl"></i>
+            <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-purple-600">
+                LoveNote
+            </h1>
         </div>
-
-        {/* Generate Section */}
-        <button 
-          onClick={handleGenerate}
-          disabled={isGenerating}
-          className="w-full py-4 rounded-2xl bg-white dark:bg-gray-800 font-semibold border-2 border-pink-200 dark:border-pink-900 hover:border-pink-500 dark:hover:border-pink-500 transition-colors flex items-center justify-center gap-2 group"
-        >
-          <Sparkles className="w-5 h-5 text-pink-500 group-hover:animate-spin" />
-          {isGenerating ? 'Generating...' : 'Create New Invite Code'}
+        <button id="theme-toggle" class="p-2 rounded-full hover:bg-white/50 dark:hover:bg-gray-800 transition-colors">
+            <i id="theme-icon" class="fa-solid fa-moon text-purple-600 text-lg"></i>
         </button>
-      </div>
-    </div>
-  );
-}
+    </header>
 
-function Dashboard({ user, roomData, pairCode }) {
-  const [activeTab, setActiveTab] = useState('note'); // note, draw, daily
-  const [isDisconnecting, setIsDisconnecting] = useState(false);
-  const [previewText, setPreviewText] = useState(null);
-  
-  const copyCode = async () => {
-    // Fallback for iframe environments where the Clipboard API is blocked
-    const fallbackCopyTextToClipboard = (text) => {
-      const textArea = document.createElement("textarea");
-      textArea.value = text;
-      // Prevent scrolling to bottom of page in MS Edge
-      textArea.style.position = "fixed";
-      textArea.style.top = "0";
-      textArea.style.left = "0";
-      textArea.style.opacity = "0";
-      
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      try {
-        document.execCommand('copy');
-      } catch (err) {
-        console.error('Fallback: Oops, unable to copy', err);
-      }
-      document.body.removeChild(textArea);
-    };
-
-    if (!navigator.clipboard) {
-      fallbackCopyTextToClipboard(pairCode);
-      return;
-    }
-    
-    try {
-      await navigator.clipboard.writeText(pairCode);
-    } catch (err) {
-      console.warn("Modern clipboard API failed, using fallback", err);
-      fallbackCopyTextToClipboard(pairCode);
-    }
-  };
-
-  const isPartnerUpdate = roomData ? roomData.updatedBy !== user.uid : false;
-
-  const handleDisconnect = async () => {
-    setIsDisconnecting(true);
-    try {
-      const profileRef = doc(db, 'artifacts', appId, 'users', user.uid);
-      await updateDoc(profileRef, {
-        pairCode: deleteField()
-      });
-    } catch (err) {
-      console.error("Error disconnecting:", err);
-      setIsDisconnecting(false);
-    }
-  };
-
-  return (
-    <div className="flex-1 flex flex-col gap-6">
-      {/* Top Info Bar */}
-      <div className="flex justify-between items-center bg-white/50 dark:bg-black/40 px-4 py-2 rounded-full backdrop-blur-sm text-sm border border-white/20 dark:border-gray-800">
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-          <span>Connected</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <button onClick={copyCode} className="flex items-center gap-1 hover:text-pink-500 transition-colors">
-            <span className="font-mono bg-black/5 dark:bg-white/10 px-2 py-1 rounded">Code: {pairCode}</span>
-            <Copy className="w-4 h-4" />
-          </button>
-          <div className="w-px h-4 bg-gray-300 dark:bg-gray-600"></div>
-          <button 
-            onClick={handleDisconnect} 
-            disabled={isDisconnecting}
-            className="text-gray-500 hover:text-red-500 transition-colors"
-            title="Disconnect & Go Back"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-
-      {/* The "Widget" View (Received Content) */}
-      <div className="relative">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2 ml-2">
-          {isPartnerUpdate ? "Partner's Widget" : "Your Widget"}
-        </h3>
-        <div className={`aspect-square w-full rounded-[2rem] p-6 flex items-center justify-center overflow-hidden transition-all duration-500 relative
-          ${roomData?.type === 'drawing' ? 'bg-white dark:bg-gray-900' : 'bg-gradient-to-br from-pink-400 to-purple-600 text-white'}
-          shadow-[0_20px_50px_-12px_rgba(236,72,153,0.5)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] border border-white/20`}
-        >
-          {roomData?.type === 'text' && (
-            <p className="text-3xl font-bold text-center leading-tight drop-shadow-md break-words w-full">
-              {previewText !== null ? previewText : (roomData.content || 'Waiting for a note...')}
-            </p>
-          )}
-          
-          {roomData?.type === 'drawing' && (
-            <img 
-              src={roomData.content} 
-              alt="Love Doodle" 
-              className="w-full h-full object-contain filter drop-shadow-xl"
-            />
-          )}
-
-          {/* Sparkle effects for new updates */}
-          {isPartnerUpdate && (
-             <div className="absolute top-4 right-4 animate-bounce">
-               <Sparkles className="w-6 h-6 text-yellow-300" />
-             </div>
-          )}
-        </div>
-      </div>
-
-      {/* Input Tools Area */}
-      <div className="mt-auto bg-white/80 dark:bg-gray-900/80 rounded-3xl p-2 backdrop-blur-xl border border-white/40 dark:border-gray-700 shadow-xl">
-        {/* Tabs */}
-        <div className="flex p-1 bg-gray-100/50 dark:bg-black/50 rounded-2xl mb-4">
-          <TabButton Icon={MessageSquare} label="Note" active={activeTab === 'note'} onClick={() => setActiveTab('note')} />
-          <TabButton Icon={PenTool} label="Draw" active={activeTab === 'draw'} onClick={() => setActiveTab('draw')} />
-          <TabButton Icon={Heart} label="Daily" active={activeTab === 'daily'} onClick={() => setActiveTab('daily')} />
+    <!-- Main Content Area -->
+    <main class="max-w-md mx-auto p-4 flex flex-col flex-1 w-full relative">
+        
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="absolute inset-0 flex items-center justify-center bg-pink-50/90 dark:bg-gray-900/90 z-40 backdrop-blur-sm">
+            <i class="fa-solid fa-heart text-pink-500 text-5xl animate-bounce"></i>
         </div>
 
-        {/* Tab Content */}
-        <div className="p-2 min-h-[160px] flex flex-col">
-          {activeTab === 'note' && <NoteInput user={user} pairCode={pairCode} setPreviewText={setPreviewText} />}
-          {activeTab === 'draw' && <DrawInput user={user} pairCode={pairCode} />}
-          {activeTab === 'daily' && <DailyLove user={user} pairCode={pairCode} />}
+        <!-- Pairing Screen (Hidden by default) -->
+        <div id="pairing-screen" class="hidden flex-1 flex flex-col items-center justify-center gap-8 py-8 w-full">
+            <div class="text-center space-y-2">
+                <div class="inline-block p-4 rounded-full bg-pink-100 dark:bg-pink-900/30 mb-4">
+                    <i class="fa-solid fa-heart text-pink-500 text-4xl animate-pulse"></i>
+                </div>
+                <h2 class="text-2xl font-bold">Connect with your Love</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Generate a code to invite them, or enter their code.</p>
+            </div>
+
+            <div class="w-full space-y-6 bg-white/60 dark:bg-gray-900/60 p-6 rounded-3xl shadow-xl backdrop-blur-md border border-white/20 dark:border-gray-800">
+                
+                <div class="space-y-3">
+                    <label class="text-sm font-medium ml-1">Enter Invite Code</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="join-code-input" placeholder="e.g. A1B2C3" maxlength="6"
+                            class="flex-1 px-4 py-3 rounded-2xl bg-white dark:bg-gray-800 border-none shadow-inner focus:ring-2 focus:ring-pink-500 outline-none uppercase font-mono tracking-widest text-center" />
+                        <button id="join-btn" class="px-6 py-3 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-pink-500/30">
+                            Join
+                        </button>
+                    </div>
+                    <p id="pair-error" class="text-red-500 text-xs text-center hidden"></p>
+                </div>
+
+                <div class="relative flex items-center py-2">
+                    <div class="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
+                    <span class="flex-shrink-0 mx-4 text-gray-400 text-sm">OR</span>
+                    <div class="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
+                </div>
+
+                <button id="generate-btn" class="w-full py-4 rounded-2xl bg-white dark:bg-gray-800 font-semibold border-2 border-pink-200 dark:border-pink-900 hover:border-pink-500 transition-colors flex items-center justify-center gap-2 group">
+                    <i class="fa-solid fa-wand-magic-sparkles text-pink-500 group-hover:animate-spin"></i>
+                    <span id="generate-text">Create New Invite Code</span>
+                </button>
+            </div>
         </div>
-      </div>
-    </div>
-  );
-}
 
-function TabButton({ Icon, label, active, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-xl transition-all ${
-        active 
-          ? 'bg-white dark:bg-gray-800 shadow-sm text-pink-500' 
-          : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
-      }`}
-    >
-      <Icon className="w-5 h-5" />
-      <span className="text-xs font-medium">{label}</span>
-    </button>
-  );
-}
+        <!-- Dashboard Screen (Hidden by default) -->
+        <div id="dashboard-screen" class="hidden flex-1 flex flex-col gap-6 w-full h-full">
+            
+            <!-- Top Bar -->
+            <div class="flex justify-between items-center bg-white/50 dark:bg-black/40 px-4 py-2 rounded-full backdrop-blur-sm text-sm border border-white/20 dark:border-gray-800">
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                    <span>Connected</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button id="copy-code-btn" class="flex items-center gap-1 hover:text-pink-500 transition-colors">
+                        <span id="display-pair-code" class="font-mono bg-black/5 dark:bg-white/10 px-2 py-1 rounded">Code: ------</span>
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
+                    <div class="w-px h-4 bg-gray-300 dark:bg-gray-600"></div>
+                    <button id="disconnect-btn" class="text-gray-500 hover:text-red-500 transition-colors" title="Disconnect">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </button>
+                </div>
+            </div>
 
-function NoteInput({ user, pairCode, setPreviewText }) {
-  const [note, setNote] = useState('');
-  const timeoutRef = useRef(null);
+            <!-- Widget Area (The big display) -->
+            <div class="relative">
+                <h3 id="widget-title" class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2 ml-2">
+                    Your Widget
+                </h3>
+                <div id="widget-container" class="aspect-square w-full rounded-[2rem] p-6 flex items-center justify-center overflow-hidden transition-all duration-500 relative bg-gradient-to-br from-pink-400 to-purple-600 text-white widget-shadow border border-white/20">
+                    
+                    <!-- Text Preview -->
+                    <p id="widget-text" class="text-3xl font-bold text-center leading-tight drop-shadow-md break-words w-full">
+                        Waiting for a note...
+                    </p>
+                    
+                    <!-- Image Preview -->
+                    <img id="widget-image" src="" alt="Doodle" class="w-full h-full object-contain filter drop-shadow-xl hidden" />
 
-  useEffect(() => {
-    return () => setPreviewText && setPreviewText(null);
-  }, [setPreviewText]);
+                    <!-- Sparkles for partner update -->
+                    <div id="widget-sparkles" class="absolute top-4 right-4 animate-bounce hidden">
+                        <i class="fa-solid fa-sparkles text-yellow-300 text-xl"></i>
+                    </div>
+                </div>
+            </div>
 
-  const updateRoom = (newNote) => {
-    const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', pairCode);
-    // Instant update via Firebase local cache
-    setDoc(roomRef, {
-      type: 'text',
-      content: newNote.trim(),
-      updatedBy: user.uid,
-      timestamp: serverTimestamp()
-    }, { merge: true }).catch(err => console.error(err));
-  };
+            <!-- Input Tools Area -->
+            <div class="mt-auto bg-white/80 dark:bg-gray-900/80 rounded-3xl p-2 backdrop-blur-xl border border-white/40 dark:border-gray-700 shadow-xl flex-1 flex flex-col min-h-[220px]">
+                
+                <!-- Tabs -->
+                <div class="flex p-1 bg-gray-100/50 dark:bg-black/50 rounded-2xl mb-4 shrink-0">
+                    <button id="tab-note" class="tab-btn flex-1 flex flex-col items-center gap-1 py-2 rounded-xl transition-all bg-white dark:bg-gray-800 shadow-sm text-pink-500">
+                        <i class="fa-regular fa-message"></i><span class="text-xs font-medium">Note</span>
+                    </button>
+                    <button id="tab-draw" class="tab-btn flex-1 flex flex-col items-center gap-1 py-2 rounded-xl transition-all text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                        <i class="fa-solid fa-pen-nib"></i><span class="text-xs font-medium">Draw</span>
+                    </button>
+                    <button id="tab-daily" class="tab-btn flex-1 flex flex-col items-center gap-1 py-2 rounded-xl transition-all text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                        <i class="fa-regular fa-heart"></i><span class="text-xs font-medium">Daily</span>
+                    </button>
+                </div>
 
-  const handleTextChange = (e) => {
-    const val = e.target.value;
-    setNote(val);
-    if(setPreviewText) setPreviewText(val);
+                <!-- Tab Contents -->
+                <div class="p-2 flex-1 flex flex-col w-full h-full">
+                    
+                    <!-- Text Tab -->
+                    <div id="content-note" class="tab-content flex flex-col flex-1 gap-3 w-full h-full">
+                        <textarea id="note-input" placeholder="Write a sweet note... it appears instantly! ✨" 
+                            class="w-full flex-1 bg-transparent resize-none outline-none text-lg p-2 placeholder:text-gray-400" maxlength="100"></textarea>
+                        <div class="flex items-center justify-between mt-auto shrink-0">
+                            <div id="emoji-bar" class="flex gap-2">
+                                <button class="emoji-btn text-xl hover:scale-125 transition-transform">❤️</button>
+                                <button class="emoji-btn text-xl hover:scale-125 transition-transform">😘</button>
+                                <button class="emoji-btn text-xl hover:scale-125 transition-transform">🥺</button>
+                                <button class="emoji-btn text-xl hover:scale-125 transition-transform">😍</button>
+                                <button class="emoji-btn text-xl hover:scale-125 transition-transform">✨</button>
+                                <button class="emoji-btn text-xl hover:scale-125 transition-transform">🔥</button>
+                            </div>
+                            <button id="clear-note-btn" class="px-4 py-2 bg-pink-100 dark:bg-gray-800 text-pink-600 dark:text-pink-400 rounded-full hover:bg-pink-200 transition-colors text-sm font-semibold">
+                                Clear
+                            </button>
+                        </div>
+                    </div>
 
-    // Auto-sync as you type (300ms debounce)
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => {
-      updateRoom(val);
-    }, 300);
-  };
+                    <!-- Draw Tab -->
+                    <div id="content-draw" class="tab-content hidden flex-col items-center gap-3 w-full h-full">
+                        <div class="w-full h-32 flex-1 bg-gray-50 dark:bg-gray-800 rounded-2xl border-2 border-dashed border-pink-200 dark:border-pink-900/50 overflow-hidden touch-none relative">
+                            <canvas id="draw-canvas" class="w-full h-full cursor-crosshair absolute inset-0 z-10"></canvas>
+                            <div class="absolute inset-0 pointer-events-none flex items-center justify-center opacity-10 z-0">
+                                <i class="fa-solid fa-pen-nib text-5xl"></i>
+                            </div>
+                        </div>
+                        <div class="flex w-full justify-between items-center px-2 shrink-0 h-8">
+                            <span class="text-xs text-gray-400">Auto-syncs instantly ✨</span>
+                            <button id="clear-canvas-btn" class="flex items-center gap-2 px-3 py-1 bg-pink-100 dark:bg-gray-800 text-pink-600 dark:text-pink-400 rounded-full hover:bg-pink-200 transition-colors text-sm font-semibold">
+                                <i class="fa-solid fa-trash"></i> Clear
+                            </button>
+                        </div>
+                    </div>
 
-  const addEmoji = (emoji) => {
-    const val = note + emoji;
-    setNote(val);
-    if(setPreviewText) setPreviewText(val);
-    updateRoom(val);
-  };
+                    <!-- Daily Tab -->
+                    <div id="content-daily" class="tab-content hidden flex-col items-center justify-center w-full h-full gap-4 text-center">
+                        <p class="text-sm text-gray-600 dark:text-gray-300">Send a random, carefully curated love quote to brighten their day.</p>
+                        <button id="send-daily-btn" class="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-full font-bold hover:scale-105 active:scale-95 transition-all shadow-lg shadow-purple-500/30 flex items-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Send Daily Love
+                        </button>
+                    </div>
 
-  const clearNote = () => {
-    setNote('');
-    if(setPreviewText) setPreviewText('');
-    updateRoom('');
-  };
-
-  const quickEmojis = ['❤️', '😘', '🥺', '😍', '✨', '🔥'];
-
-  return (
-    <div className="flex flex-col h-full gap-3">
-      <textarea
-        value={note}
-        onChange={handleTextChange}
-        placeholder="Write a sweet note... it appears instantly! ✨"
-        className="w-full flex-1 bg-transparent resize-none outline-none text-lg p-2 placeholder:text-gray-400"
-        maxLength={100}
-      />
-      <div className="flex items-center justify-between mt-auto">
-        <div className="flex gap-2">
-          {quickEmojis.map(emoji => (
-            <button 
-              key={emoji}
-              onClick={() => addEmoji(emoji)}
-              className="text-xl hover:scale-125 transition-transform"
-            >
-              {emoji}
-            </button>
-          ))}
+                </div>
+            </div>
         </div>
-        <button
-          onClick={clearNote}
-          className="px-4 py-2 bg-pink-100 dark:bg-gray-800 text-pink-600 dark:text-pink-400 rounded-full hover:bg-pink-200 dark:hover:bg-gray-700 transition-colors text-sm font-semibold"
-        >
-          Clear
-        </button>
-      </div>
-    </div>
-  );
-}
+    </main>
 
-function DrawInput({ user, pairCode }) {
-  const canvasRef = useRef(null);
-  const [isDrawing, setIsDrawing] = useState(false);
-  const syncTimeoutRef = useRef(null);
+    <!-- Application Logic -->
+    <script type="module">
+        // Import Firebase via standard ES Module CDN
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteField, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  // Set up canvas properties
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (canvas) {
-      const ctx = canvas.getContext('2d');
-      // Fix resolution for high DPI displays
-      const dpr = window.devicePixelRatio || 1;
-      const rect = canvas.getBoundingClientRect();
-      
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      
-      ctx.scale(dpr, dpr);
-      canvas.style.width = `${rect.width}px`;
-      canvas.style.height = `${rect.height}px`;
+        // Global State
+        let appUser = null;
+        let currentPairCode = null;
+        let activeTab = 'note';
+        let currentRoomData = null;
+        
+        // Setup config from platform or fallback to empty
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'lovenote-html-id';
+        
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = '#ec4899'; // pink-500
-    }
-  }, []);
+        // Daily Quotes
+        const DAILY_QUOTES = [
+            "I love you not only for what you are, but for what I am when I am with you.",
+            "You are my today and all of my tomorrows.",
+            "In all the world, there is no heart for me like yours.",
+            "I swear I couldn't love you more than I do right now, and yet I know I will tomorrow.",
+            "If I know what love is, it is because of you."
+        ];
 
-  const getCoordinates = (e) => {
-    const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    if (e.touches && e.touches.length > 0) {
-      return {
-        x: e.touches[0].clientX - rect.left,
-        y: e.touches[0].clientY - rect.top
-      };
-    }
-    return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
-    };
-  };
+        // DOM Elements
+        const el = {
+            themeToggle: document.getElementById('theme-toggle'),
+            themeIcon: document.getElementById('theme-icon'),
+            loadingScreen: document.getElementById('loading-screen'),
+            pairingScreen: document.getElementById('pairing-screen'),
+            dashboardScreen: document.getElementById('dashboard-screen'),
+            
+            // Pairing
+            joinInput: document.getElementById('join-code-input'),
+            joinBtn: document.getElementById('join-btn'),
+            generateBtn: document.getElementById('generate-btn'),
+            generateText: document.getElementById('generate-text'),
+            pairError: document.getElementById('pair-error'),
+            
+            // Dashboard Top
+            displayCode: document.getElementById('display-pair-code'),
+            copyCodeBtn: document.getElementById('copy-code-btn'),
+            disconnectBtn: document.getElementById('disconnect-btn'),
+            
+            // Widget Area
+            widgetTitle: document.getElementById('widget-title'),
+            widgetContainer: document.getElementById('widget-container'),
+            widgetText: document.getElementById('widget-text'),
+            widgetImage: document.getElementById('widget-image'),
+            widgetSparkles: document.getElementById('widget-sparkles'),
+            
+            // Tabs
+            tabs: {
+                note: document.getElementById('tab-note'),
+                draw: document.getElementById('tab-draw'),
+                daily: document.getElementById('tab-daily')
+            },
+            contents: {
+                note: document.getElementById('content-note'),
+                draw: document.getElementById('content-draw'),
+                daily: document.getElementById('content-daily')
+            },
+            
+            // Inputs
+            noteInput: document.getElementById('note-input'),
+            clearNoteBtn: document.getElementById('clear-note-btn'),
+            emojiBtns: document.querySelectorAll('.emoji-btn'),
+            
+            // Canvas
+            canvas: document.getElementById('draw-canvas'),
+            clearCanvasBtn: document.getElementById('clear-canvas-btn'),
+            
+            // Daily
+            sendDailyBtn: document.getElementById('send-daily-btn')
+        };
 
-  const startDrawing = (e) => {
-    e.preventDefault();
-    const { x, y } = getCoordinates(e);
-    const ctx = canvasRef.current.getContext('2d');
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    setIsDrawing(true);
-  };
+        // Theme Management
+        let theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        const applyTheme = () => {
+            document.documentElement.classList.toggle('dark', theme === 'dark');
+            el.themeIcon.className = theme === 'dark' ? 'fa-solid fa-sun text-yellow-400 text-lg' : 'fa-solid fa-moon text-purple-600 text-lg';
+            localStorage.setItem('theme', theme);
+        };
+        applyTheme();
+        el.themeToggle.onclick = () => { theme = theme === 'dark' ? 'light' : 'dark'; applyTheme(); };
 
-  const draw = (e) => {
-    e.preventDefault();
-    if (!isDrawing) return;
-    const { x, y } = getCoordinates(e);
-    const ctx = canvasRef.current.getContext('2d');
-    ctx.lineTo(x, y);
-    ctx.stroke();
-  };
+        // Auth Logic
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Auth Error:", error);
+            }
+        };
+        initAuth();
 
-  const syncDrawing = () => {
-    if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
-    syncTimeoutRef.current = setTimeout(() => {
-      const canvas = canvasRef.current;
-      const dataUrl = canvas.toDataURL('image/png', 0.8);
-      
-      const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', pairCode);
-      setDoc(roomRef, {
-        type: 'drawing',
-        content: dataUrl,
-        updatedBy: user.uid,
-        timestamp: serverTimestamp()
-      }, { merge: true }).catch(err => console.error(err));
-    }, 400); // Auto-send slightly after stopping the stroke
-  };
+        let profileUnsubscribe = null;
+        let roomUnsubscribe = null;
 
-  const stopDrawing = () => {
-    if (isDrawing) {
-      const ctx = canvasRef.current.getContext('2d');
-      ctx.closePath();
-      setIsDrawing(false);
-      syncDrawing(); // Send instantly when finger/mouse is lifted
-    }
-  };
+        onAuthStateChanged(auth, (user) => {
+            appUser = user;
+            if (user) {
+                listenToProfile(user.uid);
+            }
+        });
 
-  const clearCanvas = () => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    syncDrawing(); // Sync the cleared canvas too
-  };
+        // Listen to private profile for pair code
+        function listenToProfile(uid) {
+            const profileRef = doc(db, 'artifacts', appId, 'users', uid);
+            if (profileUnsubscribe) profileUnsubscribe();
+            
+            profileUnsubscribe = onSnapshot(profileRef, (docSnap) => {
+                if (docSnap.exists() && docSnap.data().pairCode) {
+                    const newCode = docSnap.data().pairCode;
+                    if (newCode !== currentPairCode) {
+                        currentPairCode = newCode;
+                        showScreen('dashboard');
+                        el.displayCode.innerText = `Code: ${currentPairCode}`;
+                        listenToRoom(currentPairCode);
+                    }
+                } else {
+                    currentPairCode = null;
+                    if(roomUnsubscribe) { roomUnsubscribe(); roomUnsubscribe = null; }
+                    showScreen('pairing');
+                }
+                el.loadingScreen.classList.add('hidden');
+            }, (err) => {
+                console.error("Profile listen error:", err);
+                el.loadingScreen.classList.add('hidden');
+            });
+        }
 
-  return (
-    <div className="flex flex-col items-center gap-3">
-      <div className="w-full h-32 bg-gray-50 dark:bg-gray-800 rounded-2xl border-2 border-dashed border-pink-200 dark:border-pink-900/50 overflow-hidden touch-none relative">
-        <canvas
-          ref={canvasRef}
-          className="w-full h-full cursor-crosshair absolute inset-0 z-10"
-          onMouseDown={startDrawing}
-          onMouseMove={draw}
-          onMouseUp={stopDrawing}
-          onMouseOut={stopDrawing}
-          onTouchStart={startDrawing}
-          onTouchMove={draw}
-          onTouchEnd={stopDrawing}
-        />
-        <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-10 z-0">
-          <PenTool className="w-12 h-12" />
-        </div>
-      </div>
-      
-      <div className="flex w-full justify-between items-center px-2">
-        <span className="text-xs text-gray-400">Drawing auto-syncs instantly ✨</span>
-        <button 
-          onClick={clearCanvas}
-          className="flex items-center gap-2 px-4 py-2 bg-pink-100 dark:bg-gray-800 text-pink-600 dark:text-pink-400 rounded-full hover:bg-pink-200 dark:hover:bg-gray-700 transition-colors text-sm font-semibold"
-        >
-          <Trash2 className="w-4 h-4" /> Clear
-        </button>
-      </div>
-    </div>
-  );
-}
+        // Listen to shared room updates
+        function listenToRoom(pairCode) {
+            const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', pairCode);
+            if (roomUnsubscribe) roomUnsubscribe();
+            
+            roomUnsubscribe = onSnapshot(roomRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    currentRoomData = docSnap.data();
+                    updateWidgetUI();
+                }
+            });
+        }
 
-function DailyLove({ user, pairCode }) {
-  const [sending, setSending] = useState(false);
+        // UI Navigation
+        function showScreen(screen) {
+            el.pairingScreen.classList.add('hidden');
+            el.dashboardScreen.classList.add('hidden');
+            if (screen === 'pairing') el.pairingScreen.classList.remove('hidden');
+            if (screen === 'dashboard') {
+                el.dashboardScreen.classList.remove('hidden');
+                setupCanvas(); // Ensure canvas is sized correctly when shown
+            }
+        }
 
-  const sendRandomQuote = async () => {
-    setSending(true);
-    const quote = DAILY_QUOTES[Math.floor(Math.random() * DAILY_QUOTES.length)];
-    
-    try {
-      const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', pairCode);
-      await setDoc(roomRef, {
-        type: 'text',
-        content: quote,
-        updatedBy: user.uid,
-        timestamp: serverTimestamp()
-      }, { merge: true });
-    } catch (err) {
-      console.error(err);
-    }
-    setSending(false);
-  };
+        // Widget UI Update
+        function updateWidgetUI() {
+            if (!currentRoomData) return;
+            
+            const isPartner = currentRoomData.updatedBy !== appUser?.uid;
+            el.widgetTitle.innerText = isPartner ? "Partner's Widget" : "Your Widget";
+            
+            if (isPartner) {
+                el.widgetSparkles.classList.remove('hidden');
+                setTimeout(() => el.widgetSparkles.classList.add('hidden'), 3000);
+            } else {
+                el.widgetSparkles.classList.add('hidden');
+            }
 
-  return (
-    <div className="flex flex-col items-center justify-center h-full gap-4 text-center p-4">
-      <p className="text-sm text-gray-600 dark:text-gray-300">
-        Send a random, carefully curated love quote to brighten their day.
-      </p>
-      <button
-        onClick={sendRandomQuote}
-        disabled={sending}
-        className="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-full font-bold hover:scale-105 active:scale-95 transition-all shadow-lg shadow-purple-500/30 flex items-center gap-2"
-      >
-        <Sparkles className="w-5 h-5" />
-        Send Daily Love
-      </button>
-    </div>
-  );
-}
+            if (currentRoomData.type === 'drawing') {
+                el.widgetContainer.className = "aspect-square w-full rounded-[2rem] p-6 flex items-center justify-center overflow-hidden transition-all duration-500 relative bg-white dark:bg-gray-900 widget-shadow border border-white/20";
+                el.widgetImage.src = currentRoomData.content;
+                el.widgetImage.classList.remove('hidden');
+                el.widgetText.classList.add('hidden');
+            } else {
+                el.widgetContainer.className = "aspect-square w-full rounded-[2rem] p-6 flex items-center justify-center overflow-hidden transition-all duration-500 relative bg-gradient-to-br from-pink-400 to-purple-600 text-white widget-shadow border border-white/20";
+                el.widgetText.classList.remove('hidden');
+                el.widgetImage.classList.add('hidden');
+                
+                const isActivelyTyping = document.activeElement === el.noteInput;
+                
+                // CRITICAL FIX: Update screen from database ONLY if partner sent it,
+                // OR if I am not currently typing. (Prevents text from jumping while typing)
+                if (isPartner || !isActivelyTyping) {
+                    el.widgetText.innerText = currentRoomData.content || "Waiting for a note...";
+                }
+                
+                // If the update came from partner, update our input box too (unless we are typing)
+                if (isPartner && !isActivelyTyping) {
+                    el.noteInput.value = currentRoomData.content;
+                }
+            }
+        }
+
+        // Pairing Actions
+        const generateCode = () => Math.random().toString(36).substring(2, 8).toUpperCase();
+
+        el.generateBtn.onclick = async () => {
+            if (!appUser) return;
+            el.generateText.innerText = "Generating...";
+            const newCode = generateCode();
+            try {
+                const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', newCode);
+                await setDoc(roomRef, {
+                    creatorId: appUser.uid,
+                    createdAt: serverTimestamp(),
+                    type: 'text',
+                    content: 'Welcome to LoveNote! ❤️',
+                    updatedBy: appUser.uid
+                });
+                const profileRef = doc(db, 'artifacts', appId, 'users', appUser.uid);
+                await setDoc(profileRef, { pairCode: newCode }, { merge: true });
+            } catch (err) {
+                console.error(err);
+                el.pairError.innerText = "Failed to generate code.";
+                el.pairError.classList.remove('hidden');
+            }
+            el.generateText.innerText = "Create New Invite Code";
+        };
+
+        el.joinBtn.onclick = async () => {
+            const code = el.joinInput.value.trim().toUpperCase();
+            if (code.length !== 6) {
+                el.pairError.innerText = "Enter a valid 6-character code.";
+                el.pairError.classList.remove('hidden');
+                return;
+            }
+            try {
+                const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', code);
+                const roomSnap = await getDoc(roomRef);
+                if (!roomSnap.exists()) {
+                    el.pairError.innerText = "Invalid invite code. Room not found.";
+                    el.pairError.classList.remove('hidden');
+                    return;
+                }
+                const profileRef = doc(db, 'artifacts', appId, 'users', appUser.uid);
+                await setDoc(profileRef, { pairCode: code }, { merge: true });
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        el.joinInput.oninput = () => el.pairError.classList.add('hidden');
+
+        // Disconnect
+        el.disconnectBtn.onclick = async () => {
+            if (!appUser) return;
+            try {
+                const profileRef = doc(db, 'artifacts', appId, 'users', appUser.uid);
+                // CRITICAL FIX: Use setDoc instead of updateDoc to prevent errors if profile is missing
+                await setDoc(profileRef, { pairCode: deleteField() }, { merge: true });
+            } catch(e) { console.error(e); }
+        };
+
+        // Copy Code
+        el.copyCodeBtn.onclick = () => {
+            if (!currentPairCode) return;
+            const temp = document.createElement('textarea');
+            temp.value = currentPairCode;
+            temp.style.position = 'fixed';
+            temp.style.opacity = '0';
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            
+            const originalHtml = el.displayCode.innerHTML;
+            el.displayCode.innerHTML = "Copied! ✓";
+            setTimeout(() => el.displayCode.innerHTML = originalHtml, 2000);
+        };
+
+        // Tab Management
+        const switchTab = (tabId) => {
+            Object.values(el.tabs).forEach(t => {
+                t.classList.remove('bg-white', 'dark:bg-gray-800', 'shadow-sm', 'text-pink-500');
+                t.classList.add('text-gray-500');
+            });
+            
+            // Hide all contents completely
+            el.contents.note.classList.add('hidden');
+            el.contents.note.classList.remove('flex');
+            el.contents.draw.classList.add('hidden');
+            el.contents.draw.classList.remove('flex');
+            el.contents.daily.classList.add('hidden');
+            el.contents.daily.classList.remove('flex');
+            
+            // Show Active Tab
+            el.tabs[tabId].classList.remove('text-gray-500');
+            el.tabs[tabId].classList.add('bg-white', 'dark:bg-gray-800', 'shadow-sm', 'text-pink-500');
+            
+            el.contents[tabId].classList.remove('hidden');
+            el.contents[tabId].classList.add('flex');
+            
+            // Re-setup canvas size if switching to draw
+            if (tabId === 'draw') {
+                setTimeout(setupCanvas, 50);
+            }
+        };
+
+        el.tabs.note.onclick = () => switchTab('note');
+        el.tabs.draw.onclick = () => switchTab('draw');
+        el.tabs.daily.onclick = () => switchTab('daily');
+
+        // Note Logic (Live Sync)
+        let noteTimeout;
+        const syncNote = (text) => {
+            if (!currentPairCode || !appUser) return;
+            const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', currentPairCode);
+            setDoc(roomRef, {
+                type: 'text',
+                content: text,
+                updatedBy: appUser.uid,
+                timestamp: serverTimestamp()
+            }, { merge: true }).catch(console.error);
+        };
+
+        const handleNoteInput = () => {
+            const val = el.noteInput.value;
+            
+            // CRITICAL FIX: Force UI to Text Mode instantly locally (even if it was a drawing)
+            el.widgetImage.classList.add('hidden');
+            el.widgetText.classList.remove('hidden');
+            el.widgetContainer.className = "aspect-square w-full rounded-[2rem] p-6 flex items-center justify-center overflow-hidden transition-all duration-500 relative bg-gradient-to-br from-pink-400 to-purple-600 text-white widget-shadow border border-white/20";
+            
+            // Immediate UI update
+            el.widgetText.innerText = val || "Waiting for a note...";
+            
+            clearTimeout(noteTimeout);
+            noteTimeout = setTimeout(() => syncNote(val), 200);
+        };
+
+        el.noteInput.addEventListener('input', handleNoteInput);
+
+        el.emojiBtns.forEach(btn => {
+            btn.onclick = () => {
+                el.noteInput.value += btn.innerText;
+                el.noteInput.focus();
+                handleNoteInput();
+            };
+        });
+
+        el.clearNoteBtn.onclick = () => {
+            el.noteInput.value = '';
+            el.noteInput.focus();
+            handleNoteInput();
+        };
+
+        // Canvas Logic
+        const ctx = el.canvas.getContext('2d');
+        let isDrawing = false;
+        let drawTimeout;
+
+        function setupCanvas() {
+            const rect = el.canvas.parentElement.getBoundingClientRect();
+            // Handle high DPI displays
+            const dpr = window.devicePixelRatio || 1;
+            el.canvas.width = rect.width * dpr;
+            el.canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = '#ec4899'; // pink-500
+        }
+        window.addEventListener('resize', () => {
+            if(!el.dashboardScreen.classList.contains('hidden') && !el.contents.draw.classList.contains('hidden')) {
+               setupCanvas(); 
+            }
+        });
+
+        const getCoords = (e) => {
+            const rect = el.canvas.getBoundingClientRect();
+            if (e.touches && e.touches.length > 0) {
+                return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+            }
+            return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+        };
+
+        const startDraw = (e) => {
+            e.preventDefault();
+            const { x, y } = getCoords(e);
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            isDrawing = true;
+        };
+
+        const doDraw = (e) => {
+            e.preventDefault();
+            if (!isDrawing) return;
+            const { x, y } = getCoords(e);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+        };
+
+        const syncDrawing = () => {
+            if (!currentPairCode || !appUser) return;
+            clearTimeout(drawTimeout);
+            drawTimeout = setTimeout(() => {
+                const dataUrl = el.canvas.toDataURL('image/png');
+                const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', currentPairCode);
+                setDoc(roomRef, {
+                    type: 'drawing',
+                    content: dataUrl,
+                    updatedBy: appUser.uid,
+                    timestamp: serverTimestamp()
+                }, { merge: true });
+            }, 300);
+        };
+
+        const stopDraw = () => {
+            if (isDrawing) {
+                ctx.closePath();
+                isDrawing = false;
+                syncDrawing();
+            }
+        };
+
+        el.canvas.addEventListener('mousedown', startDraw);
+        el.canvas.addEventListener('mousemove', doDraw);
+        el.canvas.addEventListener('mouseup', stopDraw);
+        el.canvas.addEventListener('mouseout', stopDraw);
+        
+        el.canvas.addEventListener('touchstart', startDraw, {passive: false});
+        el.canvas.addEventListener('touchmove', doDraw, {passive: false});
+        el.canvas.addEventListener('touchend', stopDraw);
+
+        el.clearCanvasBtn.onclick = () => {
+            ctx.clearRect(0, 0, el.canvas.width / (window.devicePixelRatio || 1), el.canvas.height / (window.devicePixelRatio || 1));
+            syncDrawing();
+        };
+
+        // Daily Love Logic
+        el.sendDailyBtn.onclick = () => {
+            if (!currentPairCode || !appUser) return;
+            const quote = DAILY_QUOTES[Math.floor(Math.random() * DAILY_QUOTES.length)];
+            const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', currentPairCode);
+            setDoc(roomRef, {
+                type: 'text',
+                content: quote,
+                updatedBy: appUser.uid,
+                timestamp: serverTimestamp()
+            }, { merge: true });
+        };
+
+    </script>
+</body>
+</html>
