@@ -1,0 +1,676 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { initializeApp } from 'firebase/app';
+import { 
+  getAuth, 
+  signInAnonymously, 
+  signInWithCustomToken, 
+  onAuthStateChanged 
+} from 'firebase/auth';
+import { 
+  getFirestore, 
+  doc, 
+  setDoc, 
+  getDoc, 
+  updateDoc,
+  deleteField,
+  onSnapshot, 
+  collection,
+  serverTimestamp
+} from 'firebase/firestore';
+import { 
+  Heart, 
+  PenTool, 
+  Image as ImageIcon, 
+  MessageSquare, 
+  Sun, 
+  Moon, 
+  Send, 
+  Copy,
+  RefreshCw,
+  Trash2,
+  Sparkles,
+  LogOut
+} from 'lucide-react';
+
+// Initialize Firebase using environment variables provided by the platform
+const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'lovenote-default-id';
+
+const generateInviteCode = () => {
+  return Math.random().toString(36).substring(2, 8).toUpperCase();
+};
+
+const DAILY_QUOTES = [
+  "I love you not only for what you are, but for what I am when I am with you.",
+  "You are my today and all of my tomorrows.",
+  "In all the world, there is no heart for me like yours.",
+  "I swear I couldn't love you more than I do right now, and yet I know I will tomorrow.",
+  "If I know what love is, it is because of you."
+];
+
+export default function App() {
+  const [user, setUser] = useState(null);
+  const [theme, setTheme] = useState('light');
+  const [pairCode, setPairCode] = useState(null);
+  const [roomData, setRoomData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  // Initialize Theme
+  useEffect(() => {
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      setTheme('dark');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+      } catch (error) {
+        console.error("Auth Error:", error);
+      }
+    };
+    initAuth();
+
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (!user) return;
+
+    // Listen to private user profile to see if they are already paired
+    const profileRef = doc(db, 'artifacts', appId, 'users', user.uid);
+    
+    const unsubscribe = onSnapshot(profileRef, (docSnap) => {
+      if (docSnap.exists() && docSnap.data().pairCode) {
+        setPairCode(docSnap.data().pairCode);
+      } else {
+        setPairCode(null);
+      }
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching profile:", error);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
+
+  useEffect(() => {
+    if (!user || !pairCode) return;
+
+    // Listen to the public shared room for real-time updates
+    const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', pairCode);
+    
+    const unsubscribe = onSnapshot(roomRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setRoomData(docSnap.data());
+      }
+    }, (error) => {
+      console.error("Error fetching room data:", error);
+    });
+
+    return () => unsubscribe();
+  }, [user, pairCode]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-pink-50 dark:bg-gray-900">
+        <Heart className="animate-bounce text-pink-500 w-12 h-12" />
+      </div>
+    );
+  }
+
+  return (
+    <div className={`min-h-screen transition-colors duration-300 font-sans ${theme === 'dark' ? 'dark bg-gray-950 text-white' : 'bg-gradient-to-br from-pink-50 to-purple-100 text-gray-800'}`}>
+      
+      {/* Header */}
+      <header className="p-4 flex justify-between items-center bg-white/30 dark:bg-black/30 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <div className="flex items-center gap-2">
+          <Heart className="text-pink-500 fill-pink-500 w-6 h-6" />
+          <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-purple-600">
+            LoveNote
+          </h1>
+        </div>
+        <button 
+          onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+          className="p-2 rounded-full hover:bg-white/50 dark:hover:bg-gray-800 transition-colors"
+        >
+          {theme === 'light' ? <Moon className="w-5 h-5 text-purple-600" /> : <Sun className="w-5 h-5 text-yellow-400" />}
+        </button>
+      </header>
+
+      {/* Main Content Area */}
+      <main className="max-w-md mx-auto p-4 flex flex-col min-h-[calc(100vh-70px)]">
+        {!pairCode ? (
+          <PairingScreen user={user} theme={theme} />
+        ) : (
+          <Dashboard user={user} roomData={roomData} pairCode={pairCode} />
+        )}
+      </main>
+    </div>
+  );
+}
+
+function PairingScreen({ user, theme }) {
+  const [joinCode, setJoinCode] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleGenerate = async () => {
+    setIsGenerating(true);
+    const newCode = generateInviteCode();
+    
+    try {
+      // Create new shared room
+      const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', newCode);
+      await setDoc(roomRef, {
+        creatorId: user.uid,
+        createdAt: serverTimestamp(),
+        type: 'text',
+        content: 'Welcome to LoveNote! ❤️',
+        updatedBy: user.uid
+      });
+
+      // Save code to private profile
+      const profileRef = doc(db, 'artifacts', appId, 'users', user.uid);
+      await setDoc(profileRef, { pairCode: newCode }, { merge: true });
+      
+    } catch (err) {
+      console.error(err);
+      setError('Failed to generate code.');
+    }
+    setIsGenerating(false);
+  };
+
+  const handleJoin = async () => {
+    if (!joinCode || joinCode.length !== 6) {
+      setError('Please enter a valid 6-character code.');
+      return;
+    }
+
+    try {
+      // Check if room exists
+      const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', joinCode.toUpperCase());
+      const roomSnap = await getDoc(roomRef);
+      
+      if (!roomSnap.exists()) {
+        setError('Invalid invite code. Room not found.');
+        return;
+      }
+
+      // Save code to private profile
+      const profileRef = doc(db, 'artifacts', appId, 'users', user.uid);
+      await setDoc(profileRef, { pairCode: joinCode.toUpperCase() }, { merge: true });
+
+    } catch (err) {
+      console.error(err);
+      setError('Failed to join room.');
+    }
+  };
+
+  return (
+    <div className="flex-1 flex flex-col items-center justify-center gap-8 py-8">
+      <div className="text-center space-y-2">
+        <div className="inline-block p-4 rounded-full bg-pink-100 dark:bg-pink-900/30 mb-4">
+          <Heart className="w-12 h-12 text-pink-500 fill-pink-500 animate-pulse" />
+        </div>
+        <h2 className="text-2xl font-bold">Connect with your Love</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          Generate a code to invite them, or enter their code to connect.
+        </p>
+      </div>
+
+      <div className="w-full space-y-6 bg-white/60 dark:bg-gray-900/60 p-6 rounded-3xl shadow-xl backdrop-blur-md border border-white/20 dark:border-gray-800">
+        
+        {/* Join Section */}
+        <div className="space-y-3">
+          <label className="text-sm font-medium ml-1">Enter Invite Code</label>
+          <div className="flex gap-2">
+            <input 
+              type="text"
+              value={joinCode}
+              onChange={(e) => {
+                setJoinCode(e.target.value);
+                setError('');
+              }}
+              placeholder="e.g. A1B2C3"
+              className="flex-1 px-4 py-3 rounded-2xl bg-white dark:bg-gray-800 border-none shadow-inner focus:ring-2 focus:ring-pink-500 outline-none uppercase font-mono tracking-widest text-center"
+              maxLength={6}
+            />
+            <button 
+              onClick={handleJoin}
+              className="px-6 py-3 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-pink-500/30"
+            >
+              Join
+            </button>
+          </div>
+          {error && <p className="text-red-500 text-xs text-center">{error}</p>}
+        </div>
+
+        <div className="relative flex items-center py-2">
+          <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
+          <span className="flex-shrink-0 mx-4 text-gray-400 text-sm">OR</span>
+          <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
+        </div>
+
+        {/* Generate Section */}
+        <button 
+          onClick={handleGenerate}
+          disabled={isGenerating}
+          className="w-full py-4 rounded-2xl bg-white dark:bg-gray-800 font-semibold border-2 border-pink-200 dark:border-pink-900 hover:border-pink-500 dark:hover:border-pink-500 transition-colors flex items-center justify-center gap-2 group"
+        >
+          <Sparkles className="w-5 h-5 text-pink-500 group-hover:animate-spin" />
+          {isGenerating ? 'Generating...' : 'Create New Invite Code'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function Dashboard({ user, roomData, pairCode }) {
+  const [activeTab, setActiveTab] = useState('note'); // note, draw, daily
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
+  const [previewText, setPreviewText] = useState(null);
+  
+  const copyCode = async () => {
+    // Fallback for iframe environments where the Clipboard API is blocked
+    const fallbackCopyTextToClipboard = (text) => {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      // Prevent scrolling to bottom of page in MS Edge
+      textArea.style.position = "fixed";
+      textArea.style.top = "0";
+      textArea.style.left = "0";
+      textArea.style.opacity = "0";
+      
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+      } catch (err) {
+        console.error('Fallback: Oops, unable to copy', err);
+      }
+      document.body.removeChild(textArea);
+    };
+
+    if (!navigator.clipboard) {
+      fallbackCopyTextToClipboard(pairCode);
+      return;
+    }
+    
+    try {
+      await navigator.clipboard.writeText(pairCode);
+    } catch (err) {
+      console.warn("Modern clipboard API failed, using fallback", err);
+      fallbackCopyTextToClipboard(pairCode);
+    }
+  };
+
+  const isPartnerUpdate = roomData ? roomData.updatedBy !== user.uid : false;
+
+  const handleDisconnect = async () => {
+    setIsDisconnecting(true);
+    try {
+      const profileRef = doc(db, 'artifacts', appId, 'users', user.uid);
+      await updateDoc(profileRef, {
+        pairCode: deleteField()
+      });
+    } catch (err) {
+      console.error("Error disconnecting:", err);
+      setIsDisconnecting(false);
+    }
+  };
+
+  return (
+    <div className="flex-1 flex flex-col gap-6">
+      {/* Top Info Bar */}
+      <div className="flex justify-between items-center bg-white/50 dark:bg-black/40 px-4 py-2 rounded-full backdrop-blur-sm text-sm border border-white/20 dark:border-gray-800">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+          <span>Connected</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <button onClick={copyCode} className="flex items-center gap-1 hover:text-pink-500 transition-colors">
+            <span className="font-mono bg-black/5 dark:bg-white/10 px-2 py-1 rounded">Code: {pairCode}</span>
+            <Copy className="w-4 h-4" />
+          </button>
+          <div className="w-px h-4 bg-gray-300 dark:bg-gray-600"></div>
+          <button 
+            onClick={handleDisconnect} 
+            disabled={isDisconnecting}
+            className="text-gray-500 hover:text-red-500 transition-colors"
+            title="Disconnect & Go Back"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* The "Widget" View (Received Content) */}
+      <div className="relative">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2 ml-2">
+          {isPartnerUpdate ? "Partner's Widget" : "Your Widget"}
+        </h3>
+        <div className={`aspect-square w-full rounded-[2rem] p-6 flex items-center justify-center overflow-hidden transition-all duration-500 relative
+          ${roomData?.type === 'drawing' ? 'bg-white dark:bg-gray-900' : 'bg-gradient-to-br from-pink-400 to-purple-600 text-white'}
+          shadow-[0_20px_50px_-12px_rgba(236,72,153,0.5)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] border border-white/20`}
+        >
+          {roomData?.type === 'text' && (
+            <p className="text-3xl font-bold text-center leading-tight drop-shadow-md break-words w-full">
+              {previewText !== null ? previewText : (roomData.content || 'Waiting for a note...')}
+            </p>
+          )}
+          
+          {roomData?.type === 'drawing' && (
+            <img 
+              src={roomData.content} 
+              alt="Love Doodle" 
+              className="w-full h-full object-contain filter drop-shadow-xl"
+            />
+          )}
+
+          {/* Sparkle effects for new updates */}
+          {isPartnerUpdate && (
+             <div className="absolute top-4 right-4 animate-bounce">
+               <Sparkles className="w-6 h-6 text-yellow-300" />
+             </div>
+          )}
+        </div>
+      </div>
+
+      {/* Input Tools Area */}
+      <div className="mt-auto bg-white/80 dark:bg-gray-900/80 rounded-3xl p-2 backdrop-blur-xl border border-white/40 dark:border-gray-700 shadow-xl">
+        {/* Tabs */}
+        <div className="flex p-1 bg-gray-100/50 dark:bg-black/50 rounded-2xl mb-4">
+          <TabButton Icon={MessageSquare} label="Note" active={activeTab === 'note'} onClick={() => setActiveTab('note')} />
+          <TabButton Icon={PenTool} label="Draw" active={activeTab === 'draw'} onClick={() => setActiveTab('draw')} />
+          <TabButton Icon={Heart} label="Daily" active={activeTab === 'daily'} onClick={() => setActiveTab('daily')} />
+        </div>
+
+        {/* Tab Content */}
+        <div className="p-2 min-h-[160px] flex flex-col">
+          {activeTab === 'note' && <NoteInput user={user} pairCode={pairCode} setPreviewText={setPreviewText} />}
+          {activeTab === 'draw' && <DrawInput user={user} pairCode={pairCode} />}
+          {activeTab === 'daily' && <DailyLove user={user} pairCode={pairCode} />}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TabButton({ Icon, label, active, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-xl transition-all ${
+        active 
+          ? 'bg-white dark:bg-gray-800 shadow-sm text-pink-500' 
+          : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+      }`}
+    >
+      <Icon className="w-5 h-5" />
+      <span className="text-xs font-medium">{label}</span>
+    </button>
+  );
+}
+
+function NoteInput({ user, pairCode, setPreviewText }) {
+  const [note, setNote] = useState('');
+  const timeoutRef = useRef(null);
+
+  useEffect(() => {
+    return () => setPreviewText && setPreviewText(null);
+  }, [setPreviewText]);
+
+  const updateRoom = (newNote) => {
+    const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', pairCode);
+    // Instant update via Firebase local cache
+    setDoc(roomRef, {
+      type: 'text',
+      content: newNote.trim(),
+      updatedBy: user.uid,
+      timestamp: serverTimestamp()
+    }, { merge: true }).catch(err => console.error(err));
+  };
+
+  const handleTextChange = (e) => {
+    const val = e.target.value;
+    setNote(val);
+    if(setPreviewText) setPreviewText(val);
+
+    // Auto-sync as you type (300ms debounce)
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      updateRoom(val);
+    }, 300);
+  };
+
+  const addEmoji = (emoji) => {
+    const val = note + emoji;
+    setNote(val);
+    if(setPreviewText) setPreviewText(val);
+    updateRoom(val);
+  };
+
+  const clearNote = () => {
+    setNote('');
+    if(setPreviewText) setPreviewText('');
+    updateRoom('');
+  };
+
+  const quickEmojis = ['❤️', '😘', '🥺', '😍', '✨', '🔥'];
+
+  return (
+    <div className="flex flex-col h-full gap-3">
+      <textarea
+        value={note}
+        onChange={handleTextChange}
+        placeholder="Write a sweet note... it appears instantly! ✨"
+        className="w-full flex-1 bg-transparent resize-none outline-none text-lg p-2 placeholder:text-gray-400"
+        maxLength={100}
+      />
+      <div className="flex items-center justify-between mt-auto">
+        <div className="flex gap-2">
+          {quickEmojis.map(emoji => (
+            <button 
+              key={emoji}
+              onClick={() => addEmoji(emoji)}
+              className="text-xl hover:scale-125 transition-transform"
+            >
+              {emoji}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={clearNote}
+          className="px-4 py-2 bg-pink-100 dark:bg-gray-800 text-pink-600 dark:text-pink-400 rounded-full hover:bg-pink-200 dark:hover:bg-gray-700 transition-colors text-sm font-semibold"
+        >
+          Clear
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function DrawInput({ user, pairCode }) {
+  const canvasRef = useRef(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const syncTimeoutRef = useRef(null);
+
+  // Set up canvas properties
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      // Fix resolution for high DPI displays
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      
+      ctx.scale(dpr, dpr);
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#ec4899'; // pink-500
+    }
+  }, []);
+
+  const getCoordinates = (e) => {
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    if (e.touches && e.touches.length > 0) {
+      return {
+        x: e.touches[0].clientX - rect.left,
+        y: e.touches[0].clientY - rect.top
+      };
+    }
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+  };
+
+  const startDrawing = (e) => {
+    e.preventDefault();
+    const { x, y } = getCoordinates(e);
+    const ctx = canvasRef.current.getContext('2d');
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    setIsDrawing(true);
+  };
+
+  const draw = (e) => {
+    e.preventDefault();
+    if (!isDrawing) return;
+    const { x, y } = getCoordinates(e);
+    const ctx = canvasRef.current.getContext('2d');
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  };
+
+  const syncDrawing = () => {
+    if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
+    syncTimeoutRef.current = setTimeout(() => {
+      const canvas = canvasRef.current;
+      const dataUrl = canvas.toDataURL('image/png', 0.8);
+      
+      const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', pairCode);
+      setDoc(roomRef, {
+        type: 'drawing',
+        content: dataUrl,
+        updatedBy: user.uid,
+        timestamp: serverTimestamp()
+      }, { merge: true }).catch(err => console.error(err));
+    }, 400); // Auto-send slightly after stopping the stroke
+  };
+
+  const stopDrawing = () => {
+    if (isDrawing) {
+      const ctx = canvasRef.current.getContext('2d');
+      ctx.closePath();
+      setIsDrawing(false);
+      syncDrawing(); // Send instantly when finger/mouse is lifted
+    }
+  };
+
+  const clearCanvas = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    syncDrawing(); // Sync the cleared canvas too
+  };
+
+  return (
+    <div className="flex flex-col items-center gap-3">
+      <div className="w-full h-32 bg-gray-50 dark:bg-gray-800 rounded-2xl border-2 border-dashed border-pink-200 dark:border-pink-900/50 overflow-hidden touch-none relative">
+        <canvas
+          ref={canvasRef}
+          className="w-full h-full cursor-crosshair absolute inset-0 z-10"
+          onMouseDown={startDrawing}
+          onMouseMove={draw}
+          onMouseUp={stopDrawing}
+          onMouseOut={stopDrawing}
+          onTouchStart={startDrawing}
+          onTouchMove={draw}
+          onTouchEnd={stopDrawing}
+        />
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-10 z-0">
+          <PenTool className="w-12 h-12" />
+        </div>
+      </div>
+      
+      <div className="flex w-full justify-between items-center px-2">
+        <span className="text-xs text-gray-400">Drawing auto-syncs instantly ✨</span>
+        <button 
+          onClick={clearCanvas}
+          className="flex items-center gap-2 px-4 py-2 bg-pink-100 dark:bg-gray-800 text-pink-600 dark:text-pink-400 rounded-full hover:bg-pink-200 dark:hover:bg-gray-700 transition-colors text-sm font-semibold"
+        >
+          <Trash2 className="w-4 h-4" /> Clear
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function DailyLove({ user, pairCode }) {
+  const [sending, setSending] = useState(false);
+
+  const sendRandomQuote = async () => {
+    setSending(true);
+    const quote = DAILY_QUOTES[Math.floor(Math.random() * DAILY_QUOTES.length)];
+    
+    try {
+      const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', pairCode);
+      await setDoc(roomRef, {
+        type: 'text',
+        content: quote,
+        updatedBy: user.uid,
+        timestamp: serverTimestamp()
+      }, { merge: true });
+    } catch (err) {
+      console.error(err);
+    }
+    setSending(false);
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center h-full gap-4 text-center p-4">
+      <p className="text-sm text-gray-600 dark:text-gray-300">
+        Send a random, carefully curated love quote to brighten their day.
+      </p>
+      <button
+        onClick={sendRandomQuote}
+        disabled={sending}
+        className="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-full font-bold hover:scale-105 active:scale-95 transition-all shadow-lg shadow-purple-500/30 flex items-center gap-2"
+      >
+        <Sparkles className="w-5 h-5" />
+        Send Daily Love
+      </button>
+    </div>
+  );
+}
