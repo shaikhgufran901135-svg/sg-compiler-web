@@ -1,1164 +1,676 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apna Store - Groceries in 25 Min</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+import React, { useState, useEffect, useRef } from 'react';
+import { initializeApp } from 'firebase/app';
+import { 
+  getAuth, 
+  signInAnonymously, 
+  signInWithCustomToken, 
+  onAuthStateChanged 
+} from 'firebase/auth';
+import { 
+  getFirestore, 
+  doc, 
+  setDoc, 
+  getDoc, 
+  updateDoc,
+  deleteField,
+  onSnapshot, 
+  collection,
+  serverTimestamp
+} from 'firebase/firestore';
+import { 
+  Heart, 
+  PenTool, 
+  Image as ImageIcon, 
+  MessageSquare, 
+  Sun, 
+  Moon, 
+  Send, 
+  Copy,
+  RefreshCw,
+  Trash2,
+  Sparkles,
+  LogOut
+} from 'lucide-react';
+
+// Initialize Firebase using environment variables provided by the platform
+const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'lovenote-default-id';
+
+const generateInviteCode = () => {
+  return Math.random().toString(36).substring(2, 8).toUpperCase();
+};
+
+const DAILY_QUOTES = [
+  "I love you not only for what you are, but for what I am when I am with you.",
+  "You are my today and all of my tomorrows.",
+  "In all the world, there is no heart for me like yours.",
+  "I swear I couldn't love you more than I do right now, and yet I know I will tomorrow.",
+  "If I know what love is, it is because of you."
+];
+
+export default function App() {
+  const [user, setUser] = useState(null);
+  const [theme, setTheme] = useState('light');
+  const [pairCode, setPairCode] = useState(null);
+  const [roomData, setRoomData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  // Initialize Theme
+  useEffect(() => {
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      setTheme('dark');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+      } catch (error) {
+        console.error("Auth Error:", error);
+      }
+    };
+    initAuth();
+
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (!user) return;
+
+    // Listen to private user profile to see if they are already paired
+    const profileRef = doc(db, 'artifacts', appId, 'users', user.uid);
     
-    <style>
-        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        
-        /* Smooth Slide Animations */
-        .cart-slide { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .modal-fade { transition: opacity 0.2s ease-in-out; }
-        
-        /* OTP Notification Drop */
-        @keyframes slideDownOTP {
-            0% { transform: translateY(-100%); opacity: 0; }
-            10% { transform: translateY(0); opacity: 1; }
-            90% { transform: translateY(0); opacity: 1; }
-            100% { transform: translateY(-100%); opacity: 0; }
-        }
-        .otp-toast {
-            animation: slideDownOTP 6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
+    const unsubscribe = onSnapshot(profileRef, (docSnap) => {
+      if (docSnap.exists() && docSnap.data().pairCode) {
+        setPairCode(docSnap.data().pairCode);
+      } else {
+        setPairCode(null);
+      }
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching profile:", error);
+      setLoading(false);
+    });
 
-        /* Pulse for floating button */
-        @keyframes pulse-ring {
-            0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); }
-            100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
-        }
-        .call-pulse { animation: pulse-ring 2s infinite; }
+    return () => unsubscribe();
+  }, [user]);
 
-        /* Hide scrollbars */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
-    </style>
-</head>
-<body class="bg-gray-50 text-gray-800 pb-20">
+  useEffect(() => {
+    if (!user || !pairCode) return;
 
-    <header class="bg-white shadow-sm sticky top-0 z-40">
-        <div class="px-4 py-3 flex justify-between items-center max-w-2xl mx-auto">
-            <div class="flex items-center space-x-3 w-2/3">
-                <!-- Secret Admin Tap on Logo (5 Taps) -->
-                <div onclick="handleAdminTap()" class="bg-yellow-400 text-yellow-900 rounded-xl p-2 font-bold text-xl leading-none shadow-sm cursor-pointer select-none active:scale-95 transition-transform shrink-0">
-                    AS
-                </div>
-                <div class="flex flex-col cursor-pointer truncate" onclick="openAddressModal()">
-                    <div class="flex items-center space-x-1">
-                        <span class="font-bold text-lg truncate text-gray-900">Delivery in 25 min</span>
-                        <i class="fas fa-chevron-down text-xs text-gray-500 shrink-0"></i>
-                    </div>
-                    <span class="text-xs text-gray-500 truncate" id="topAddressText">Select Location</span>
-                </div>
-            </div>
-            
-            <div class="flex items-center space-x-4 shrink-0">
-                <button onclick="openTracking()" class="text-blue-600 font-bold text-xs uppercase tracking-wider flex items-center hover:text-blue-700">
-                    <i class="fas fa-map-marker-alt mr-1"></i> Track
-                </button>
-                <div class="relative cursor-pointer" onclick="openCart()">
-                    <i class="fas fa-shopping-basket text-2xl text-gray-700 hover:text-green-600 transition-colors"></i>
-                    <span id="navCartBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center hidden border border-white">0</span>
-                </div>
-                <button id="loginNavBtn" onclick="openLoginModal()" class="text-sm font-semibold text-gray-600 hover:text-gray-900 transition">
-                    Login
-                </button>
-                <div id="userProfileIcon" class="hidden h-8 w-8 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-700 font-bold border border-yellow-300">
-                    <i class="fas fa-user text-sm"></i>
-                </div>
-            </div>
+    // Listen to the public shared room for real-time updates
+    const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', pairCode);
+    
+    const unsubscribe = onSnapshot(roomRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setRoomData(docSnap.data());
+      }
+    }, (error) => {
+      console.error("Error fetching room data:", error);
+    });
+
+    return () => unsubscribe();
+  }, [user, pairCode]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-pink-50 dark:bg-gray-900">
+        <Heart className="animate-bounce text-pink-500 w-12 h-12" />
+      </div>
+    );
+  }
+
+  return (
+    <div className={`min-h-screen transition-colors duration-300 font-sans ${theme === 'dark' ? 'dark bg-gray-950 text-white' : 'bg-gradient-to-br from-pink-50 to-purple-100 text-gray-800'}`}>
+      
+      {/* Header */}
+      <header className="p-4 flex justify-between items-center bg-white/30 dark:bg-black/30 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <div className="flex items-center gap-2">
+          <Heart className="text-pink-500 fill-pink-500 w-6 h-6" />
+          <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-purple-600">
+            LoveNote
+          </h1>
         </div>
-    </header>
+        <button 
+          onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+          className="p-2 rounded-full hover:bg-white/50 dark:hover:bg-gray-800 transition-colors"
+        >
+          {theme === 'light' ? <Moon className="w-5 h-5 text-purple-600" /> : <Sun className="w-5 h-5 text-yellow-400" />}
+        </button>
+      </header>
 
-    <main class="max-w-2xl mx-auto">
-        <!-- Search -->
-        <div class="px-4 py-3">
-            <div class="bg-white border border-gray-200 rounded-xl px-4 py-3 flex items-center shadow-sm hover:border-green-300 transition-colors">
-                <i class="fas fa-search text-gray-400 mr-3"></i>
-                <input type="text" placeholder="Search 'Aashirvaad Atta'" class="w-full outline-none text-sm bg-transparent">
-            </div>
-        </div>
-
-        <!-- Banner -->
-        <div class="px-4 mb-4">
-            <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-5 text-white shadow-md relative overflow-hidden">
-                <div class="relative z-10">
-                    <span class="bg-white/20 px-2 py-1 rounded text-xs font-bold mb-2 inline-block backdrop-blur-sm">FASTEST DELIVERY</span>
-                    <h2 class="font-bold text-xl mb-1">Apna Store</h2>
-                    <p class="text-blue-100 text-sm mb-3">Fresh groceries delivered in 25 mins</p>
-                    <button class="bg-white text-blue-700 px-4 py-1.5 rounded-full text-sm font-bold shadow-sm hover:scale-105 transition-transform">Shop Now</button>
-                </div>
-                <i class="fas fa-shipping-fast absolute right-2 -bottom-4 text-7xl text-white/20"></i>
-            </div>
-        </div>
-
-        <!-- Products Section -->
-        <div class="px-4 pb-24">
-            <h3 class="font-bold text-lg mb-4 flex items-center text-gray-800"><i class="fas fa-fire text-orange-500 mr-2"></i> Daily Essentials</h3>
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-3" id="productContainer">
-                <!-- Products will be injected here via JS -->
-            </div>
-        </div>
-    </main>
-
-    <!-- Floating Call Support -->
-    <a href="tel:+919876543210" class="fixed bottom-24 right-4 z-30 bg-green-500 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg call-pulse">
-        <i class="fas fa-phone-alt text-lg"></i>
-    </a>
-
-    <!-- Floating Cart Summary -->
-    <div id="cartSummary" class="fixed bottom-4 left-4 right-4 max-w-2xl mx-auto bg-green-600 text-white rounded-xl p-3 shadow-xl hidden flex justify-between items-center z-40 cursor-pointer hover:bg-green-700 transition-colors" onclick="openCart()">
-        <div class="flex items-center space-x-3">
-            <div class="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
-                <i class="fas fa-shopping-bag"></i>
-            </div>
-            <div>
-                <div class="font-bold text-sm"><span id="summaryItemCount">0</span> Items</div>
-                <div class="text-xs text-green-100 font-medium">View Cart</div>
-            </div>
-        </div>
-        <div class="flex items-center space-x-2">
-            <div class="font-bold text-lg">₹<span id="summaryTotal">0</span></div>
-            <i class="fas fa-chevron-right text-sm"></i>
-        </div>
+      {/* Main Content Area */}
+      <main className="max-w-md mx-auto p-4 flex flex-col min-h-[calc(100vh-70px)]">
+        {!pairCode ? (
+          <PairingScreen user={user} theme={theme} />
+        ) : (
+          <Dashboard user={user} roomData={roomData} pairCode={pairCode} />
+        )}
+      </main>
     </div>
+  );
+}
 
-    <!-- Cart Slide-out Panel -->
-    <div id="cartOverlay" class="fixed inset-0 bg-black/50 z-50 hidden modal-fade backdrop-blur-sm" onclick="closeCart()"></div>
-    <div id="cartPanel" class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-gray-50 z-50 translate-x-full cart-slide flex flex-col shadow-2xl">
-        <div class="bg-white px-4 py-4 flex justify-between items-center shadow-sm z-10">
-            <h2 class="font-bold text-lg text-gray-800">My Cart</h2>
-            <button onclick="closeCart()" class="h-8 w-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-gray-600 transition-colors">
-                <i class="fas fa-times"></i>
+function PairingScreen({ user, theme }) {
+  const [joinCode, setJoinCode] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleGenerate = async () => {
+    setIsGenerating(true);
+    const newCode = generateInviteCode();
+    
+    try {
+      // Create new shared room
+      const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', newCode);
+      await setDoc(roomRef, {
+        creatorId: user.uid,
+        createdAt: serverTimestamp(),
+        type: 'text',
+        content: 'Welcome to LoveNote! ❤️',
+        updatedBy: user.uid
+      });
+
+      // Save code to private profile
+      const profileRef = doc(db, 'artifacts', appId, 'users', user.uid);
+      await setDoc(profileRef, { pairCode: newCode }, { merge: true });
+      
+    } catch (err) {
+      console.error(err);
+      setError('Failed to generate code.');
+    }
+    setIsGenerating(false);
+  };
+
+  const handleJoin = async () => {
+    if (!joinCode || joinCode.length !== 6) {
+      setError('Please enter a valid 6-character code.');
+      return;
+    }
+
+    try {
+      // Check if room exists
+      const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', joinCode.toUpperCase());
+      const roomSnap = await getDoc(roomRef);
+      
+      if (!roomSnap.exists()) {
+        setError('Invalid invite code. Room not found.');
+        return;
+      }
+
+      // Save code to private profile
+      const profileRef = doc(db, 'artifacts', appId, 'users', user.uid);
+      await setDoc(profileRef, { pairCode: joinCode.toUpperCase() }, { merge: true });
+
+    } catch (err) {
+      console.error(err);
+      setError('Failed to join room.');
+    }
+  };
+
+  return (
+    <div className="flex-1 flex flex-col items-center justify-center gap-8 py-8">
+      <div className="text-center space-y-2">
+        <div className="inline-block p-4 rounded-full bg-pink-100 dark:bg-pink-900/30 mb-4">
+          <Heart className="w-12 h-12 text-pink-500 fill-pink-500 animate-pulse" />
+        </div>
+        <h2 className="text-2xl font-bold">Connect with your Love</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          Generate a code to invite them, or enter their code to connect.
+        </p>
+      </div>
+
+      <div className="w-full space-y-6 bg-white/60 dark:bg-gray-900/60 p-6 rounded-3xl shadow-xl backdrop-blur-md border border-white/20 dark:border-gray-800">
+        
+        {/* Join Section */}
+        <div className="space-y-3">
+          <label className="text-sm font-medium ml-1">Enter Invite Code</label>
+          <div className="flex gap-2">
+            <input 
+              type="text"
+              value={joinCode}
+              onChange={(e) => {
+                setJoinCode(e.target.value);
+                setError('');
+              }}
+              placeholder="e.g. A1B2C3"
+              className="flex-1 px-4 py-3 rounded-2xl bg-white dark:bg-gray-800 border-none shadow-inner focus:ring-2 focus:ring-pink-500 outline-none uppercase font-mono tracking-widest text-center"
+              maxLength={6}
+            />
+            <button 
+              onClick={handleJoin}
+              className="px-6 py-3 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-pink-500/30"
+            >
+              Join
             </button>
-        </div>
-        
-        <div class="flex-1 overflow-y-auto p-4 pb-32 custom-scrollbar">
-            <!-- Delivery Note -->
-            <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 flex items-start space-x-3 mb-4">
-                <div class="bg-blue-100 p-1.5 rounded-lg text-blue-600 mt-0.5"><i class="fas fa-bolt text-sm"></i></div>
-                <div>
-                    <h4 class="text-sm font-bold text-blue-900">Superfast Delivery</h4>
-                    <p class="text-xs text-blue-700 mt-0.5">Your items arrive in 25 mins</p>
-                </div>
-            </div>
-
-            <div id="cartItemsList" class="bg-white rounded-xl shadow-sm border border-gray-100 mb-4 divide-y divide-gray-50">
-                <!-- Cart Items will render here -->
-            </div>
-
-            <!-- Bill Details -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-                <h3 class="font-bold text-sm mb-3 text-gray-800">Bill Details</h3>
-                <div class="space-y-2 text-sm text-gray-600">
-                    <div class="flex justify-between">
-                        <span>Item Total</span>
-                        <span class="font-medium text-gray-800">₹<span id="billItemTotal">0</span></span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>Delivery Fee (Distance Based)</span>
-                        <span id="billDeliveryFee" class="font-medium">₹0</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>Handling Charge <i class="fas fa-info-circle text-gray-400 text-[10px]"></i></span>
-                        <span class="font-medium text-gray-800" id="billConvenienceFee">₹0</span>
-                    </div>
-                    <div class="border-t border-gray-100 pt-2 mt-2 flex justify-between font-bold text-gray-900 text-base">
-                        <span>Grand Total</span>
-                        <span>₹<span id="billGrandTotal">0</span></span>
-                    </div>
-                </div>
-            </div>
+          </div>
+          {error && <p className="text-red-500 text-xs text-center">{error}</p>}
         </div>
 
-        <div class="bg-white border-t p-4 pb-6 sm:pb-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] absolute bottom-0 w-full z-20">
-            <button onclick="openPaymentModal()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 rounded-xl shadow-lg flex justify-between items-center px-4 transition-colors">
-                <div class="text-left flex flex-col">
-                    <span class="text-xs text-green-200 font-medium">Proceed to Checkout</span>
-                    <span class="text-lg leading-tight">₹<span id="checkoutBtnTotal">0</span></span>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <span>Pay Now</span>
-                    <i class="fas fa-caret-right"></i>
-                </div>
+        <div className="relative flex items-center py-2">
+          <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
+          <span className="flex-shrink-0 mx-4 text-gray-400 text-sm">OR</span>
+          <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
+        </div>
+
+        {/* Generate Section */}
+        <button 
+          onClick={handleGenerate}
+          disabled={isGenerating}
+          className="w-full py-4 rounded-2xl bg-white dark:bg-gray-800 font-semibold border-2 border-pink-200 dark:border-pink-900 hover:border-pink-500 dark:hover:border-pink-500 transition-colors flex items-center justify-center gap-2 group"
+        >
+          <Sparkles className="w-5 h-5 text-pink-500 group-hover:animate-spin" />
+          {isGenerating ? 'Generating...' : 'Create New Invite Code'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function Dashboard({ user, roomData, pairCode }) {
+  const [activeTab, setActiveTab] = useState('note'); // note, draw, daily
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
+  const [previewText, setPreviewText] = useState(null);
+  
+  const copyCode = async () => {
+    // Fallback for iframe environments where the Clipboard API is blocked
+    const fallbackCopyTextToClipboard = (text) => {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      // Prevent scrolling to bottom of page in MS Edge
+      textArea.style.position = "fixed";
+      textArea.style.top = "0";
+      textArea.style.left = "0";
+      textArea.style.opacity = "0";
+      
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+      } catch (err) {
+        console.error('Fallback: Oops, unable to copy', err);
+      }
+      document.body.removeChild(textArea);
+    };
+
+    if (!navigator.clipboard) {
+      fallbackCopyTextToClipboard(pairCode);
+      return;
+    }
+    
+    try {
+      await navigator.clipboard.writeText(pairCode);
+    } catch (err) {
+      console.warn("Modern clipboard API failed, using fallback", err);
+      fallbackCopyTextToClipboard(pairCode);
+    }
+  };
+
+  const isPartnerUpdate = roomData ? roomData.updatedBy !== user.uid : false;
+
+  const handleDisconnect = async () => {
+    setIsDisconnecting(true);
+    try {
+      const profileRef = doc(db, 'artifacts', appId, 'users', user.uid);
+      await updateDoc(profileRef, {
+        pairCode: deleteField()
+      });
+    } catch (err) {
+      console.error("Error disconnecting:", err);
+      setIsDisconnecting(false);
+    }
+  };
+
+  return (
+    <div className="flex-1 flex flex-col gap-6">
+      {/* Top Info Bar */}
+      <div className="flex justify-between items-center bg-white/50 dark:bg-black/40 px-4 py-2 rounded-full backdrop-blur-sm text-sm border border-white/20 dark:border-gray-800">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+          <span>Connected</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <button onClick={copyCode} className="flex items-center gap-1 hover:text-pink-500 transition-colors">
+            <span className="font-mono bg-black/5 dark:bg-white/10 px-2 py-1 rounded">Code: {pairCode}</span>
+            <Copy className="w-4 h-4" />
+          </button>
+          <div className="w-px h-4 bg-gray-300 dark:bg-gray-600"></div>
+          <button 
+            onClick={handleDisconnect} 
+            disabled={isDisconnecting}
+            className="text-gray-500 hover:text-red-500 transition-colors"
+            title="Disconnect & Go Back"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* The "Widget" View (Received Content) */}
+      <div className="relative">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2 ml-2">
+          {isPartnerUpdate ? "Partner's Widget" : "Your Widget"}
+        </h3>
+        <div className={`aspect-square w-full rounded-[2rem] p-6 flex items-center justify-center overflow-hidden transition-all duration-500 relative
+          ${roomData?.type === 'drawing' ? 'bg-white dark:bg-gray-900' : 'bg-gradient-to-br from-pink-400 to-purple-600 text-white'}
+          shadow-[0_20px_50px_-12px_rgba(236,72,153,0.5)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] border border-white/20`}
+        >
+          {roomData?.type === 'text' && (
+            <p className="text-3xl font-bold text-center leading-tight drop-shadow-md break-words w-full">
+              {previewText !== null ? previewText : (roomData.content || 'Waiting for a note...')}
+            </p>
+          )}
+          
+          {roomData?.type === 'drawing' && (
+            <img 
+              src={roomData.content} 
+              alt="Love Doodle" 
+              className="w-full h-full object-contain filter drop-shadow-xl"
+            />
+          )}
+
+          {/* Sparkle effects for new updates */}
+          {isPartnerUpdate && (
+             <div className="absolute top-4 right-4 animate-bounce">
+               <Sparkles className="w-6 h-6 text-yellow-300" />
+             </div>
+          )}
+        </div>
+      </div>
+
+      {/* Input Tools Area */}
+      <div className="mt-auto bg-white/80 dark:bg-gray-900/80 rounded-3xl p-2 backdrop-blur-xl border border-white/40 dark:border-gray-700 shadow-xl">
+        {/* Tabs */}
+        <div className="flex p-1 bg-gray-100/50 dark:bg-black/50 rounded-2xl mb-4">
+          <TabButton Icon={MessageSquare} label="Note" active={activeTab === 'note'} onClick={() => setActiveTab('note')} />
+          <TabButton Icon={PenTool} label="Draw" active={activeTab === 'draw'} onClick={() => setActiveTab('draw')} />
+          <TabButton Icon={Heart} label="Daily" active={activeTab === 'daily'} onClick={() => setActiveTab('daily')} />
+        </div>
+
+        {/* Tab Content */}
+        <div className="p-2 min-h-[160px] flex flex-col">
+          {activeTab === 'note' && <NoteInput user={user} pairCode={pairCode} setPreviewText={setPreviewText} />}
+          {activeTab === 'draw' && <DrawInput user={user} pairCode={pairCode} />}
+          {activeTab === 'daily' && <DailyLove user={user} pairCode={pairCode} />}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TabButton({ Icon, label, active, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-xl transition-all ${
+        active 
+          ? 'bg-white dark:bg-gray-800 shadow-sm text-pink-500' 
+          : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+      }`}
+    >
+      <Icon className="w-5 h-5" />
+      <span className="text-xs font-medium">{label}</span>
+    </button>
+  );
+}
+
+function NoteInput({ user, pairCode, setPreviewText }) {
+  const [note, setNote] = useState('');
+  const timeoutRef = useRef(null);
+
+  useEffect(() => {
+    return () => setPreviewText && setPreviewText(null);
+  }, [setPreviewText]);
+
+  const updateRoom = (newNote) => {
+    const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', pairCode);
+    // Instant update via Firebase local cache
+    setDoc(roomRef, {
+      type: 'text',
+      content: newNote.trim(),
+      updatedBy: user.uid,
+      timestamp: serverTimestamp()
+    }, { merge: true }).catch(err => console.error(err));
+  };
+
+  const handleTextChange = (e) => {
+    const val = e.target.value;
+    setNote(val);
+    if(setPreviewText) setPreviewText(val);
+
+    // Auto-sync as you type (300ms debounce)
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      updateRoom(val);
+    }, 300);
+  };
+
+  const addEmoji = (emoji) => {
+    const val = note + emoji;
+    setNote(val);
+    if(setPreviewText) setPreviewText(val);
+    updateRoom(val);
+  };
+
+  const clearNote = () => {
+    setNote('');
+    if(setPreviewText) setPreviewText('');
+    updateRoom('');
+  };
+
+  const quickEmojis = ['❤️', '😘', '🥺', '😍', '✨', '🔥'];
+
+  return (
+    <div className="flex flex-col h-full gap-3">
+      <textarea
+        value={note}
+        onChange={handleTextChange}
+        placeholder="Write a sweet note... it appears instantly! ✨"
+        className="w-full flex-1 bg-transparent resize-none outline-none text-lg p-2 placeholder:text-gray-400"
+        maxLength={100}
+      />
+      <div className="flex items-center justify-between mt-auto">
+        <div className="flex gap-2">
+          {quickEmojis.map(emoji => (
+            <button 
+              key={emoji}
+              onClick={() => addEmoji(emoji)}
+              className="text-xl hover:scale-125 transition-transform"
+            >
+              {emoji}
             </button>
+          ))}
         </div>
+        <button
+          onClick={clearNote}
+          className="px-4 py-2 bg-pink-100 dark:bg-gray-800 text-pink-600 dark:text-pink-400 rounded-full hover:bg-pink-200 dark:hover:bg-gray-700 transition-colors text-sm font-semibold"
+        >
+          Clear
+        </button>
+      </div>
     </div>
+  );
+}
 
-    <!-- Login / OTP Modal -->
-    <div id="loginModal" class="fixed inset-0 bg-black/60 z-[60] hidden flex items-end sm:items-center justify-center modal-fade backdrop-blur-sm">
-        <div class="bg-white w-full sm:w-[400px] rounded-t-2xl sm:rounded-2xl p-6 relative shadow-2xl">
-            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"><i class="fas fa-times text-xl"></i></button>
-            <div id="loginStep1">
-                <h2 class="text-xl font-bold mb-1 text-gray-800">Login to Apna Store</h2>
-                <p class="text-sm text-gray-500 mb-6">Enter your phone number to proceed</p>
-                <div class="flex border-b-2 border-gray-300 focus-within:border-green-600 mb-6 pb-2 transition-colors">
-                    <span class="text-gray-500 font-medium mr-2">+91</span>
-                    <input type="tel" id="phoneInput" placeholder="Enter 10 digit mobile number" class="w-full outline-none font-medium text-gray-800 bg-transparent" maxlength="10">
-                </div>
-                <button onclick="sendOTP()" class="w-full bg-gray-200 text-gray-500 py-3 rounded-xl font-bold transition-colors" id="sendOtpBtn" disabled>
-                    Get OTP
-                </button>
-            </div>
-            
-            <div id="loginStep2" class="hidden">
-                <i class="fas fa-arrow-left text-gray-400 mb-4 cursor-pointer hover:text-gray-800 transition-colors" onclick="backToPhone()"></i>
-                <h2 class="text-xl font-bold mb-1 text-gray-800">Verify details</h2>
-                <p class="text-sm text-gray-500 mb-6">OTP sent to <span id="displayPhone" class="font-bold text-gray-800"></span></p>
-                <div class="flex space-x-3 mb-6 justify-center">
-                    <input type="number" class="otp-input w-12 h-12 border-2 border-gray-300 rounded-xl text-center text-xl font-bold focus:border-green-500 outline-none transition-colors" maxlength="1" oninput="moveToNext(this, 0)">
-                    <input type="number" class="otp-input w-12 h-12 border-2 border-gray-300 rounded-xl text-center text-xl font-bold focus:border-green-500 outline-none transition-colors" maxlength="1" oninput="moveToNext(this, 1)">
-                    <input type="number" class="otp-input w-12 h-12 border-2 border-gray-300 rounded-xl text-center text-xl font-bold focus:border-green-500 outline-none transition-colors" maxlength="1" oninput="moveToNext(this, 2)">
-                    <input type="number" class="otp-input w-12 h-12 border-2 border-gray-300 rounded-xl text-center text-xl font-bold focus:border-green-500 outline-none transition-colors" maxlength="1" oninput="moveToNext(this, 3)">
-                </div>
-                <button onclick="verifyOTP()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold shadow-md transition-colors">
-                    Verify & Login
-                </button>
-            </div>
+function DrawInput({ user, pairCode }) {
+  const canvasRef = useRef(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const syncTimeoutRef = useRef(null);
+
+  // Set up canvas properties
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      // Fix resolution for high DPI displays
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      
+      ctx.scale(dpr, dpr);
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#ec4899'; // pink-500
+    }
+  }, []);
+
+  const getCoordinates = (e) => {
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    if (e.touches && e.touches.length > 0) {
+      return {
+        x: e.touches[0].clientX - rect.left,
+        y: e.touches[0].clientY - rect.top
+      };
+    }
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+  };
+
+  const startDrawing = (e) => {
+    e.preventDefault();
+    const { x, y } = getCoordinates(e);
+    const ctx = canvasRef.current.getContext('2d');
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    setIsDrawing(true);
+  };
+
+  const draw = (e) => {
+    e.preventDefault();
+    if (!isDrawing) return;
+    const { x, y } = getCoordinates(e);
+    const ctx = canvasRef.current.getContext('2d');
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  };
+
+  const syncDrawing = () => {
+    if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
+    syncTimeoutRef.current = setTimeout(() => {
+      const canvas = canvasRef.current;
+      const dataUrl = canvas.toDataURL('image/png', 0.8);
+      
+      const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', pairCode);
+      setDoc(roomRef, {
+        type: 'drawing',
+        content: dataUrl,
+        updatedBy: user.uid,
+        timestamp: serverTimestamp()
+      }, { merge: true }).catch(err => console.error(err));
+    }, 400); // Auto-send slightly after stopping the stroke
+  };
+
+  const stopDrawing = () => {
+    if (isDrawing) {
+      const ctx = canvasRef.current.getContext('2d');
+      ctx.closePath();
+      setIsDrawing(false);
+      syncDrawing(); // Send instantly when finger/mouse is lifted
+    }
+  };
+
+  const clearCanvas = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    syncDrawing(); // Sync the cleared canvas too
+  };
+
+  return (
+    <div className="flex flex-col items-center gap-3">
+      <div className="w-full h-32 bg-gray-50 dark:bg-gray-800 rounded-2xl border-2 border-dashed border-pink-200 dark:border-pink-900/50 overflow-hidden touch-none relative">
+        <canvas
+          ref={canvasRef}
+          className="w-full h-full cursor-crosshair absolute inset-0 z-10"
+          onMouseDown={startDrawing}
+          onMouseMove={draw}
+          onMouseUp={stopDrawing}
+          onMouseOut={stopDrawing}
+          onTouchStart={startDrawing}
+          onTouchMove={draw}
+          onTouchEnd={stopDrawing}
+        />
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-10 z-0">
+          <PenTool className="w-12 h-12" />
         </div>
+      </div>
+      
+      <div className="flex w-full justify-between items-center px-2">
+        <span className="text-xs text-gray-400">Drawing auto-syncs instantly ✨</span>
+        <button 
+          onClick={clearCanvas}
+          className="flex items-center gap-2 px-4 py-2 bg-pink-100 dark:bg-gray-800 text-pink-600 dark:text-pink-400 rounded-full hover:bg-pink-200 dark:hover:bg-gray-700 transition-colors text-sm font-semibold"
+        >
+          <Trash2 className="w-4 h-4" /> Clear
+        </button>
+      </div>
     </div>
+  );
+}
 
-    <!-- OTP Toast Notification Container -->
-    <div id="otpToastContainer" class="fixed top-0 left-0 right-0 flex justify-center z-[70] pointer-events-none"></div>
+function DailyLove({ user, pairCode }) {
+  const [sending, setSending] = useState(false);
 
-    <!-- Smart Address Modal -->
-    <div id="addressModal" class="fixed inset-0 bg-black/60 z-[60] hidden flex items-end sm:items-center justify-center modal-fade backdrop-blur-sm" onclick="if(event.target === this) closeAddressModal()">
-        <div class="bg-white w-full sm:w-[400px] rounded-t-2xl sm:rounded-2xl p-6 transform transition-transform shadow-2xl" id="addressSlide">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-bold text-gray-800">Select your area</h2>
-                <button onclick="closeAddressModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
-            </div>
-            
-            <!-- Manual Address Input Box -->
-            <div class="bg-gray-50 border border-gray-200 p-3 rounded-xl mb-4">
-                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Type your address</p>
-                <div class="flex space-x-2">
-                    <input type="text" id="manualAddressInput" placeholder="House No, Society, Landmark..." class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-green-500 transition-colors">
-                    <button onclick="setCustomAddress()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-colors">Save</button>
-                </div>
-            </div>
+  const sendRandomQuote = async () => {
+    setSending(true);
+    const quote = DAILY_QUOTES[Math.floor(Math.random() * DAILY_QUOTES.length)];
+    
+    try {
+      const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'pairs', pairCode);
+      await setDoc(roomRef, {
+        type: 'text',
+        content: quote,
+        updatedBy: user.uid,
+        timestamp: serverTimestamp()
+      }, { merge: true });
+    } catch (err) {
+      console.error(err);
+    }
+    setSending(false);
+  };
 
-            <div class="relative flex items-center mb-4">
-                <div class="flex-grow border-t border-gray-200"></div>
-                <span class="flex-shrink-0 mx-4 text-gray-400 text-xs font-medium uppercase">Or select nearby</span>
-                <div class="flex-grow border-t border-gray-200"></div>
-            </div>
-
-            <div class="space-y-3 mb-2 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
-                <!-- Area Options List -->
-                <button class="w-full border border-gray-200 p-3 rounded-xl flex justify-between items-center hover:bg-green-50 transition-colors" onclick="setAddress('Current Location (GPS)', 25)">
-                    <div class="flex items-center">
-                        <i class="fas fa-location-crosshairs text-green-600 text-xl w-8 text-center"></i>
-                        <div class="ml-2 text-left">
-                            <div class="font-bold text-green-600 text-sm">Use GPS Location</div>
-                            <div class="text-xs text-gray-500">Auto detect</div>
-                        </div>
-                    </div>
-                    <span class="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded shadow-sm">₹25 Delivery</span>
-                </button>
-                
-                <button class="w-full border border-gray-100 p-3 rounded-xl flex justify-between items-center hover:bg-gray-50 transition-colors" onclick="setAddress('Shivaji Chowk, Pusad', 15)">
-                    <div class="text-left ml-2">
-                        <div class="font-bold text-gray-800 text-sm">Shivaji Chowk, Pusad</div>
-                        <div class="text-xs text-gray-500">Nearby (Under 1km)</div>
-                    </div>
-                    <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded shadow-sm">₹15 Delivery</span>
-                </button>
-
-                <button class="w-full border border-gray-100 p-3 rounded-xl flex justify-between items-center hover:bg-gray-50 transition-colors" onclick="setAddress('Vasant Nagar, Pusad', 30)">
-                    <div class="text-left ml-2">
-                        <div class="font-bold text-gray-800 text-sm">Vasant Nagar, Pusad</div>
-                        <div class="text-xs text-gray-500">Distance (3km+)</div>
-                    </div>
-                    <span class="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded shadow-sm">₹30 Delivery</span>
-                </button>
-
-                <button class="w-full border border-gray-100 p-3 rounded-xl flex justify-between items-center hover:bg-gray-50 transition-colors" onclick="setAddress('Phulsing Naik College Road', 20)">
-                    <div class="text-left ml-2">
-                        <div class="font-bold text-gray-800 text-sm">P.N. College Road</div>
-                        <div class="text-xs text-gray-500">Distance (2km)</div>
-                    </div>
-                    <span class="text-xs font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded shadow-sm">₹20 Delivery</span>
-                </button>
-            </div>
-        </div>
+  return (
+    <div className="flex flex-col items-center justify-center h-full gap-4 text-center p-4">
+      <p className="text-sm text-gray-600 dark:text-gray-300">
+        Send a random, carefully curated love quote to brighten their day.
+      </p>
+      <button
+        onClick={sendRandomQuote}
+        disabled={sending}
+        className="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-full font-bold hover:scale-105 active:scale-95 transition-all shadow-lg shadow-purple-500/30 flex items-center gap-2"
+      >
+        <Sparkles className="w-5 h-5" />
+        Send Daily Love
+      </button>
     </div>
-
-    <!-- Payment Setup Modal -->
-    <div id="paymentModal" class="fixed inset-0 bg-black/60 z-[70] hidden flex items-end sm:items-center justify-center modal-fade backdrop-blur-sm" onclick="if(event.target === this) closePaymentModal()">
-        <div class="bg-white w-full sm:w-[400px] rounded-t-2xl sm:rounded-2xl relative overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
-            <div class="p-4 border-b bg-gray-50 flex justify-between items-center sticky top-0 z-10">
-                <div>
-                    <h2 class="text-lg font-bold text-gray-800">Select Payment Mode</h2>
-                    <p class="text-xs text-gray-500">To Pay: <span class="font-bold text-black text-sm">₹<span id="payModalTotal"></span></span></p>
-                </div>
-                <button onclick="closePaymentModal()" class="h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-300 transition-colors"><i class="fas fa-times"></i></button>
-            </div>
-            
-            <div class="p-4 overflow-y-auto flex-1 custom-scrollbar">
-                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Pay via UPI App</h3>
-                <div class="space-y-3 mb-6">
-                    <div onclick="processUPI('gpay')" class="border border-gray-200 rounded-xl p-3 flex justify-between items-center cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition-colors shadow-sm">
-                        <div class="flex items-center space-x-3">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" class="h-8 w-8 object-contain bg-white rounded-full border border-gray-100 p-1">
-                            <span class="font-semibold text-gray-800">Google Pay</span>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-300"></i>
-                    </div>
-                    
-                    <div onclick="processUPI('phonepe')" class="border border-gray-200 rounded-xl p-3 flex justify-between items-center cursor-pointer hover:bg-purple-50 hover:border-purple-200 transition-colors shadow-sm">
-                        <div class="flex items-center space-x-3">
-                            <div class="h-8 w-8 bg-purple-700 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-inner">Pe</div>
-                            <span class="font-semibold text-gray-800">PhonePe</span>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-300"></i>
-                    </div>
-                    
-                    <div onclick="processUPI('paytm')" class="border border-gray-200 rounded-xl p-3 flex justify-between items-center cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition-colors shadow-sm">
-                        <div class="flex items-center space-x-3">
-                            <div class="h-8 w-8 bg-[#002970] rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow-inner">Paytm</div>
-                            <span class="font-semibold text-gray-800">Paytm</span>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-300"></i>
-                    </div>
-                </div>
-
-                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Pay on Delivery</h3>
-                <div class="border rounded-xl p-3 flex flex-col cursor-pointer hover:bg-orange-100 transition-colors shadow-sm border-orange-200 bg-orange-50/50" onclick="showCODAdvance()">
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center space-x-3">
-                            <div class="h-8 w-8 bg-white border border-orange-200 rounded-full flex items-center justify-center text-orange-500 shadow-sm"><i class="fas fa-money-bill-wave"></i></div>
-                            <span class="font-semibold text-gray-800">Cash on Delivery</span>
-                        </div>
-                        <i class="fas fa-chevron-right text-orange-300"></i>
-                    </div>
-                    <p class="text-xs text-orange-700 mt-2 ml-11">Pay a small advance fee to place COD orders.</p>
-                </div>
-
-                <!-- COD Advance Details -->
-                <div id="codAdvanceSection" class="hidden mt-3 p-4 border border-orange-200 bg-white rounded-xl shadow-inner">
-                    <h4 class="font-bold text-gray-800 text-sm mb-3">Confirm Order</h4>
-                    <div class="flex justify-between text-sm mb-2 border-b border-gray-100 pb-2">
-                        <span class="text-gray-500">Pay Now (Delivery & Handling)</span>
-                        <span class="font-bold text-orange-600">₹<span id="codAdvanceAmt">0</span></span>
-                    </div>
-                    <div class="flex justify-between text-sm mb-4">
-                        <span class="text-gray-500">Cash to pay at Door</span>
-                        <span class="font-bold text-gray-800">₹<span id="codCashAmt">0</span></span>
-                    </div>
-                    <button onclick="processUPI('gpay', true)" class="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3 rounded-xl text-sm shadow-md hover:shadow-lg transition-shadow">
-                        Pay ₹<span id="codAdvanceBtnAmt">0</span> via UPI to Confirm
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Payment Processing & Honesty Check Overlay -->
-    <div id="processingOverlay" class="fixed inset-0 bg-white z-[80] hidden flex flex-col items-center justify-center modal-fade px-4">
-        <!-- Step 1: Connecting -->
-        <div id="verifyingSpinner" class="flex flex-col items-center">
-            <div class="w-16 h-16 border-4 border-gray-100 border-t-green-500 rounded-full animate-spin mb-6"></div>
-            <h2 class="text-xl font-bold text-gray-800">Verifying Payment...</h2>
-            <p class="text-gray-500 mt-2 text-sm text-center px-6">Connecting to your bank app...</p>
-        </div>
-        
-        <!-- Step 2: Confirmation Box -->
-        <div id="paymentConfirmBox" class="hidden flex flex-col items-center bg-white p-6 w-full max-w-sm rounded-3xl text-center shadow-2xl border border-gray-100">
-            <div class="h-20 w-20 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 text-4xl mb-4">
-                <i class="fas fa-question-circle"></i>
-            </div>
-            <h2 class="text-xl font-bold text-gray-800 mb-2">Did your payment succeed?</h2>
-            <p class="text-gray-500 text-sm mb-6">Please confirm if the payment was successful in your UPI app to place the order.</p>
-            <div class="flex space-x-3 w-full">
-                <button onclick="confirmPayment(false)" class="w-1/2 border border-red-200 bg-red-50 text-red-600 py-3 rounded-xl font-bold hover:bg-red-100 transition-colors">No, It Failed</button>
-                <button onclick="confirmPayment(true)" class="w-1/2 bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 shadow-md transition-colors">Yes, Paid</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Order Success Full Screen -->
-    <div id="orderSuccess" class="fixed inset-0 bg-white z-[90] hidden flex flex-col items-center justify-center modal-fade">
-        <div class="bg-green-500 text-white h-24 w-24 rounded-full flex items-center justify-center mb-4 shadow-xl scale-0 transition-transform duration-500" id="successIcon">
-            <i class="fas fa-check text-5xl"></i>
-        </div>
-        <h1 class="text-3xl font-black mb-2 text-gray-800 text-center px-4">Order Placed!</h1>
-        <p class="text-gray-500 mb-6 text-center px-4 font-medium">Your groceries will arrive in 25 mins.</p>
-        
-        <div class="bg-gray-50 p-5 rounded-2xl w-[85%] max-w-sm mb-8 text-center border border-gray-200">
-            <p class="text-sm text-gray-500 mb-1 font-medium">Total Amount</p>
-            <p class="text-4xl font-black text-gray-900">₹<span id="successTotal">0</span></p>
-        </div>
-
-        <div class="w-[85%] max-w-sm space-y-3">
-            <button onclick="sendToWhatsApp()" class="w-full bg-[#25D366] text-white px-6 py-4 rounded-xl font-bold shadow-lg flex items-center justify-center space-x-2 hover:bg-[#128C7E] transition-colors">
-                <i class="fab fa-whatsapp text-xl"></i>
-                <span>Send Bill to WhatsApp</span>
-            </button>
-            <button onclick="openTracking()" class="w-full bg-blue-50 text-blue-600 border border-blue-200 px-6 py-4 rounded-xl font-bold shadow-sm flex items-center justify-center space-x-2 hover:bg-blue-100 transition-colors">
-                <i class="fas fa-map-marker-alt"></i>
-                <span>Track Order Status</span>
-            </button>
-            <button onclick="resetApp()" class="w-full text-gray-500 py-3 font-semibold text-sm hover:text-gray-800 transition-colors mt-2">
-                Back to Home
-            </button>
-        </div>
-    </div>
-
-    <!-- Live Order Tracking Modal -->
-    <div id="trackingModal" class="fixed inset-0 bg-black/60 z-[100] hidden flex items-end sm:items-center justify-center modal-fade backdrop-blur-sm" onclick="if(event.target === this) closeTracking()">
-        <div class="bg-white w-full sm:w-[400px] rounded-t-2xl sm:rounded-2xl p-6 transform transition-transform shadow-2xl translate-y-full" id="trackingSlide">
-            <div class="flex justify-between items-center mb-6 border-b pb-3">
-                <h2 class="text-lg font-black text-gray-800"><i class="fas fa-motorcycle text-blue-600 mr-2"></i> Live Tracking</h2>
-                <button onclick="closeTracking()" class="text-gray-400 hover:text-gray-600 bg-gray-100 h-8 w-8 rounded-full flex items-center justify-center"><i class="fas fa-times"></i></button>
-            </div>
-            
-            <div id="trackingContent" class="mb-4">
-                <!-- Content generated by JS -->
-            </div>
-        </div>
-    </div>
-
-    <!-- SECRET PIN MODAL (Hidden) -->
-    <div id="pinModal" class="fixed inset-0 bg-black/80 z-[100] hidden flex items-center justify-center modal-fade backdrop-blur-sm">
-        <div class="bg-white p-6 rounded-2xl w-64 shadow-2xl text-center transform scale-95 transition-transform duration-300" id="pinBox">
-            <div class="bg-gray-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-lock text-gray-500 text-xl"></i>
-            </div>
-            <h3 class="font-bold text-gray-800 mb-4">Admin Panel</h3>
-            <input type="password" id="adminPinInput" placeholder="Enter PIN" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-center tracking-[0.5em] font-bold outline-none focus:border-blue-500 mb-4" maxlength="4">
-            <div class="flex space-x-2">
-                <button onclick="closePinModal()" class="w-1/2 bg-gray-100 text-gray-600 py-2.5 rounded-xl font-bold hover:bg-gray-200">Cancel</button>
-                <button onclick="verifyAdminPin()" class="w-1/2 bg-blue-600 text-white py-2.5 rounded-xl font-bold hover:bg-blue-700 shadow-sm">Verify</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- HISAAB MODAL (Admin Panel - Premium UI) -->
-    <div id="hisaabModal" class="fixed inset-0 bg-black/60 z-[90] hidden flex items-end sm:items-center justify-center modal-fade backdrop-blur-sm" onclick="if(event.target === this) closeHisaab()">
-        <div class="bg-gray-100 w-full sm:w-[500px] rounded-t-3xl sm:rounded-2xl shadow-2xl flex flex-col h-[85vh] sm:h-[650px] transform translate-y-full transition-transform duration-300 overflow-hidden" id="hisaabSlide">
-            <!-- Header -->
-            <div class="bg-white pt-3 pb-4 px-5 border-b flex flex-col sticky top-0 z-10 shadow-sm rounded-t-3xl sm:rounded-t-2xl">
-                <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-4 sm:hidden"></div>
-                <div class="flex justify-between items-center">
-                    <h2 class="text-lg font-black text-gray-800 flex items-center tracking-tight"><i class="fas fa-chart-pie text-blue-600 mr-2.5 text-xl"></i> Store Dashboard</h2>
-                    <button onclick="closeHisaab()" class="h-8 w-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-gray-600 transition-colors"><i class="fas fa-times"></i></button>
-                </div>
-            </div>
-            
-            <!-- Content -->
-            <div class="flex-1 overflow-y-auto p-4 custom-scrollbar bg-gray-50" id="hisaabContent">
-                <!-- Content rendered via JS -->
-            </div>
-            
-            <!-- Footer -->
-            <div class="bg-white p-4 border-t sticky bottom-0 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)]">
-                <button onclick="clearHisaab()" id="clearHisaabBtn" class="w-full bg-red-50 text-red-600 border border-red-200 font-bold py-3.5 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm">
-                    Clear Today's Hisaab
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // =========================================================================
-        // SYSTEM 1: YAHAN SIRF ITEMS (PRODUCTS) KA DATA HAI
-        // =========================================================================
-        
-        // High Quality Real Images (Unsplash) added
-        const products = [
-            { 
-                id: 1, 
-                name: "Aashirvaad Shudh Chakki Atta", 
-                weight: "5 kg", 
-                price: 230, 
-                oldPrice: 270, 
-                img: "https://down-my.img.susercontent.com/file/sg-11134201-22090-uxxn8xv53qhv6d" 
-            },
-            { 
-                id: 2, 
-                name: "Maggi 2-Minute Noodles", 
-                weight: "Pack of 4 (280g)", 
-                price: 56, 
-                oldPrice: 60, 
-                img: "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?w=300&h=300&fit=crop" 
-            },
-            { 
-                id: 3, 
-                name: "Amul Pasteurized Butter", 
-                weight: "100 g", 
-                price: 58, 
-                oldPrice: 60, 
-                img: "https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?w=300&h=300&fit=crop" 
-            },
-            { 
-                id: 4, 
-                name: "Tata Salt Vacuum Evaporated", 
-                weight: "1 kg", 
-                price: 25, 
-                oldPrice: 28, 
-                img: "https://m.media-amazon.com/images/I/614mm2hYHyL._SL1000_.jpg" 
-            },
-            { 
-                id: 5, 
-                name: "Amul Taaza Toned Milk", 
-                weight: "1 L", 
-                price: 72, 
-                oldPrice: 72, 
-                img: "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=300&h=300&fit=crop" 
-            },
-            { 
-                id: 6, 
-                name: "Haldiram's Bhujia Sev", 
-                weight: "200 g", 
-                price: 45, 
-                oldPrice: 50, 
-                img: "https://tse1.mm.bing.net/th/id/OIP.g_LPAlTI14naC57cywUgxAHaIE?r=0&w=480&h=523&rs=1&pid=ImgDetMain&o=7&rm=3" 
-            },
-            { 
-                id: 7, 
-                name: "AMUL Dairy Classic Dahi", 
-                weight: "400 g", 
-                price: 35, 
-                oldPrice: 40, 
-                img: "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=85,metadata=none,w=480,h=480/da/cms-assets/cms/product/6f472740-89b8-463d-bc86-065b6bdf6be3.jpg" 
-            },
-            { 
-                id: 8, 
-                name: "Surf Excel Easy Wash Detergent", 
-                weight: "1 kg", 
-                price: 120, 
-                oldPrice: 135, 
-                img: "https://i5.walmartimages.com/seo/Surf-Excel-Easy-Wash-Detergent-Powder-500-g_80aab582-d5cc-4101-b1e8-4c5d335ced5a.75a9d00c8e568f593bdc565f3ac12c55.jpeg" 
-            }
-        ];
-
-        // =========================================================================
-        // SYSTEM 2: YAHAN APP KA BAAKI PURA LOGIC HAI (Settings & State)
-        // =========================================================================
-
-        // --- MERCHANTS SETTINGS (YOUR DETAILS) ---
-        const upiId = "9527652098-3@ybl"; // Apni UPI ID yahan dalein
-        const ownerWhatsAppNumber = "919527652098"; // Apna WhatsApp Number dalein (Country code 91 ke sath)
-
-        // --- STATE VARIABLES ---
-        let cart = {};
-        const FEES = {
-            delivery: 35, // Default delivery fee based on area
-            freeDeliveryThreshold: 0 // Set to 0 to make Delivery Free permanently for all!
-        };
-        let currentAddress = "Select Location";
-        
-        let userLoggedIn = false;
-        let generatedOTP = "";
-        let paymentAppOpened = false;
-        let isConfirmingClear = false;
-        let lastSelectedPaymentMethod = "";
-        let customerPhone = "";
-        let currentWaLink = "";
-
-        // --- RENDER PRODUCTS ---
-        function renderProducts() {
-            const container = document.getElementById('productContainer');
-            container.innerHTML = '';
-            
-            products.forEach(p => {
-                const cartQty = cart[p.id] ? cart[p.id].quantity : 0;
-                
-                let btnHTML = '';
-                if (cartQty > 0) {
-                    btnHTML = `
-                        <div class="bg-green-600 text-white rounded-lg flex justify-between items-center w-full h-8 px-1 font-bold shadow-sm">
-                            <button onclick="updateCart(${p.id}, -1)" class="px-2 cursor-pointer text-lg hover:bg-green-700 rounded">-</button>
-                            <span>${cartQty}</span>
-                            <button onclick="updateCart(${p.id}, 1)" class="px-2 cursor-pointer text-lg hover:bg-green-700 rounded">+</button>
-                        </div>
-                    `;
-                } else {
-                    btnHTML = `
-                        <button onclick="updateCart(${p.id}, 1)" class="border border-green-600 text-green-600 bg-green-50 hover:bg-green-100 rounded-lg w-full h-8 font-bold text-sm uppercase shadow-sm transition-colors">
-                            Add
-                        </button>
-                    `;
-                }
-
-                const card = `
-                    <div class="bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 flex flex-col relative overflow-hidden group">
-                        <div class="absolute top-0 right-0 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-bl-lg z-10 shadow-sm">
-                            ${Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100)}% OFF
-                        </div>
-                        <div class="h-28 w-full bg-gray-50 rounded-lg mb-2 overflow-hidden flex items-center justify-center">
-                            <img src="${p.img}" alt="${p.name}" class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300">
-                        </div>
-                        <h4 class="font-semibold text-sm text-gray-800 leading-tight mb-1 line-clamp-2 min-h-[2.5rem]">${p.name}</h4>
-                        <p class="text-xs text-gray-500 mb-2 font-medium">${p.weight}</p>
-                        <div class="mt-auto flex justify-between items-end">
-                            <div>
-                                <span class="font-bold text-sm text-gray-900">₹${p.price}</span>
-                                <span class="text-xs text-gray-400 line-through block">₹${p.oldPrice}</span>
-                            </div>
-                            <div class="w-16">
-                                ${btnHTML}
-                            </div>
-                        </div>
-                    </div>
-                `;
-                container.innerHTML += card;
-            });
-        }
-
-        // --- CART LOGIC ---
-        function updateCart(productId, change) {
-            if (!cart[productId]) {
-                const prod = products.find(p => p.id === productId);
-                cart[productId] = { ...prod, quantity: 0 };
-            }
-            
-            cart[productId].quantity += change;
-            
-            if (cart[productId].quantity <= 0) {
-                delete cart[productId];
-            }
-            
-            renderProducts();
-            updateCartUI();
-        }
-
-        function updateCartUI() {
-            let count = 0;
-            let itemTotal = 0;
-            
-            const listContainer = document.getElementById('cartItemsList');
-            listContainer.innerHTML = '';
-
-            for (let id in cart) {
-                const item = cart[id];
-                count += item.quantity;
-                itemTotal += (item.price * item.quantity);
-
-                listContainer.innerHTML += `
-                    <div class="p-3 flex justify-between items-center">
-                        <div class="flex items-center space-x-3 w-3/5">
-                            <img src="${item.img}" class="h-12 w-12 object-cover rounded border border-gray-100 bg-gray-50 p-1">
-                            <div>
-                                <h4 class="text-sm font-semibold text-gray-800 leading-tight line-clamp-1">${item.name}</h4>
-                                <p class="text-xs text-gray-500 mt-0.5 font-medium">${item.weight} • ₹${item.price}</p>
-                            </div>
-                        </div>
-                        <div class="bg-green-600 text-white rounded-md flex justify-between items-center w-20 h-7 px-1 font-bold shadow-sm text-sm">
-                            <button onclick="updateCart(${item.id}, -1)" class="px-2 w-1/3 hover:bg-green-700 rounded">-</button>
-                            <span class="w-1/3 text-center">${item.quantity}</span>
-                            <button onclick="updateCart(${item.id}, 1)" class="px-2 w-1/3 hover:bg-green-700 rounded">+</button>
-                        </div>
-                    </div>
-                `;
-            }
-
-            // Check if First Order from History
-            let history = JSON.parse(localStorage.getItem('apnaStoreHistory') || '[]');
-            let isFirstOrder = history.length === 0;
-
-            let deliveryFee = 0;
-            let convenienceFee = 0;
-            let grandTotal = 0;
-
-            if (count > 0) {
-                deliveryFee = itemTotal > FEES.freeDeliveryThreshold ? FEES.delivery : 0;
-                
-                // 1st Order Free Handling Fee Logic
-                if (isFirstOrder) {
-                    convenienceFee = 0;
-                } else {
-                    // Dynamic convenience fee
-                    if (itemTotal <= 200) { convenienceFee = 5; } 
-                    else if (itemTotal <= 500) { convenienceFee = 8; } 
-                    else { convenienceFee = 10; }
-                }
-                
-                grandTotal = itemTotal + deliveryFee + convenienceFee;
-            }
-
-            // Update Counts
-            document.getElementById('summaryItemCount').innerText = count;
-            document.getElementById('summaryTotal').innerText = itemTotal;
-            
-            // Top Nav Badge
-            const navBadge = document.getElementById('navCartBadge');
-            if(count > 0) {
-                navBadge.innerText = count;
-                navBadge.classList.remove('hidden');
-            } else {
-                navBadge.classList.add('hidden');
-            }
-
-            // Bill UI
-            document.getElementById('billItemTotal').innerText = itemTotal;
-            document.getElementById('billDeliveryFee').innerHTML = deliveryFee === 0 ? `<span class="text-green-600 bg-green-50 px-1 rounded font-bold">Free</span>` : `₹${deliveryFee}`;
-            
-            // Show Free badge if first order
-            if (isFirstOrder) {
-                document.getElementById('billConvenienceFee').innerHTML = `<span class="text-green-600 bg-green-50 px-1 rounded font-bold">Free (1st Order)</span>`;
-            } else {
-                document.getElementById('billConvenienceFee').innerText = `₹${convenienceFee}`;
-            }
-
-            document.getElementById('billGrandTotal').innerText = grandTotal;
-            document.getElementById('checkoutBtnTotal').innerText = grandTotal;
-            document.getElementById('payModalTotal').innerText = grandTotal;
-
-            const summary = document.getElementById('cartSummary');
-            if (count > 0) { summary.classList.remove('hidden'); } 
-            else { summary.classList.add('hidden'); closeCart(); }
-        }
-
-        function openCart() {
-            if(Object.keys(cart).length === 0) { showMessage("Your cart is empty!"); return; }
-            document.getElementById('cartOverlay').classList.remove('hidden');
-            setTimeout(() => { document.getElementById('cartPanel').classList.remove('translate-x-full'); }, 10);
-        }
-        function closeCart() {
-            document.getElementById('cartPanel').classList.add('translate-x-full');
-            setTimeout(() => { document.getElementById('cartOverlay').classList.add('hidden'); }, 300);
-        }
-
-        function openAddressModal() { document.getElementById('addressModal').classList.remove('hidden'); }
-        function closeAddressModal() { document.getElementById('addressModal').classList.add('hidden'); }
-
-        function setAddress(addr, fee) {
-            currentAddress = addr;
-            FEES.delivery = fee;
-            document.getElementById('topAddressText').innerText = addr;
-            updateCartUI();
-            closeAddressModal();
-            showMessage(`Location set. Processing fee updated.`);
-        }
-
-        function setCustomAddress() {
-            const inputVal = document.getElementById('manualAddressInput').value;
-            if (inputVal.trim() === "") { showMessage("Please enter an address first."); return; }
-            currentAddress = inputVal.trim();
-            FEES.delivery = 25; 
-            document.getElementById('topAddressText').innerText = currentAddress;
-            updateCartUI();
-            closeAddressModal();
-            showMessage(`Custom Address saved.`);
-        }
-
-        function showCustomToast(htmlContent) {
-            const container = document.getElementById('otpToastContainer');
-            const toast = document.createElement('div');
-            toast.className = 'bg-white rounded-2xl shadow-2xl p-4 m-4 max-w-sm w-full flex items-start space-x-3 border-l-4 border-blue-500 otp-toast';
-            toast.innerHTML = htmlContent;
-            container.appendChild(toast);
-            setTimeout(() => { if(toast.parentElement) toast.remove(); }, 6000);
-        }
-
-        function showMessage(msg) {
-            showCustomToast(`
-                <div class="bg-gray-100 rounded-full p-2 h-8 w-8 flex items-center justify-center shrink-0"><i class="fas fa-info-circle text-blue-500"></i></div>
-                <div class="flex-1 mt-0.5"><p class="text-sm font-semibold text-gray-800">${msg}</p></div>
-            `);
-        }
-
-        function openLoginModal() {
-            document.getElementById('loginModal').classList.remove('hidden');
-            document.getElementById('phoneInput').value = '';
-            document.getElementById('sendOtpBtn').disabled = true;
-            document.getElementById('sendOtpBtn').className = "w-full bg-gray-200 text-gray-500 py-3 rounded-xl font-bold transition-colors";
-            document.getElementById('loginStep1').classList.remove('hidden');
-            document.getElementById('loginStep2').classList.add('hidden');
-        }
-
-        function closeLoginModal() { document.getElementById('loginModal').classList.add('hidden'); }
-
-        document.getElementById('phoneInput').addEventListener('input', function(e) {
-            this.value = this.value.replace(/[^0-9]/g, '');
-            const btn = document.getElementById('sendOtpBtn');
-            if (this.value.length === 10) {
-                btn.disabled = false;
-                btn.className = "w-full bg-green-600 text-white py-3 rounded-xl font-bold shadow-md transition-colors";
-            } else {
-                btn.disabled = true;
-                btn.className = "w-full bg-gray-200 text-gray-500 py-3 rounded-xl font-bold transition-colors";
-            }
-        });
-
-        function sendOTP() {
-            const phone = document.getElementById('phoneInput').value;
-            if(!/^[6-9]\d{9}$/.test(phone)){ showMessage("Enter a valid 10-digit mobile number."); return; }
-            customerPhone = phone;
-            document.getElementById('displayPhone').innerText = "+91 " + phone;
-            document.getElementById('loginStep1').classList.add('hidden');
-            document.getElementById('loginStep2').classList.remove('hidden');
-            
-            document.querySelectorAll('.otp-input').forEach(i => i.value = '');
-            document.querySelectorAll('.otp-input')[0].focus();
-
-            generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
-            setTimeout(() => {
-                showCustomToast(`
-                    <div class="bg-blue-100 rounded-full h-10 w-10 flex items-center justify-center shrink-0"><i class="fas fa-comment-sms text-blue-600"></i></div>
-                    <div class="flex-1"><p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-0.5">Messages • Now</p><p class="text-sm font-bold text-gray-800 leading-tight">Your Apna Store login OTP is <span class="text-blue-600 text-lg">${generatedOTP}</span>. Do not share.</p></div>
-                `);
-            }, 800);
-        }
-
-        function backToPhone() { document.getElementById('loginStep2').classList.add('hidden'); document.getElementById('loginStep1').classList.remove('hidden'); }
-
-        function moveToNext(current, index) {
-            current.value = current.value.replace(/[^0-9]/g, '');
-            if (current.value.length >= 1) {
-                const inputs = document.querySelectorAll('.otp-input');
-                if (index < 3) inputs[index + 1].focus();
-                else verifyOTP();
-            }
-        }
-
-        function verifyOTP() {
-            let entered = "";
-            document.querySelectorAll('.otp-input').forEach(i => entered += i.value);
-            if (entered === generatedOTP) {
-                userLoggedIn = true;
-                closeLoginModal();
-                document.getElementById('loginNavBtn').classList.add('hidden');
-                document.getElementById('userProfileIcon').classList.remove('hidden');
-                showMessage("Logged in successfully!");
-            } else {
-                showMessage("Invalid OTP. Check SMS.");
-                document.querySelectorAll('.otp-input').forEach(i => i.value = '');
-                document.querySelectorAll('.otp-input')[0].focus();
-            }
-        }
-
-        function openPaymentModal() {
-            if (!userLoggedIn) { openLoginModal(); return; }
-            if (currentAddress === "Select Location") { openAddressModal(); return; }
-            document.getElementById('codAdvanceSection').classList.add('hidden');
-            document.getElementById('paymentModal').classList.remove('hidden');
-            closeCart();
-        }
-
-        function closePaymentModal() { document.getElementById('paymentModal').classList.add('hidden'); }
-
-        function showCODAdvance() {
-            const total = parseInt(document.getElementById('billGrandTotal').innerText);
-            const itemTotal = parseInt(document.getElementById('billItemTotal').innerText);
-            const advance = total - itemTotal; 
-            
-            document.getElementById('codAdvanceAmt').innerText = advance;
-            document.getElementById('codAdvanceBtnAmt').innerText = advance;
-            document.getElementById('codCashAmt').innerText = itemTotal;
-            document.getElementById('codAdvanceSection').classList.toggle('hidden');
-        }
-
-        function processUPI(app, isCODAdvance = false) {
-            closePaymentModal();
-            let amount = parseInt(document.getElementById('billGrandTotal').innerText);
-            lastSelectedPaymentMethod = app;
-            
-            if (isCODAdvance) {
-                const itemTotal = parseInt(document.getElementById('billItemTotal').innerText);
-                amount = amount - itemTotal; 
-                lastSelectedPaymentMethod = "COD (Adv. " + app + ")";
-            }
-
-            const merchantName = encodeURIComponent("Apna Store");
-            const transactionRef = "ORD" + Math.floor(Math.random() * 1000000);
-            
-            // Standard UPI String works best for PhonePe recently to avoid scheme blocking
-            const upiString = `upi://pay?pa=${upiId}&pn=${merchantName}&tr=${transactionRef}&am=${amount}&cu=INR`;
-            
-            let finalUrl = upiString;
-            if(app === 'gpay') { finalUrl = upiString.replace("upi://pay", "tez://upi/pay"); } 
-            else if (app === 'paytm') { finalUrl = upiString.replace("upi://pay", "paytmmp://pay"); }
-
-            paymentAppOpened = true;
-            
-            try {
-                const link = document.createElement('a');
-                link.href = finalUrl;
-                link.target = "_top";
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } catch (e) {
-                console.log("Fallback");
-            }
-
-            setTimeout(() => { if(paymentAppOpened) { verifyPaymentReturn(); } }, 6000);
-        }
-
-        document.addEventListener("visibilitychange", function() {
-            if (document.visibilityState === 'visible' && paymentAppOpened) { verifyPaymentReturn(); }
-        });
-
-        function verifyPaymentReturn() {
-            if(!paymentAppOpened) return;
-            paymentAppOpened = false;
-            
-            document.getElementById('processingOverlay').classList.remove('hidden');
-            document.getElementById('verifyingSpinner').classList.remove('hidden');
-            document.getElementById('paymentConfirmBox').classList.add('hidden');
-            
-            // Wait 2 seconds then show manual confirmation box (Honesty check)
-            setTimeout(() => {
-                document.getElementById('verifyingSpinner').classList.add('hidden');
-                document.getElementById('paymentConfirmBox').classList.remove('hidden');
-            }, 2000);
-        }
-
-        function confirmPayment(isSuccess) {
-            document.getElementById('processingOverlay').classList.add('hidden');
-            if(isSuccess) {
-                showOrderSuccess();
-            } else {
-                showMessage("Payment failed or cancelled. Please try again.");
-                setTimeout(() => openPaymentModal(), 1000);
-            }
-        }
-
-        function showOrderSuccess() {
-            const orderInfo = saveOrderToHistory(lastSelectedPaymentMethod);
-            
-            document.getElementById('successTotal').innerText = document.getElementById('billGrandTotal').innerText;
-            const successScreen = document.getElementById('orderSuccess');
-            successScreen.classList.remove('hidden');
-            
-            setTimeout(() => {
-                document.getElementById('successIcon').classList.remove('scale-0');
-                
-                let waMsg = `🛒 *NEW ORDER RECEIVED!* 🛒\n\n`;
-                waMsg += `🆔 *Order ID:* ${orderInfo.id}\n`;
-                waMsg += `📞 *Customer Phone:* ${customerPhone}\n`;
-                waMsg += `📍 *Delivery Area:* ${currentAddress}\n`;
-                
-                if(lastSelectedPaymentMethod.includes('gpay') || lastSelectedPaymentMethod.includes('phonepe') || lastSelectedPaymentMethod.includes('paytm')) {
-                    waMsg += `💳 *Payment Mode:* ${lastSelectedPaymentMethod.toUpperCase()}\n`;
-                    waMsg += `⚠️ *ALERT FOR ADMIN: Check your bank app to confirm payment before packing! Customer claimed it was successful.*\n\n`;
-                } else {
-                    waMsg += `💳 *Payment Mode:* ${lastSelectedPaymentMethod.toUpperCase()}\n\n`;
-                }
-                
-                waMsg += `📦 *ORDER ITEMS:*\n`;
-                for(let id in cart) { waMsg += `▪️ ${cart[id].name} (x${cart[id].quantity})\n`; }
-                
-                waMsg += `\n💰 *Total Bill: ₹${document.getElementById('billGrandTotal').innerText}*\n`;
-                waMsg += `\n🚀 _Deliver fast!_`;
-                
-                currentWaLink = `https://api.whatsapp.com/send?phone=${ownerWhatsAppNumber}&text=${encodeURIComponent(waMsg)}`;
-            }, 100);
-        }
-
-        function sendToWhatsApp() {
-            if(currentWaLink) { window.open(currentWaLink, '_blank'); }
-        }
-
-        function openTracking() {
-            document.getElementById('trackingModal').classList.remove('hidden');
-            document.getElementById('orderSuccess').classList.add('hidden'); // hide success if open
-            setTimeout(() => { document.getElementById('trackingSlide').classList.remove('translate-y-full'); }, 10);
-            renderTracking();
-        }
-
-        function closeTracking() {
-            document.getElementById('trackingSlide').classList.add('translate-y-full');
-            setTimeout(() => { document.getElementById('trackingModal').classList.add('hidden'); }, 300);
-        }
-
-        function renderTracking() {
-            const history = JSON.parse(localStorage.getItem('apnaStoreHistory') || '[]');
-            const container = document.getElementById('trackingContent');
-            
-            if (history.length === 0) {
-                container.innerHTML = `<div class="text-center text-gray-500 py-10"><i class="fas fa-box-open text-5xl mb-4 text-gray-200"></i><p class="font-bold text-gray-800 text-lg">No Active Orders</p></div>`;
-                return;
-            }
-
-            const latestOrder = history[history.length - 1];
-            const elapsedMinutes = (Date.now() - latestOrder.timestamp) / 60000;
-            
-            let step = 1; 
-            if (elapsedMinutes >= 25) step = 4;
-            else if (elapsedMinutes >= 15) step = 3;
-            else if (elapsedMinutes >= 5) step = 2;
-            
-            container.innerHTML = `
-                <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 mb-4 shadow-sm">
-                    <div class="flex justify-between items-center mb-5 border-b border-gray-200 pb-3">
-                        <div><p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Order ID</p><p class="font-bold text-gray-800">#${latestOrder.id}</p></div>
-                        <div class="text-right"><p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Amount</p><p class="font-bold text-green-600">₹${latestOrder.grandTotal}</p></div>
-                    </div>
-                    <div class="relative pl-6 space-y-6">
-                        <div class="absolute left-[11px] top-2 bottom-2 w-0.5 bg-gray-200 rounded"></div>
-                        <div class="absolute left-[11px] top-2 w-0.5 bg-green-500 rounded transition-all duration-1000" style="height: ${step === 1 ? '10%' : step === 2 ? '40%' : step === 3 ? '70%' : '100%'}"></div>
-
-                        <div class="relative z-10 flex items-center">
-                            <div class="h-6 w-6 rounded-full flex items-center justify-center ${step >= 1 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'} border-2 border-white absolute -left-6 shadow-sm"><i class="fas fa-check text-[10px]"></i></div>
-                            <div class="ml-4"><p class="font-bold text-sm ${step >= 1 ? 'text-gray-800' : 'text-gray-400'}">Order Placed</p><p class="text-xs text-gray-500">Received your order</p></div>
-                        </div>
-                        <div class="relative z-10 flex items-center">
-                            <div class="h-6 w-6 rounded-full flex items-center justify-center ${step >= 2 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'} border-2 border-white absolute -left-6 shadow-sm"><i class="fas fa-box text-[10px]"></i></div>
-                            <div class="ml-4"><p class="font-bold text-sm ${step >= 2 ? 'text-gray-800' : 'text-gray-400'}">Order Packed</p><p class="text-xs text-gray-500">Items ready</p></div>
-                        </div>
-                        <div class="relative z-10 flex items-center">
-                            <div class="h-6 w-6 rounded-full flex items-center justify-center ${step >= 3 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'} border-2 border-white absolute -left-6 shadow-sm"><i class="fas fa-motorcycle text-[10px]"></i></div>
-                            <div class="ml-4"><p class="font-bold text-sm ${step >= 3 ? 'text-gray-800' : 'text-gray-400'}">Out for Delivery</p><p class="text-xs text-gray-500">Partner on the way</p></div>
-                        </div>
-                        <div class="relative z-10 flex items-center">
-                            <div class="h-6 w-6 rounded-full flex items-center justify-center ${step >= 4 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'} border-2 border-white absolute -left-6 shadow-sm"><i class="fas fa-home text-[10px]"></i></div>
-                            <div class="ml-4"><p class="font-bold text-sm ${step >= 4 ? 'text-gray-800' : 'text-gray-400'}">Delivered</p><p class="text-xs text-gray-500">Enjoy your groceries!</p></div>
-                        </div>
-                    </div>
-                </div>
-                <button onclick="renderTracking()" class="w-full bg-green-50 hover:bg-green-100 text-green-700 py-3 rounded-xl font-bold border border-green-200 transition-colors"><i class="fas fa-sync-alt mr-2"></i> Refresh Status</button>
-            `;
-        }
-
-        function resetApp() {
-            cart = {}; renderProducts(); updateCartUI();
-            document.getElementById('orderSuccess').classList.add('hidden');
-            document.getElementById('successIcon').classList.add('scale-0');
-            window.scrollTo(0,0);
-        }
-
-        let adminTapCount = 0; let adminTapTimer;
-        function handleAdminTap() {
-            adminTapCount++; clearTimeout(adminTapTimer);
-            if(adminTapCount === 5) {
-                adminTapCount = 0;
-                document.getElementById('pinModal').classList.remove('hidden');
-                setTimeout(() => { document.getElementById('pinBox').classList.remove('scale-95'); document.getElementById('pinBox').classList.add('scale-100'); }, 10);
-                document.getElementById('adminPinInput').value = '';
-                document.getElementById('adminPinInput').focus();
-                return;
-            }
-            adminTapTimer = setTimeout(() => { adminTapCount = 0; }, 2000); 
-        }
-
-        function closePinModal() {
-            document.getElementById('pinBox').classList.remove('scale-100'); document.getElementById('pinBox').classList.add('scale-95');
-            setTimeout(() => { document.getElementById('pinModal').classList.add('hidden'); }, 200);
-        }
-
-        function verifyAdminPin() {
-            if(document.getElementById('adminPinInput').value === "9999") { closePinModal(); openHisaab(); } 
-            else { showMessage("Incorrect Admin PIN!"); document.getElementById('adminPinInput').value = ''; }
-        }
-
-        function saveOrderToHistory(paymentMethod) {
-            let history = JSON.parse(localStorage.getItem('apnaStoreHistory') || '[]');
-            
-            const itemTotal = parseInt(document.getElementById('billItemTotal').innerText);
-            
-            // Extracting Delivery and Convenience safely, accounting for the "Free" text
-            let delText = document.getElementById('billDeliveryFee').innerText;
-            const deliveryFee = delText.includes('Free') ? 0 : parseInt(delText.replace('₹', '')) || 0;
-            
-            let convText = document.getElementById('billConvenienceFee').innerText;
-            const convenienceFee = convText.includes('Free') ? 0 : parseInt(convText.replace('₹', '')) || 0;
-            
-            const grandTotal = parseInt(document.getElementById('billGrandTotal').innerText);
-            const generatedId = 'ORD' + Math.floor(100000 + Math.random() * 900000);
-
-            const newOrder = {
-                id: generatedId,
-                timestamp: Date.now(),
-                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                date: new Date().toLocaleDateString(),
-                itemTotal: itemTotal,
-                deliveryFee: deliveryFee,
-                convenienceFee: convenienceFee,
-                grandTotal: grandTotal,
-                method: paymentMethod
-            };
-            
-            history.push(newOrder);
-            localStorage.setItem('apnaStoreHistory', JSON.stringify(history));
-            return newOrder;
-        }
-
-        function openHisaab() {
-            document.getElementById('hisaabModal').classList.remove('hidden');
-            setTimeout(() => { document.getElementById('hisaabSlide').classList.remove('translate-y-full'); }, 10);
-            renderHisaab();
-            isConfirmingClear = false;
-            const btn = document.getElementById('clearHisaabBtn');
-            btn.innerText = "Clear Today's Hisaab";
-            btn.className = "w-full bg-red-50 text-red-600 border border-red-200 font-bold py-3.5 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm";
-        }
-
-        function closeHisaab() {
-            document.getElementById('hisaabSlide').classList.add('translate-y-full');
-            setTimeout(() => { document.getElementById('hisaabModal').classList.add('hidden'); }, 300);
-        }
-
-        function renderHisaab() {
-            const history = JSON.parse(localStorage.getItem('apnaStoreHistory') || '[]');
-            const container = document.getElementById('hisaabContent');
-            
-            if (history.length === 0) {
-                container.innerHTML = `<div class="text-center text-gray-500 mt-24 flex flex-col items-center"><div class="bg-white shadow-sm h-24 w-24 rounded-full flex items-center justify-center mb-5 border border-gray-100"><i class="fas fa-receipt text-4xl text-gray-300"></i></div><p class="font-bold text-gray-800 text-xl mb-1">No Orders Yet</p></div>`;
-                return;
-            }
-
-            let totalCollection = 0; let vendorShare = 0; let myProfit = 0;
-            let historyHTML = `<h3 class="font-bold text-gray-800 mb-3 text-sm flex items-center px-1"><i class="fas fa-history text-gray-400 mr-2"></i> Recent Orders</h3>`;
-            
-            for (let i = history.length - 1; i >= 0; i--) {
-                let order = history[i];
-                totalCollection += order.grandTotal;
-                vendorShare += order.itemTotal;
-                myProfit += (order.deliveryFee + order.convenienceFee);
-
-                historyHTML += `
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-3 transition-all hover:shadow-md">
-                        <div class="flex justify-between items-center border-b border-gray-50 pb-3 mb-3">
-                            <div class="flex items-center space-x-3"><div class="bg-blue-50 text-blue-600 h-10 w-10 rounded-full flex items-center justify-center font-bold text-sm shadow-inner"><i class="fas fa-box"></i></div><div><span class="font-bold text-gray-900 block text-sm tracking-tight">#${order.id}</span><span class="text-gray-400 text-xs font-medium">${order.time}</span></div></div>
-                            <div class="text-right"><span class="font-black text-gray-900 block text-lg">₹${order.grandTotal}</span><span class="text-[9px] uppercase font-bold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200 mt-1 inline-block">${order.method}</span></div>
-                        </div>
-                        <div class="flex justify-between items-center text-xs bg-gray-50/80 p-2.5 rounded-lg border border-gray-100">
-                            <span class="text-gray-500 flex items-center"><i class="fas fa-store text-orange-400 mr-1.5"></i>Vendor: <strong class="text-gray-800 ml-1">₹${order.itemTotal}</strong></span>
-                            <span class="text-gray-500 flex items-center"><i class="fas fa-plus-circle text-green-500 mr-1.5"></i>App Fee: <strong class="text-green-600 ml-1">+₹${order.deliveryFee + order.convenienceFee}</strong></span>
-                        </div>
-                    </div>`;
-            }
-
-            container.innerHTML = `
-                <div class="bg-gray-900 text-white p-6 rounded-3xl shadow-xl mb-6 relative overflow-hidden">
-                    <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-500 rounded-full blur-3xl opacity-20"></div>
-                    <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-green-500 rounded-full blur-3xl opacity-20"></div>
-                    <p class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">Total Collection (Dhanda)</p>
-                    <div class="flex items-baseline space-x-1 mb-5"><span class="text-2xl font-medium text-gray-300">₹</span><h2 class="text-4xl font-black tracking-tight text-white">${totalCollection}</h2></div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="bg-white/10 rounded-2xl p-3.5 backdrop-blur-md border border-white/10 flex flex-col justify-between"><p class="text-orange-300 text-[10px] font-bold uppercase tracking-wide mb-2 flex items-center"><i class="fas fa-store mr-1.5"></i> Dukan Wale Ka</p><p class="text-xl font-bold text-white">₹${vendorShare}</p></div>
-                        <div class="bg-gradient-to-br from-green-500/20 to-blue-500/20 rounded-2xl p-3.5 backdrop-blur-md border border-white/10 flex flex-col justify-between"><p class="text-green-300 text-[10px] font-bold uppercase tracking-wide mb-2 flex items-center"><i class="fas fa-wallet mr-1.5"></i> Mera Profit</p><p class="text-xl font-bold text-white">₹${myProfit}</p></div>
-                    </div>
-                </div>` + historyHTML;
-        }
-
-        function clearHisaab() {
-            const btn = document.getElementById('clearHisaabBtn');
-            if(!isConfirmingClear) {
-                isConfirmingClear = true;
-                btn.innerText = "Are you sure? Click again to delete";
-                btn.className = "w-full bg-red-600 text-white border border-red-600 font-bold py-3.5 rounded-xl transition-all shadow-sm";
-                setTimeout(() => { if(isConfirmingClear) { isConfirmingClear = false; btn.innerText = "Clear Today's Hisaab"; btn.className = "w-full bg-red-50 text-red-600 border border-red-200 font-bold py-3.5 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm"; } }, 3000);
-            } else {
-                localStorage.removeItem('apnaStoreHistory'); isConfirmingClear = false;
-                btn.innerText = "Clear Today's Hisaab"; btn.className = "w-full bg-red-50 text-red-600 border border-red-200 font-bold py-3.5 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm";
-                renderHisaab(); showMessage("Hisaab cleared successfully."); updateCartUI(); // Refresh UI to reset "1st order Free" logic
-            }
-        }
-
-        window.onload = () => { renderProducts(); };
-    </script>
-</body>
-</html>
+  );
+}
