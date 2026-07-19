@@ -1,671 +1,561 @@
 <!DOCTYPE html>
-<html lang="en" class="light">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LoveNote</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SG Code Compiler - Premium Tool</title>
     
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.2/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/material-darker.min.css"> 
     
-    <!-- Font Awesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- FREE REAL-TIME SERVER (MQTT) - No Setup Required! -->
-    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
-    
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        pink: {
-                            50: '#fdf2f8', 100: '#fce7f3', 200: '#fbcfe8',
-                            300: '#f9a8d4', 400: '#f472b6', 500: '#ec4899',
-                            600: '#db2777', 900: '#831843',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-        /* Custom scrollbar hidden */
-        ::-webkit-scrollbar { width: 0px; background: transparent; }
+        /* =========================================
+           1. BASIC LAYOUT & DESIGN
+           ========================================= */
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #e8f5e9; color: #0b3d0b; transition: 0.3s; }
         
-        .widget-shadow {
-            box-shadow: 0 20px 50px -12px rgba(236, 72, 153, 0.5);
+        header { 
+            background-color: #2e7d32; padding: 15px; display: flex; justify-content: space-between; 
+            align-items: center; color: white; font-size: 24px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
+            z-index: 10; position: relative;
         }
-        .dark .widget-shadow {
-            box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
+        
+        .container { display: flex; flex-wrap: wrap; padding: 20px; gap: 20px; max-width: 1200px; margin: 0 auto; }
+        
+        .editor, .output { flex: 1 1 450px; background: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); min-width: 300px; transition: 0.3s; }
+        h3 { margin-top: 0; color: #1b5e20; border-bottom: 2px solid #a5d6a7; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
+
+        /* =========================================
+           2. CODEMIRROR FIXES
+           ========================================= */
+        .CodeMirror { height: 350px; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; box-sizing: border-box; margin-top: 10px; }
+        .CodeMirror-scroll { max-height: 350px; overflow-y: auto; }
+        .CodeMirror pre.CodeMirror-line, .CodeMirror pre.CodeMirror-line-like {
+            line-height: 1.5 !important;  
+            padding: 0 4px !important;    
+            margin: 0 !important;         
         }
+
+        /* =========================================
+           3. BUTTONS & CONTROLS
+           ========================================= */
+        .controls { margin-top: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: #f1f8e9; padding: 10px; border-radius: 8px; transition: 0.3s; }
+        button { background-color: #2e7d32; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: bold; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        button:active { transform: scale(0.95); }
+        button:hover { background-color: #1b5e20; }
+        
+        #darkModeToggle { background-color: #fdd835; color: #000; padding: 8px 15px; font-size: 14px; }
+        #darkModeToggle:hover { background-color: #fbc02d; }
+        #resetDefaultBtn { background-color: #fbc02d; color: #000; } #resetDefaultBtn:hover { background-color: #f9a825; }
+        #clearEditorBtn { background-color: #d32f2f; } #clearEditorBtn:hover { background-color: #b71c1c; }
+        #copyOutputBtn { background-color: #0288d1; } #copyOutputBtn:hover { background-color: #01579b; }
+        
+        pre#outputBox { background:#263238; color: #eceff1; padding:15px; border-radius:8px; height:350px; overflow:auto; white-space: pre-wrap; font-family: 'Consolas', monospace; font-size: 14px; margin: 0; }
+
+        /* =========================================
+           4. CUSTOM LANGUAGE BUTTON & GRID (PRO VIBE)
+           ========================================= */
+        .custom-lang-btn {
+            background-color: #fff; padding: 6px 14px; border-radius: 8px; border: 2px solid #ccc;
+            font-size: 15px; font-weight: bold; color: #1b5e20; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 8px; transition: 0.3s;
+        }
+        .custom-lang-btn:active { transform: scale(0.95); }
+
+        .lang-sheet-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 2000; display: none; align-items: flex-end; 
+            opacity: 0; transition: opacity 0.3s ease; backdrop-filter: blur(3px);
+        }
+        .lang-sheet {
+            background: #ffffff; width: 100%; border-radius: 25px 25px 0 0; padding: 20px; box-sizing: border-box;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.3); transform: translateY(100%); 
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 85vh; display: flex; flex-direction: column;
+        }
+        .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; }
+        .sheet-header h3 { margin: 0; border: none; font-size: 1.4rem; padding: 0; }
+        .close-sheet-btn { background: none; border: none; font-size: 2rem; cursor: pointer; color: #888; padding: 0; line-height: 1; box-shadow: none; }
+        
+        /* Grid Layout */
+        .lang-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px;
+            overflow-y: auto; padding-bottom: 20px; padding-right: 5px;
+        }
+        .lang-card {
+            background: #f8f9fa; border: 2px solid #e0e0e0; border-radius: 15px; padding: 20px 10px;
+            cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px;
+            transition: 0.2s; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .lang-card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-color: #a5d6a7; }
+        .lang-card.active { border-color: #2e7d32; background: #e8f5e9; }
+        .lang-icon { font-size: 2.2rem; }
+        .lang-name { font-weight: 800; font-size: 0.95rem; color: #333; }
+        
+        /* Glowing PRO Badge */
+        .pro-badge {
+            position: absolute; top: -10px; right: -8px; background: #000; color: #39ff14; 
+            font-size: 0.65rem; font-weight: 900; padding: 4px 8px; border-radius: 10px;
+            border: 1px solid #39ff14; box-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+            letter-spacing: 0.5px; z-index: 2; animation: pulseGlow 2s infinite;
+        }
+        @keyframes pulseGlow { 0% { box-shadow: 0 0 5px rgba(57,255,20,0.5); } 50% { box-shadow: 0 0 15px rgba(57,255,20,0.9); } 100% { box-shadow: 0 0 5px rgba(57,255,20,0.5); } }
+
+        /* =========================================
+           5. MODAL BOX (Ad UI) & TOAST BANNER
+           ========================================= */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000; display: none; justify-content: center; align-items: center; }
+        .ad-modal { background: #ffffff; padding: 25px; border-radius: 15px; text-align: center; max-width: 320px; width: 90%; box-shadow: 0 5px 25px rgba(0,0,0,0.5); }
+        .ad-modal h3 { color: #1b5e20; border: none; padding: 0; margin-bottom: 10px; justify-content: center;}
+        .progress-container { background: #e0e0e0; border-radius: 10px; height: 18px; margin: 20px 0; overflow: hidden; border: 1px solid #ccc; }
+        .progress-bar { background: #fbc02d; height: 100%; width: 0%; transition: width 0.4s ease; }
+        .modal-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+        .cancel-btn { background-color: #d32f2f !important; } .cancel-btn:hover { background-color: #b71c1c !important; }
+
+        .toast-banner {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background-color: #333; color: #fff; padding: 12px 24px; border-radius: 30px;
+            font-size: 14px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; z-index: 9999;
+            transition: top 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+        .toast-banner.show { top: 20px; }
+        .toast-success { border-left: 4px solid #4CAF50; }
+        .toast-info { border-left: 4px solid #2196F3; }
+
+        /* =========================================
+           6. DARK MODE COLORS (Hacker Theme)
+           ========================================= */
+        .dark-mode { background-color: #121212 !important; color: #e0e0e0 !important; }
+        .dark-mode header { background-color: #000; border-bottom: 1px solid #333; }
+        .dark-mode .editor, .dark-mode .output { background: #1e1e1e; box-shadow: 0 4px 20px rgba(0,0,0,0.8); }
+        .dark-mode h3 { color: #00e676; border-bottom: 2px solid #333; }
+        .dark-mode .controls { background: #252525; }
+        .dark-mode button { background-color: #000; border: 1px solid #444; color: #e0e0e0; } 
+        .dark-mode button:hover { background-color: #333; border-color: #00e676; color: #00e676; }
+        .dark-mode #darkModeToggle { background-color: #00e676; color: #000; border: none; }
+        
+        .dark-mode .custom-lang-btn { background-color: #000; color: #00e676; border-color: #444; }
+        .dark-mode .custom-lang-btn:hover { background-color: #111; border-color: #00e676; }
+        
+        .dark-mode .lang-sheet { background: #1a1a1a; }
+        .dark-mode .sheet-header { border-bottom-color: #333; }
+        .dark-mode .lang-card { background: #252525; border-color: #444; }
+        .dark-mode .lang-card:hover { border-color: #00e676; box-shadow: 0 8px 20px rgba(0,230,118,0.1); }
+        .dark-mode .lang-card.active { border-color: #00e676; background: rgba(0,230,118,0.1); }
+        .dark-mode .lang-name { color: #eee; }
+        
+        .dark-mode .ad-modal { background: #1e1e1e; border: 1px solid #444; }
+        .dark-mode .ad-modal h3 { color: #00e676; } 
+        .dark-mode .progress-container { background: #333; border-color: #555; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-pink-50 to-purple-100 dark:from-gray-950 dark:to-gray-900 text-gray-800 dark:text-white min-h-screen transition-colors duration-300 flex flex-col">
+<body onload="initializeEditor()">
 
-    <header class="p-4 flex justify-between items-center bg-white/30 dark:bg-black/30 backdrop-blur-md sticky top-0 z-50 shadow-sm">
-        <div class="flex items-center gap-2">
-            <i class="fa-solid fa-heart text-pink-500 text-xl"></i>
-            <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-purple-600">
-                LoveNote
-            </h1>
+    <div id="toastBanner" class="toast-banner">
+        <span id="toastIcon">✅</span>
+        <span id="toastText">Message goes here</span>
+    </div>
+
+    <div id="adModalOverlay" class="modal-overlay">
+        <div class="ad-modal">
+            <h3 id="adModalTitle">Unlock Language</h3>
+            <p style="font-size: 14px; margin: 0; color: inherit; opacity: 0.8;">Watch 3 short video ads to unlock this premium language forever!</p>
+            <div class="progress-container">
+                <div id="adProgressBar" class="progress-bar"></div>
+            </div>
+            <p id="adModalStatus" style="font-weight: bold; color: #d32f2f;">Ads Watched: 0 / 3</p>
+            <div class="modal-buttons">
+                <button id="watchAdBtn" onclick="triggerAppAd()">🎥 Watch Ad</button>
+                <button class="cancel-btn" onclick="closeAdModal()">Cancel</button>
+            </div>
         </div>
-        <button id="theme-toggle" class="p-2 rounded-full hover:bg-white/50 dark:hover:bg-gray-800 transition-colors">
-            <i id="theme-icon" class="fa-solid fa-moon text-purple-600 text-lg"></i>
-        </button>
+    </div>
+
+    <div id="langSheetOverlay" class="lang-sheet-overlay" onclick="closeLangSheet()">
+        <div class="lang-sheet" onclick="event.stopPropagation()">
+            <div class="sheet-header">
+                <h3>Select Environment</h3>
+                <button class="close-sheet-btn" onclick="closeLangSheet()">×</button>
+            </div>
+            
+            <div class="lang-grid" id="langGrid">
+                <div class="lang-card active" data-lang="c" data-name="C" data-icon="⚙️" data-locked="false" onclick="handleLangClick(this)">
+                    <div class="lang-icon">⚙️</div><div class="lang-name">C</div>
+                </div>
+                
+                <div class="lang-card" data-lang="python" data-name="Python" data-icon="🐍" data-locked="true" onclick="handleLangClick(this)">
+                    <div class="pro-badge">PRO</div>
+                    <div class="lang-icon">🐍</div><div class="lang-name">Python</div>
+                </div>
+                <div class="lang-card" data-lang="java" data-name="Java" data-icon="☕" data-locked="true" onclick="handleLangClick(this)">
+                    <div class="pro-badge">PRO</div>
+                    <div class="lang-icon">☕</div><div class="lang-name">Java</div>
+                </div>
+                <div class="lang-card" data-lang="cpp" data-name="C++" data-icon="🚀" data-locked="true" onclick="handleLangClick(this)">
+                    <div class="pro-badge">PRO</div>
+                    <div class="lang-icon">🚀</div><div class="lang-name">C++</div>
+                </div>
+                <div class="lang-card" data-lang="javascript" data-name="JavaScript" data-icon="⚡" data-locked="true" onclick="handleLangClick(this)">
+                    <div class="pro-badge">PRO</div>
+                    <div class="lang-icon">⚡</div><div class="lang-name">JavaScript</div>
+                </div>
+                <div class="lang-card" data-lang="php" data-name="PHP" data-icon="🐘" data-locked="true" onclick="handleLangClick(this)">
+                    <div class="pro-badge">PRO</div>
+                    <div class="lang-icon">🐘</div><div class="lang-name">PHP</div>
+                </div>
+                <div class="lang-card" data-lang="ruby" data-name="Ruby" data-icon="💎" data-locked="true" onclick="handleLangClick(this)">
+                    <div class="pro-badge">PRO</div>
+                    <div class="lang-icon">💎</div><div class="lang-name">Ruby</div>
+                </div>
+                <div class="lang-card" data-lang="go" data-name="Go" data-icon="🐹" data-locked="true" onclick="handleLangClick(this)">
+                    <div class="pro-badge">PRO</div>
+                    <div class="lang-icon">🐹</div><div class="lang-name">Go</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <span>SG Code Compiler</span>
+        <button id="darkModeToggle" onclick="toggleDarkMode()">☀️ Light</button> 
     </header>
 
-    <main class="max-w-md mx-auto p-4 flex flex-col flex-1 w-full relative">
-        
-        <!-- Loading Screen -->
-        <div id="loading-screen" class="absolute inset-0 flex flex-col items-center justify-center bg-pink-50/90 dark:bg-gray-900/90 z-40 backdrop-blur-sm">
-            <i class="fa-solid fa-heart text-pink-500 text-5xl animate-bounce mb-4"></i>
-            <p class="text-sm text-pink-600 font-semibold">Connecting to global server...</p>
-        </div>
-
-        <!-- Pairing Screen (Hidden by default) -->
-        <div id="pairing-screen" class="hidden flex-1 flex flex-col items-center justify-center gap-8 py-8 w-full">
-            <div class="text-center space-y-2">
-                <div class="inline-block p-4 rounded-full bg-pink-100 dark:bg-pink-900/30 mb-4">
-                    <i class="fa-solid fa-heart text-pink-500 text-4xl animate-pulse"></i>
+    <div class="container">
+        <div class="editor">
+            <h3>
+                <span>Write Your Code</span>
+                <div id="customLangBtn" class="custom-lang-btn" onclick="openLangSheet()">
+                    <span id="btnLangIcon">⚙️</span> <span id="btnLangName">C</span> ▾
                 </div>
-                <h2 class="text-2xl font-bold">Connect with your Love</h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Generate a code to invite them, or enter their code.</p>
-            </div>
-
-            <div class="w-full space-y-6 bg-white/60 dark:bg-gray-900/60 p-6 rounded-3xl shadow-xl backdrop-blur-md border border-white/20 dark:border-gray-800">
-                
-                <div class="space-y-3">
-                    <label class="text-sm font-medium ml-1">Enter Invite Code</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="join-code-input" placeholder="e.g. A1B2C3" maxlength="6"
-                            class="flex-1 px-4 py-3 rounded-2xl bg-white dark:bg-gray-800 border-none shadow-inner focus:ring-2 focus:ring-pink-500 outline-none uppercase font-mono tracking-widest text-center" />
-                        <button id="join-btn" class="px-6 py-3 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-pink-500/30">
-                            Join
-                        </button>
-                    </div>
-                    <p id="pair-error" class="text-red-500 text-xs text-center hidden"></p>
-                </div>
-
-                <div class="relative flex items-center py-2">
-                    <div class="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
-                    <span class="flex-shrink-0 mx-4 text-gray-400 text-sm">OR</span>
-                    <div class="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
-                </div>
-
-                <button id="generate-btn" class="w-full py-4 rounded-2xl bg-white dark:bg-gray-800 font-semibold border-2 border-pink-200 dark:border-pink-900 hover:border-pink-500 transition-colors flex items-center justify-center gap-2 group">
-                    <i class="fa-solid fa-wand-magic-sparkles text-pink-500 group-hover:animate-spin"></i>
-                    <span id="generate-text">Create New Invite Code</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Dashboard Screen (Hidden by default) -->
-        <div id="dashboard-screen" class="hidden flex-1 flex flex-col gap-6 w-full h-full">
+            </h3>
             
-            <!-- Top Bar -->
-            <div class="flex justify-between items-center bg-white/50 dark:bg-black/40 px-4 py-2 rounded-full backdrop-blur-sm text-sm border border-white/20 dark:border-gray-800">
-                <div class="flex items-center gap-2">
-                    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                    <span>Connected</span>
-                </div>
-                <div class="flex items-center gap-3">
-                    <button id="copy-code-btn" class="flex items-center gap-1 hover:text-pink-500 transition-colors">
-                        <span id="display-pair-code" class="font-mono bg-black/5 dark:bg-white/10 px-2 py-1 rounded">Code: ------</span>
-                        <i class="fa-regular fa-copy"></i>
-                    </button>
-                    <div class="w-px h-4 bg-gray-300 dark:bg-gray-600"></div>
-                    <button id="disconnect-btn" class="text-gray-500 hover:text-red-500 transition-colors" title="Disconnect & Exit">
-                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                    </button>
-                </div>
+            <select id="languageSelector" style="display: none;">
+                <option value="c">C</option>
+                <option value="python">Python</option>
+                <option value="java">Java</option>
+                <option value="cpp">C++</option>
+                <option value="javascript">JavaScript</option>
+                <option value="php">PHP</option>
+                <option value="ruby">Ruby</option>
+                <option value="go">Go</option>
+            </select>
+            
+            <textarea id="code"></textarea>
+
+            <div class="controls">
+                <button onclick="runCode()">▶ Run Code</button>
+                <button onclick="clearOutput()">Clear Output</button>
+                <button id="resetDefaultBtn" onclick="resetDefaultCode()">🔄 Reset Default</button> 
+                <button id="clearEditorBtn" onclick="clearEditor()">Clear Editor</button>
             </div>
-
-            <!-- Widget Area (The big display) -->
-            <div class="relative">
-                <h3 id="widget-title" class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2 ml-2">
-                    Your Widget
-                </h3>
-                <div id="widget-container" class="aspect-square w-full rounded-[2rem] p-6 flex items-center justify-center overflow-hidden transition-all duration-500 relative bg-gradient-to-br from-pink-400 to-purple-600 text-white widget-shadow border border-white/20">
-                    
-                    <!-- Text Preview -->
-                    <p id="widget-text" class="text-3xl font-bold text-center leading-tight drop-shadow-md break-words w-full">
-                        Waiting for a note...
-                    </p>
-                    
-                    <!-- Image Preview -->
-                    <img id="widget-image" src="" alt="Doodle" class="w-full h-full object-contain filter drop-shadow-xl hidden" />
-
-                    <!-- Sparkles for partner update -->
-                    <div id="widget-sparkles" class="absolute top-4 right-4 animate-bounce hidden">
-                        <i class="fa-solid fa-sparkles text-yellow-300 text-xl"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Input Tools Area -->
-            <div class="mt-auto bg-white/80 dark:bg-gray-900/80 rounded-3xl p-2 backdrop-blur-xl border border-white/40 dark:border-gray-700 shadow-xl flex flex-col min-h-[220px]">
-                
-                <!-- Tabs -->
-                <div class="flex p-1 bg-gray-100/50 dark:bg-black/50 rounded-2xl mb-4 shrink-0">
-                    <button id="tab-note" class="tab-btn flex-1 flex flex-col items-center gap-1 py-2 rounded-xl transition-all bg-white dark:bg-gray-800 shadow-sm text-pink-500">
-                        <i class="fa-regular fa-message"></i><span class="text-xs font-medium">Note</span>
-                    </button>
-                    <button id="tab-draw" class="tab-btn flex-1 flex flex-col items-center gap-1 py-2 rounded-xl transition-all text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-                        <i class="fa-solid fa-pen-nib"></i><span class="text-xs font-medium">Draw</span>
-                    </button>
-                    <button id="tab-daily" class="tab-btn flex-1 flex flex-col items-center gap-1 py-2 rounded-xl transition-all text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-                        <i class="fa-regular fa-heart"></i><span class="text-xs font-medium">Daily</span>
-                    </button>
-                </div>
-
-                <!-- Tab Contents -->
-                <div class="p-2 flex-1 flex flex-col w-full h-full relative">
-                    
-                    <!-- Text Tab -->
-                    <div id="content-note" class="tab-content flex-col flex-1 gap-3 w-full h-full" style="display: flex;">
-                        <textarea id="note-input" placeholder="Write a sweet note... it appears instantly! ✨" 
-                            class="w-full h-24 bg-transparent resize-none outline-none text-lg p-2 placeholder:text-gray-400" maxlength="100"></textarea>
-                        <div class="flex items-center justify-between mt-auto shrink-0">
-                            <div id="emoji-bar" class="flex gap-2">
-                                <button class="emoji-btn text-xl hover:scale-125 transition-transform">❤️</button>
-                                <button class="emoji-btn text-xl hover:scale-125 transition-transform">😘</button>
-                                <button class="emoji-btn text-xl hover:scale-125 transition-transform">🥺</button>
-                                <button class="emoji-btn text-xl hover:scale-125 transition-transform">😍</button>
-                                <button class="emoji-btn text-xl hover:scale-125 transition-transform">✨</button>
-                            </div>
-                            <button id="clear-note-btn" class="px-4 py-2 bg-pink-100 dark:bg-gray-800 text-pink-600 dark:text-pink-400 rounded-full hover:bg-pink-200 transition-colors text-sm font-semibold">
-                                Clear
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Draw Tab -->
-                    <div id="content-draw" class="tab-content flex-col items-center gap-3 w-full h-full" style="display: none;">
-                        <div class="w-full min-h-[160px] flex-1 bg-gray-50 dark:bg-gray-800 rounded-2xl border-2 border-dashed border-pink-200 dark:border-pink-900/50 overflow-hidden touch-none relative">
-                            <canvas id="draw-canvas" class="w-full h-full cursor-crosshair absolute inset-0 z-10"></canvas>
-                            <div class="absolute inset-0 pointer-events-none flex items-center justify-center opacity-10 z-0">
-                                <i class="fa-solid fa-pen-nib text-5xl"></i>
-                            </div>
-                        </div>
-                        <div class="flex w-full justify-between items-center px-2 shrink-0 h-8">
-                            <span class="text-xs text-gray-400">Auto-syncs instantly ✨</span>
-                            <button id="clear-canvas-btn" class="flex items-center gap-2 px-3 py-1 bg-pink-100 dark:bg-gray-800 text-pink-600 dark:text-pink-400 rounded-full hover:bg-pink-200 transition-colors text-sm font-semibold">
-                                <i class="fa-solid fa-trash"></i> Clear
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Daily Tab -->
-                    <div id="content-daily" class="tab-content flex-col items-center justify-center w-full h-full gap-4 text-center" style="display: none;">
-                        <p class="text-sm text-gray-600 dark:text-gray-300">Send a random, carefully curated love quote to brighten their day.</p>
-                        <button id="send-daily-btn" class="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-full font-bold hover:scale-105 active:scale-95 transition-all shadow-lg shadow-purple-500/30 flex items-center gap-2">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i> Send Love
-                        </button>
-                    </div>
-
-                </div>
-            </div>
+            <p style="font-size:12px; color: gray; margin-top: 8px;">*Code is saved automatically in your browser.</p>
         </div>
-    </main>
 
-    <!-- Application Logic -->
+        <div class="output">
+            <h3>Output <button id="copyOutputBtn" onclick="copyOutput()" style="padding: 6px 12px; font-size: 13px;">📋 Copy</button></h3>
+            <pre id="outputBox">(Output will appear here)</pre>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/clike/clike.min.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/python/python.min.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/php/php.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/ruby/ruby.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/go/go.min.js"></script>
+
     <script>
-        // ----------------------------------------------------------------
-        // 1. GLOBAL STATE & USER SETUP
-        // ----------------------------------------------------------------
+        /* =========================================
+           GLOBAL VARIABLES & DEFAULT CODES
+           ========================================= */
+        let codeEditorInstance; 
+        let adWatchCounts = {}; 
+        const REQUIRED_ADS_TO_UNLOCK = 3; 
+        let currentlySelectedLockedLang = ""; 
         
-        // Generate a random ID for this specific phone/browser to identify who is sending messages
-        let myUserId = localStorage.getItem('lovenote_uid');
-        if (!myUserId) {
-            myUserId = Math.random().toString(36).substring(2, 10);
-            localStorage.setItem('lovenote_uid', myUserId);
-        }
-        
-        let currentPairCode = null;
-        let currentRoomData = null;
-        
-        // Daily Quotes
-        const DAILY_QUOTES = [
-            "I love you not only for what you are, but for what I am when I am with you.",
-            "You are my today and all of my tomorrows.",
-            "In all the world, there is no heart for me like yours.",
-            "I swear I couldn't love you more than I do right now, and yet I know I will tomorrow.",
-            "If I know what love is, it is because of you."
-        ];
-
-        // ----------------------------------------------------------------
-        // 2. DOM ELEMENTS
-        // ----------------------------------------------------------------
-        const el = {
-            themeToggle: document.getElementById('theme-toggle'),
-            themeIcon: document.getElementById('theme-icon'),
-            loadingScreen: document.getElementById('loading-screen'),
-            pairingScreen: document.getElementById('pairing-screen'),
-            dashboardScreen: document.getElementById('dashboard-screen'),
-            
-            // Pairing
-            joinInput: document.getElementById('join-code-input'),
-            joinBtn: document.getElementById('join-btn'),
-            generateBtn: document.getElementById('generate-btn'),
-            generateText: document.getElementById('generate-text'),
-            pairError: document.getElementById('pair-error'),
-            
-            // Dashboard Top
-            displayCode: document.getElementById('display-pair-code'),
-            copyCodeBtn: document.getElementById('copy-code-btn'),
-            disconnectBtn: document.getElementById('disconnect-btn'),
-            
-            // Widget Area
-            widgetTitle: document.getElementById('widget-title'),
-            widgetContainer: document.getElementById('widget-container'),
-            widgetText: document.getElementById('widget-text'),
-            widgetImage: document.getElementById('widget-image'),
-            widgetSparkles: document.getElementById('widget-sparkles'),
-            
-            // Tabs
-            tabs: {
-                note: document.getElementById('tab-note'),
-                draw: document.getElementById('tab-draw'),
-                daily: document.getElementById('tab-daily')
-            },
-            contents: {
-                note: document.getElementById('content-note'),
-                draw: document.getElementById('content-draw'),
-                daily: document.getElementById('content-daily')
-            },
-            
-            // Inputs
-            noteInput: document.getElementById('note-input'),
-            clearNoteBtn: document.getElementById('clear-note-btn'),
-            emojiBtns: document.querySelectorAll('.emoji-btn'),
-            
-            // Canvas
-            canvas: document.getElementById('draw-canvas'),
-            clearCanvasBtn: document.getElementById('clear-canvas-btn'),
-            
-            // Daily
-            sendDailyBtn: document.getElementById('send-daily-btn')
+        const defaultCodeExamples = {
+            'c': `#include <stdio.h>\n\nint main() {\n    int num = 10;\n    printf("Hello from C compiler! The number is %d.\\n", num);\n    return 0;\n}`,
+            'python': `# Python Example\nprint("Hello from Python!")\nprint("The actual compiler is working now.")`,
+            'java': `// Java Example\nclass Main {\n    public static void main(String[] args) {\n        System.out.println("Hello from Java!");\n    }\n}`,
+            'cpp': `#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Hello from Premium C++ Compiler!" << endl;\n    return 0;\n}`,
+            'javascript': `// JavaScript Example\nconsole.log("Hello from Premium JavaScript Compiler!");`,
+            'php': `<?php\n// PHP Example\necho "Hello from Premium PHP Compiler!";\n?>`,
+            'ruby': `# Ruby Example\nputs "Hello from Premium Ruby Compiler!"`,
+            'go': `// Go Example\npackage main\nimport "fmt"\nfunc main() {\n    fmt.Println("Hello from Premium Go Compiler!")\n}`
         };
 
-        // ----------------------------------------------------------------
-        // 3. THEME MANAGEMENT
-        // ----------------------------------------------------------------
-        let theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        const applyTheme = () => {
-            document.documentElement.classList.toggle('dark', theme === 'dark');
-            el.themeIcon.className = theme === 'dark' ? 'fa-solid fa-sun text-yellow-400 text-lg' : 'fa-solid fa-moon text-purple-600 text-lg';
-            localStorage.setItem('theme', theme);
-        };
-        applyTheme();
-        el.themeToggle.onclick = () => { theme = theme === 'dark' ? 'light' : 'dark'; applyTheme(); };
-
-        // ----------------------------------------------------------------
-        // 4. NETWORKING (HYBRID: GLOBAL + LOCAL FALLBACK)
-        // ----------------------------------------------------------------
-        let mqttClient = null;
-        let isLocalMode = false;
-        
-        // BroadcastChannel for cross-tab sync when Canvas blocks WebSockets
-        const localChannel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('lovenote_sync') : null;
-
-        const checkSavedCode = () => {
-            const savedCode = localStorage.getItem('lovenote_paircode');
-            if (savedCode) {
-                connectToRoom(savedCode);
+        /* =========================================
+           UI & THEME FUNCTIONS
+           ========================================= */
+        function toggleDarkMode() {
+            const body = document.body;
+            const toggleBtn = document.getElementById('darkModeToggle');
+            body.classList.toggle('dark-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                toggleBtn.innerText = '🌙 Dark';
+                localStorage.setItem('darkModeEnabled', 'true'); 
             } else {
-                showScreen('pairing');
-            }
-        };
-
-        const enableLocalMode = () => {
-            if(isLocalMode) return;
-            isLocalMode = true;
-            console.log("Canvas restricted external servers. Using Local Sync Mode.");
-            el.loadingScreen.classList.add('hidden');
-            checkSavedCode();
-            
-            if (localChannel) {
-                localChannel.onmessage = (e) => {
-                    if (e.data.room === currentPairCode) {
-                        currentRoomData = e.data.payload;
-                        updateWidgetUI();
-                    }
-                };
-            }
-        };
-
-        try {
-            // Attempt to connect to the global server
-            mqttClient = mqtt.connect('wss://broker.emqx.io:8084/mqtt');
-
-            mqttClient.on('connect', () => {
-                console.log("Connected to Free Global Server!");
-                el.loadingScreen.classList.add('hidden');
-                checkSavedCode();
-            });
-
-            mqttClient.on('error', (err) => {
-                console.warn("Connection error, falling back to local.", err);
-                enableLocalMode();
-            });
-
-            mqttClient.on('message', (topic, message) => {
-                try {
-                    const data = JSON.parse(message.toString());
-                    currentRoomData = data;
-                    updateWidgetUI();
-                } catch (e) { }
-            });
-        } catch (error) {
-            // If Canvas CSP immediately blocks the WebSocket creation
-            enableLocalMode();
-        }
-
-        const connectToRoom = (code) => {
-            currentPairCode = code;
-            localStorage.setItem('lovenote_paircode', code);
-            
-            if (!isLocalMode && mqttClient) {
-                mqttClient.subscribe(`lovenote_room_${code}`);
-            }
-            
-            showScreen('dashboard');
-            el.displayCode.innerText = `Code: ${code}`;
-        };
-
-        const syncToServer = (type, content) => {
-            if (!currentPairCode) return;
-            
-            const payloadObj = {
-                type: type,
-                content: content,
-                updatedBy: myUserId,
-                timestamp: Date.now()
-            };
-
-            if (isLocalMode && localChannel) {
-                // Sync locally across browser tabs (Canvas Preview)
-                localChannel.postMessage({
-                    room: currentPairCode,
-                    payload: payloadObj
-                });
-            } else if (mqttClient) {
-                // Sync globally across different phones
-                mqttClient.publish(`lovenote_room_${currentPairCode}`, JSON.stringify(payloadObj), { retain: true });
-            }
-        };
-
-        // ----------------------------------------------------------------
-        // 5. UI NAVIGATION & UPDATES
-        // ----------------------------------------------------------------
-        function showScreen(screen) {
-            el.pairingScreen.classList.add('hidden');
-            el.dashboardScreen.classList.add('hidden');
-            if (screen === 'pairing') el.pairingScreen.classList.remove('hidden');
-            if (screen === 'dashboard') {
-                el.dashboardScreen.classList.remove('hidden');
-                setTimeout(setupCanvas, 100); // Wait for DOM layout
+                toggleBtn.innerText = '☀️ Light';
+                localStorage.removeItem('darkModeEnabled');
             }
         }
 
-        function updateWidgetUI() {
-            if (!currentRoomData) return;
+        function initializeEditor() {
+            if (localStorage.getItem('darkModeEnabled') === 'true') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('darkModeToggle').innerText = '🌙 Dark';
+            }
             
-            const isPartner = currentRoomData.updatedBy !== myUserId;
-            el.widgetTitle.innerText = isPartner ? "Partner's Widget" : "Your Widget";
-            
-            if (isPartner) {
-                el.widgetSparkles.classList.remove('hidden');
-                setTimeout(() => el.widgetSparkles.classList.add('hidden'), 3000);
-            } else {
-                el.widgetSparkles.classList.add('hidden');
+            if (typeof AndroidApp !== "undefined") {
+                AndroidApp.checkLanguageStatus(); 
             }
 
-            if (currentRoomData.type === 'drawing') {
-                // Show Drawing UI
-                el.widgetContainer.className = "aspect-square w-full rounded-[2rem] p-6 flex items-center justify-center overflow-hidden transition-all duration-500 relative bg-white dark:bg-gray-900 widget-shadow border border-white/20";
-                el.widgetImage.src = currentRoomData.content;
-                el.widgetImage.classList.remove('hidden');
-                el.widgetText.classList.add('hidden');
-            } else {
-                // Show Text UI
-                el.widgetContainer.className = "aspect-square w-full rounded-[2rem] p-6 flex items-center justify-center overflow-hidden transition-all duration-500 relative bg-gradient-to-br from-pink-400 to-purple-600 text-white widget-shadow border border-white/20";
-                el.widgetText.classList.remove('hidden');
-                el.widgetImage.classList.add('hidden');
-                
-                const isActivelyTyping = document.activeElement === el.noteInput;
-                
-                // Prevent jumping text if you are currently typing
-                if (isPartner || !isActivelyTyping) {
-                    el.widgetText.innerText = currentRoomData.content || "Waiting for a note...";
+            const savedLanguage = localStorage.getItem('selectedLanguage') || 'c';
+            const savedUserCode = localStorage.getItem('sgCompilerCode');
+            
+            codeEditorInstance = CodeMirror.fromTextArea(document.getElementById('code'), {
+                mode: getModeString(savedLanguage), 
+                theme: 'material-darker',     
+                lineNumbers: true,    
+                indentUnit: 4,        
+                tabSize: 4,
+                indentWithTabs: true,
+                electricChars: true,
+                matchBrackets: true,
+                autoCloseBrackets: true,
+            });
+
+            codeEditorInstance.setValue(savedUserCode || defaultCodeExamples[savedLanguage] || defaultCodeExamples['c']); 
+            codeEditorInstance.on('change', saveUserCodeLocally);
+            
+            // Sync initial custom UI with saved language
+            document.getElementById('languageSelector').value = savedLanguage;
+            const savedCard = document.querySelector(`.lang-card[data-lang="${savedLanguage}"]`);
+            if(savedCard) {
+                // Automatically unlock if it was saved (means user already unlocked it)
+                if (savedCard.getAttribute('data-locked') === 'true') {
+                    savedCard.setAttribute('data-locked', 'false');
+                    let badge = savedCard.querySelector('.pro-badge');
+                    if (badge) badge.remove();
                 }
-                
-                if (isPartner && !isActivelyTyping) {
-                    el.noteInput.value = currentRoomData.content;
-                }
+                updateUISelection(savedCard);
             }
         }
 
-        // ----------------------------------------------------------------
-        // 6. PAIRING LOGIC (Generate / Join / Disconnect)
-        // ----------------------------------------------------------------
-        el.generateBtn.onclick = () => {
-            const newCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-            // Instantly send a welcome message to initialize the room
-            currentPairCode = newCode;
-            syncToServer('text', 'Welcome to LoveNote! ❤️');
-            connectToRoom(newCode);
-        };
+        function getModeString(lang) {
+            if (lang === 'python') return 'text/x-python';
+            if (lang === 'java' || lang === 'cpp') return 'text/x-java';
+            if (lang === 'javascript') return 'text/javascript';
+            if (lang === 'php') return 'application/x-httpd-php';
+            if (lang === 'ruby') return 'text/x-ruby';
+            if (lang === 'go') return 'text/x-go';
+            return 'text/x-csrc'; // default C
+        }
 
-        el.joinBtn.onclick = () => {
-            const code = el.joinInput.value.trim().toUpperCase();
-            if (code.length !== 6) {
-                el.pairError.innerText = "Enter a valid 6-character code.";
-                el.pairError.classList.remove('hidden');
+        function showBanner(message, type = 'info') {
+            const banner = document.getElementById('toastBanner');
+            document.getElementById('toastText').innerText = message;
+            document.getElementById('toastIcon').innerText = (type === 'success') ? "🎉" : "ℹ️";
+            banner.className = `toast-banner toast-${type} show`;
+            setTimeout(() => { banner.className = "toast-banner"; }, 3000);
+        }
+
+        /* =========================================
+           🚀 NEW BOTTOM SHEET LOGIC
+           ========================================= */
+        const sheetOverlay = document.getElementById('langSheetOverlay');
+        const sheet = document.querySelector('.lang-sheet');
+
+        function openLangSheet() {
+            sheetOverlay.style.display = 'flex';
+            setTimeout(() => {
+                sheetOverlay.style.opacity = '1';
+                sheet.style.transform = 'translateY(0)';
+            }, 10);
+        }
+
+        function closeLangSheet() {
+            sheetOverlay.style.opacity = '0';
+            sheet.style.transform = 'translateY(100%)';
+            setTimeout(() => { sheetOverlay.style.display = 'none'; }, 300);
+        }
+
+        function handleLangClick(card) {
+            const langId = card.getAttribute('data-lang');
+            const langName = card.getAttribute('data-name');
+            const isLocked = card.getAttribute('data-locked') === 'true';
+
+            if (isLocked) {
+                // 🚀 AD WALA DABBA KHULNE SE PEHLE PICHE WALI LIST BAND HO JAYEGI
+                closeLangSheet();
+                
+                if (typeof AndroidApp !== "undefined") {
+                    openAdModal(langId, langName);
+                } else {
+                    alert("Premium Feature! ✦ ᴾᴿᴼ\nThis language can only be unlocked by watching short video ads in the SG Code Compiler App. Please download our Android App from the Play Store!");
+                }
                 return;
             }
-            connectToRoom(code);
-        };
 
-        el.joinInput.oninput = () => el.pairError.classList.add('hidden');
+            updateUISelection(card);
+            closeLangSheet();
+            changeLanguageInternal(langId);
+        }
 
-        // Disconnect & Exit Button
-        el.disconnectBtn.onclick = () => {
-            if (currentPairCode) {
-                mqttClient.unsubscribe(`lovenote_room_${currentPairCode}`); // Stop listening to this room
+        function updateUISelection(card) {
+            // Update the Top Button
+            document.getElementById('btnLangIcon').innerText = card.getAttribute('data-icon');
+            document.getElementById('btnLangName').innerText = card.getAttribute('data-name');
+            
+            // Highlight Grid Card
+            document.querySelectorAll('.lang-card').forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+        }
+
+        /* =========================================
+           AD MODAL & UNLOCK SYSTEM
+           ========================================= */
+        function openAdModal(langId, langName) {
+            currentlySelectedLockedLang = langId; 
+            document.getElementById('adModalTitle').innerText = "Unlock " + langName;
+            document.getElementById('adModalOverlay').style.display = 'flex';
+            updateModalProgress(langId); 
+        }
+
+        function closeAdModal() {
+            document.getElementById('adModalOverlay').style.display = 'none';
+            currentlySelectedLockedLang = "";
+        }
+
+        function updateModalProgress(langId) {
+            let count = adWatchCounts[langId] || 0;
+            let statusText = document.getElementById('adModalStatus');
+            statusText.innerText = `Ads Watched: ${count} / ${REQUIRED_ADS_TO_UNLOCK}`;
+            document.getElementById('adProgressBar').style.width = ((count / REQUIRED_ADS_TO_UNLOCK) * 100) + "%";
+            if(count === 0) statusText.style.color = "#d32f2f"; 
+            else if(count < 3) statusText.style.color = "#f57f17"; 
+            else statusText.style.color = "#2e7d32"; 
+        }
+
+        function triggerAppAd() {
+            if (typeof AndroidApp !== "undefined") {
+                showBanner("Loading Advertisement...", "info");
+                AndroidApp.showRewardedAd(currentlySelectedLockedLang);
+            } else {
+                alert("Please download the SG Code Compiler Android App to watch ads.");
+                closeAdModal();
             }
-            currentPairCode = null;
-            localStorage.removeItem('lovenote_paircode'); // Delete saved code
-            el.joinInput.value = ''; // Clear input box
-            showScreen('pairing'); // Go back to invite screen
-        };
+        }
 
-        // Copy Invite Code
-        el.copyCodeBtn.onclick = () => {
-            if (!currentPairCode) return;
-            const temp = document.createElement('textarea');
-            temp.value = currentPairCode;
-            document.body.appendChild(temp);
-            temp.select();
-            document.execCommand('copy');
-            document.body.removeChild(temp);
-            
-            const originalHtml = el.displayCode.innerHTML;
-            el.displayCode.innerHTML = "Copied! ✓";
-            setTimeout(() => el.displayCode.innerHTML = originalHtml, 2000);
-        };
+        function unlockLanguage(langId) {
+            if (!adWatchCounts[langId]) adWatchCounts[langId] = 0;
+            adWatchCounts[langId]++;
+            updateModalProgress(langId);
 
-        // ----------------------------------------------------------------
-        // 7. TAB MANAGEMENT (Switching between Note, Draw, Daily)
-        // ----------------------------------------------------------------
-        const switchTab = (tabId) => {
-            Object.values(el.tabs).forEach(t => {
-                t.classList.remove('bg-white', 'dark:bg-gray-800', 'shadow-sm', 'text-pink-500');
-                t.classList.add('text-gray-500');
-            });
-            
-            // Hide all tab content completely
-            el.contents.note.style.display = 'none';
-            el.contents.draw.style.display = 'none';
-            el.contents.daily.style.display = 'none';
-            
-            // Highlight selected tab
-            el.tabs[tabId].classList.remove('text-gray-500');
-            el.tabs[tabId].classList.add('bg-white', 'dark:bg-gray-800', 'shadow-sm', 'text-pink-500');
-            
-            // Show selected content
-            el.contents[tabId].style.display = 'flex';
-            
-            // Handle Canvas resize issue properly
-            if (tabId === 'draw') {
-                setTimeout(setupCanvas, 100);
+            if (adWatchCounts[langId] >= REQUIRED_ADS_TO_UNLOCK) {
+                setTimeout(() => { 
+                    const card = document.querySelector(`.lang-card[data-lang="${langId}"]`);
+                    if(card) {
+                        card.setAttribute('data-locked', 'false');
+                        let badge = card.querySelector('.pro-badge');
+                        if(badge) badge.remove();
+                    }
+                    closeAdModal();
+                    showBanner("Premium Language Unlocked! 🎉", "success");
+                    handleLangClick(card); // Auto-select it after unlocking
+                }, 500); 
+            } else {
+                let remaining = REQUIRED_ADS_TO_UNLOCK - adWatchCounts[langId];
+                showBanner(`Ad Watched! ${remaining} more needed.`, "info");
             }
-        };
+        }
 
-        el.tabs.note.onclick = () => switchTab('note');
-        el.tabs.draw.onclick = () => switchTab('draw');
-        el.tabs.daily.onclick = () => switchTab('daily');
+        /* =========================================
+           CORE COMPILER FUNCTIONS
+           ========================================= */
+        function changeLanguageInternal(langId) {
+            document.getElementById('languageSelector').value = langId;
+            codeEditorInstance.setOption('mode', getModeString(langId));
+            codeEditorInstance.setValue(defaultCodeExamples[langId] || defaultCodeExamples['c']); 
+            localStorage.setItem('selectedLanguage', langId); 
+        }
 
-        // ----------------------------------------------------------------
-        // 8. TEXT NOTE LOGIC (100% Instant Typing)
-        // ----------------------------------------------------------------
-        const handleNoteInput = () => {
-            const val = el.noteInput.value;
-            
-            // Instantly change screen to text mode locally
-            el.widgetImage.classList.add('hidden');
-            el.widgetText.classList.remove('hidden');
-            el.widgetContainer.className = "aspect-square w-full rounded-[2rem] p-6 flex items-center justify-center overflow-hidden transition-all duration-500 relative bg-gradient-to-br from-pink-400 to-purple-600 text-white widget-shadow border border-white/20";
-            el.widgetText.innerText = val || "Waiting for a note...";
-            
-            // Send to partner over MQTT
-            syncToServer('text', val);
-        };
-
-        el.noteInput.addEventListener('input', handleNoteInput);
-
-        el.emojiBtns.forEach(btn => {
-            btn.onclick = () => {
-                el.noteInput.value += btn.innerText;
-                el.noteInput.focus();
-                handleNoteInput();
-            };
-        });
-
-        el.clearNoteBtn.onclick = () => {
-            el.noteInput.value = '';
-            el.noteInput.focus();
-            handleNoteInput();
-        };
-
-        // ----------------------------------------------------------------
-        // 9. CANVAS (DRAWING) LOGIC
-        // ----------------------------------------------------------------
-        const ctx = el.canvas.getContext('2d');
-        let isDrawing = false;
-
-        function setupCanvas() {
-            const rect = el.canvas.parentElement.getBoundingClientRect();
-            if(rect.width === 0 || rect.height === 0) return; // Prevent zero-size bug
-            
-            const dpr = window.devicePixelRatio || 1;
-            el.canvas.width = rect.width * dpr;
-            el.canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-            
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
-            ctx.lineWidth = 4;
-            ctx.strokeStyle = '#ec4899'; // Pink color
+        function saveUserCodeLocally() {
+            localStorage.setItem('sgCompilerCode', codeEditorInstance.getValue());
         }
         
-        window.addEventListener('resize', () => {
-            if(!el.dashboardScreen.classList.contains('hidden') && !el.contents.draw.classList.contains('hidden')) {
-               setupCanvas(); 
+        function resetDefaultCode() {
+            const lang = document.getElementById('languageSelector').value;
+            if (confirm(`Are you sure you want to reset the code to the default ${lang.toUpperCase()} example?`)) {
+                codeEditorInstance.setValue(defaultCodeExamples[lang] || defaultCodeExamples['c']);
             }
-        });
+        }
 
-        const getCoords = (e) => {
-            const rect = el.canvas.getBoundingClientRect();
-            if (e.touches && e.touches.length > 0) {
-                return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+        function clearEditor() {
+            if(confirm("Are you sure you want to clear all code in the editor?")) {
+                codeEditorInstance.setValue(''); 
+                localStorage.removeItem('sgCompilerCode'); 
             }
-            return { x: e.clientX - rect.left, y: e.clientY - rect.top };
-        };
+        }
 
-        const startDraw = (e) => {
-            e.preventDefault();
-            const { x, y } = getCoords(e);
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-            isDrawing = true;
-        };
+        function copyOutput() {
+            const outputText = document.getElementById('outputBox').innerText;
+            navigator.clipboard.writeText(outputText).then(() => {
+                alert('Output copied to clipboard!');
+            }).catch(err => {
+                alert('Could not copy output. Please try manually.');
+            });
+        }
 
-        const doDraw = (e) => {
-            e.preventDefault();
-            if (!isDrawing) return;
-            const { x, y } = getCoords(e);
-            ctx.lineTo(x, y);
-            ctx.stroke();
-        };
-
-        const stopDraw = () => {
-            if (isDrawing) {
-                ctx.closePath();
-                isDrawing = false;
-                
-                // Get Image Data and Sync
-                const dataUrl = el.canvas.toDataURL('image/png', 0.8);
-                syncToServer('drawing', dataUrl);
-                
-                // Instantly update our own widget UI
-                el.widgetContainer.className = "aspect-square w-full rounded-[2rem] p-6 flex items-center justify-center overflow-hidden transition-all duration-500 relative bg-white dark:bg-gray-900 widget-shadow border border-white/20";
-                el.widgetImage.src = dataUrl;
-                el.widgetImage.classList.remove('hidden');
-                el.widgetText.classList.add('hidden');
-            }
-        };
-
-        el.canvas.addEventListener('mousedown', startDraw);
-        el.canvas.addEventListener('mousemove', doDraw);
-        el.canvas.addEventListener('mouseup', stopDraw);
-        el.canvas.addEventListener('mouseout', stopDraw);
-        
-        // Touch support for mobiles
-        el.canvas.addEventListener('touchstart', startDraw, {passive: false});
-        el.canvas.addEventListener('touchmove', doDraw, {passive: false});
-        el.canvas.addEventListener('touchend', stopDraw);
-
-        el.clearCanvasBtn.onclick = () => {
-            ctx.clearRect(0, 0, el.canvas.width / (window.devicePixelRatio || 1), el.canvas.height / (window.devicePixelRatio || 1));
-            // Send a blank drawing
-            const dataUrl = el.canvas.toDataURL('image/png');
-            syncToServer('drawing', dataUrl);
+        async function runCode() {
+            const userCode = codeEditorInstance.getValue(); 
+            const outputBox = document.getElementById('outputBox');
+            const selectedLang = document.getElementById('languageSelector').value; 
             
-            // Instantly clear local screen
-            el.widgetImage.src = dataUrl;
-        };
-
-        // ----------------------------------------------------------------
-        // 10. DAILY LOVE QUOTE
-        // ----------------------------------------------------------------
-        el.sendDailyBtn.onclick = () => {
-            const quote = DAILY_QUOTES[Math.floor(Math.random() * DAILY_QUOTES.length)];
-            syncToServer('text', quote);
+            outputBox.innerText = `Compiling & Running ${selectedLang.toUpperCase()} on Server... Please wait.`;
             
-            // Instantly update locally
-            el.widgetImage.classList.add('hidden');
-            el.widgetText.classList.remove('hidden');
-            el.widgetContainer.className = "aspect-square w-full rounded-[2rem] p-6 flex items-center justify-center overflow-hidden transition-all duration-500 relative bg-gradient-to-br from-pink-400 to-purple-600 text-white widget-shadow border border-white/20";
-            el.widgetText.innerText = quote;
-        };
+            let apiLanguageId = 50; // C
+            if (selectedLang === 'python') apiLanguageId = 71; 
+            else if (selectedLang === 'java') apiLanguageId = 62;   
+            else if (selectedLang === 'cpp') apiLanguageId = 54;
+            else if (selectedLang === 'javascript') apiLanguageId = 63;
+            else if (selectedLang === 'php') apiLanguageId = 68;
+            else if (selectedLang === 'ruby') apiLanguageId = 72;
+            else if (selectedLang === 'go') apiLanguageId = 60;
 
+            try {
+                const response = await fetch('https://compiler-backend-4dbz.onrender.com/compile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ language_id: apiLanguageId, source_code: userCode, stdin: "" })
+                });
+
+                const result = await response.json();
+
+                if (result.error) {
+                     outputBox.innerText = "Server Error:\n" + (result.message || "Something went wrong.");
+                } else if (result.compile_output) {
+                    outputBox.innerText = "Compilation Error:\n" + result.compile_output;
+                } else if (result.stderr) {
+                    outputBox.innerText = "Runtime Error:\n" + result.stderr;
+                } else if (result.stdout !== null && result.stdout !== undefined) {
+                    outputBox.innerText = result.stdout || "Program executed successfully but returned no output.";
+                } else if (result.status && result.status.description) {
+                     outputBox.innerText = "Status:\n" + result.status.description;
+                } else {
+                    outputBox.innerText = "Something went wrong. Please check console.";
+                }
+
+            } catch (error) {
+                outputBox.innerText = `Network Error: Server is not reachable.\nDetails: ${error.message}`;
+            }
+        }
+
+        function clearOutput() {
+            document.getElementById('outputBox').innerText = "(Output cleared)";
+        }
     </script>
 </body>
 </html>
