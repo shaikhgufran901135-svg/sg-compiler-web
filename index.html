@@ -13,60 +13,42 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            50: '#FCF6F6',  /* Soft blush background */
-                            100: '#F2E8E8', /* Light borders */
-                            200: '#E6D3D3', 
-                            500: '#9B2D45', /* Highlight / Badges */
-                            600: '#802237', /* Hover states */
-                            800: '#541627', /* Deep Burgundy */
-                            900: '#4A1525', /* Main Deep Burgundy (Header/Banner) */
-                        },
-                        gold: {
-                            400: '#E8C37D',
-                            500: '#D4AF37', /* Premium Gold */
-                        }
+                        brand: { 50: '#FCF6F6', 100: '#F2E8E8', 200: '#E6D3D3', 500: '#9B2D45', 600: '#802237', 800: '#541627', 900: '#3A0D19' },
+                        gold: { 400: '#E8C37D', 500: '#D4AF37' }
                     },
-                    fontFamily: {
-                        serif: ['"Playfair Display"', 'serif'],
-                        sans: ['Inter', 'sans-serif'],
-                    }
+                    fontFamily: { serif: ['"Playfair Display"', 'serif'], sans: ['Inter', 'sans-serif'] }
                 }
             }
         }
     </script>
 
     <style>
-        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; background-color: #FCF6F6; }
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         h1, h2, h3, .brand-font { font-family: 'Playfair Display', serif; }
-        
-        /* Animations */
         .slide-up { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .modal-fade { transition: opacity 0.2s ease-in-out; }
-        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #E6D3D3; border-radius: 4px; }
+        .shade-active { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #3A0D19; }
+
         @keyframes slideDownOTP {
             0% { transform: translateY(-100%); opacity: 0; }
             10% { transform: translateY(0); opacity: 1; }
             90% { transform: translateY(0); opacity: 1; }
             100% { transform: translateY(-100%); opacity: 0; }
         }
-        .otp-toast { animation: slideDownOTP 5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-
-        /* Scrollbars */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #E6D3D3; border-radius: 4px; }
+        .otp-toast { animation: slideDownOTP 6s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
     </style>
 </head>
-<body class="text-gray-800 pb-20 lg:pb-0">
+<body class="bg-brand-50 text-gray-800 pb-20">
 
-    <!-- ==================== HEADER ==================== -->
+    <!-- HEADER -->
     <header class="bg-white shadow-sm sticky top-0 z-40 border-b border-brand-100">
         <div class="px-4 py-3 flex justify-between items-center max-w-6xl mx-auto">
             <div class="flex items-center space-x-3 w-2/3">
-                <!-- Secret Admin Tap on Logo (5 Taps) -->
-                <div onclick="handleAdminTap()" class="bg-brand-900 text-gold-500 rounded-xl w-10 h-10 flex items-center justify-center font-black text-xl leading-none shadow-md cursor-pointer select-none active:scale-95 transition-transform shrink-0 brand-font">
+                <div onclick="handleAdminTap()" class="bg-brand-900 text-gold-400 rounded-xl w-10 h-10 flex items-center justify-center font-black text-xl leading-none shadow-md cursor-pointer select-none active:scale-95 transition-transform shrink-0 brand-font">
                     AK
                 </div>
                 <div class="flex flex-col cursor-pointer truncate" onclick="openAddressModal()">
@@ -79,20 +61,19 @@
             </div>
             
             <div class="flex items-center space-x-4 shrink-0">
-                <!-- Mobile Rate List Toggle -->
                 <button onclick="toggleRateList()" class="text-brand-800 font-bold text-xs uppercase tracking-wider flex items-center lg:hidden bg-brand-100 px-3 py-1.5 rounded-lg">
                     <i class="fas fa-list-ul mr-1"></i> List
                 </button>
 
                 <div class="relative cursor-pointer" onclick="openCart()">
                     <i class="fas fa-shopping-bag text-2xl text-brand-900 hover:text-brand-600 transition-colors"></i>
-                    <span id="navCartBadge" class="absolute -top-1 -right-1 bg-gold-500 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center hidden border border-white shadow-sm">0</span>
+                    <span id="navCartBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center hidden border border-white shadow-sm">0</span>
                 </div>
                 
-                <button id="loginNavBtn" onclick="openLoginModal()" class="hidden sm:flex px-4 py-1.5 bg-brand-50 text-brand-900 rounded border border-brand-200 font-bold text-sm hover:bg-brand-100 transition-colors">
+                <button id="loginNavBtn" onclick="openLoginModal()" class="hidden sm:flex px-4 py-1.5 bg-brand-50 text-brand-900 rounded border border-brand-200 font-bold text-sm cursor-pointer hover:bg-brand-100">
                     Login
                 </button>
-                <div id="userProfileIcon" class="hidden h-8 w-8 bg-brand-900 rounded-full flex items-center justify-center text-gold-500 font-bold border border-gold-400 cursor-pointer shadow-sm">
+                <div id="userProfileIcon" class="hidden h-8 w-8 bg-brand-100 rounded-full flex items-center justify-center text-brand-900 font-bold border border-brand-200">
                     <i class="fas fa-user text-sm"></i>
                 </div>
             </div>
@@ -101,47 +82,40 @@
 
     <div class="max-w-6xl mx-auto flex flex-col lg:flex-row mt-4 px-2 lg:px-4 gap-4">
         
-        <!-- ==================== SIDE RATE LIST ==================== -->
+        <!-- SIDE RATE LIST -->
         <aside id="sideRateList" class="hidden lg:flex flex-col w-full lg:w-80 bg-white rounded-2xl border border-brand-100 h-[calc(100vh-100px)] sticky top-[80px] overflow-hidden shadow-sm z-30 order-2 lg:order-1 transition-all">
             <div class="p-4 bg-brand-900 text-white flex justify-between items-center rounded-t-2xl relative overflow-hidden">
                 <div class="relative z-10">
-                    <h3 class="font-bold text-gold-500 brand-font text-lg">Quick Rate List</h3>
+                    <h3 class="font-bold text-gold-400 brand-font text-lg">Quick Rate List</h3>
                     <p class="text-[10px] text-brand-100 opacity-80 mt-0.5">Fast add multiple items</p>
                 </div>
                 <i class="fas fa-clipboard-list absolute right-[-10px] top-[-10px] text-6xl text-white opacity-5 z-0"></i>
                 <button onclick="toggleRateList()" class="lg:hidden relative z-10 text-white opacity-70 hover:opacity-100"><i class="fas fa-times text-xl"></i></button>
             </div>
             
-            <div class="p-3 border-b border-brand-50 bg-brand-50/30">
-                <div class="bg-white border border-brand-100 rounded-lg px-3 py-2 flex items-center focus-within:border-brand-500 transition-colors">
-                    <i class="fas fa-search text-gray-300 mr-2 text-sm"></i>
-                    <input type="text" id="searchInput" oninput="filterProducts(this.value)" placeholder="Search products..." class="w-full outline-none text-xs bg-transparent">
-                </div>
-            </div>
-
             <div class="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar" id="rateListContainer">
-                <!-- Rate List Injected Here via JS -->
+                <!-- Rate List Injected Here -->
             </div>
 
             <div class="p-3 border-t border-brand-100 bg-white flex justify-between items-center">
                 <div class="text-xs font-semibold text-gray-500"><span id="sideListSelectedCount">0</span> items selected</div>
-                <button onclick="openCart()" class="bg-brand-900 text-gold-500 px-4 py-2 rounded-lg text-xs font-bold hover:bg-brand-800 transition-colors shadow-md flex items-center">
-                    View Bag <i class="fas fa-arrow-right ml-2 text-white"></i>
+                <button onclick="openCart()" class="bg-brand-900 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-brand-800 transition-colors shadow-md flex items-center">
+                    View Bag <i class="fas fa-arrow-right ml-2"></i>
                 </button>
             </div>
         </aside>
 
-        <!-- ==================== MAIN CONTENT ==================== -->
+        <!-- MAIN CONTENT AREA -->
         <main class="flex-1 w-full order-1 lg:order-2">
             <!-- Banner -->
             <div class="mb-6">
-                <div class="bg-brand-900 rounded-2xl p-6 md:p-8 text-white shadow-md relative overflow-hidden flex flex-col justify-center min-h-[160px]">
+                <div class="bg-brand-800 rounded-2xl p-6 md:p-8 text-white shadow-md relative overflow-hidden flex flex-col justify-center min-h-[160px]">
                     <div class="relative z-10">
-                        <span class="border border-gold-500 text-gold-500 px-2 py-1 rounded text-[9px] uppercase tracking-widest font-bold mb-3 inline-block bg-brand-900/50 backdrop-blur-sm">Premium Beauty</span>
+                        <span class="border border-gold-400 text-gold-400 px-2 py-1 rounded text-[9px] uppercase tracking-widest font-bold mb-3 inline-block">Premium Beauty</span>
                         <h2 class="font-bold text-2xl md:text-3xl mb-2 brand-font">Al Kaynat Cosmetic Store</h2>
                         <p class="text-brand-100 text-xs md:text-sm max-w-md opacity-90">Experience luxury makeup, skincare, and bridal essentials delivered safely to your doorstep.</p>
                     </div>
-                    <i class="fas fa-crown absolute -right-6 -bottom-6 text-[120px] text-brand-800 opacity-50"></i>
+                    <i class="fas fa-crown absolute -right-6 -bottom-6 text-[120px] text-brand-900 opacity-40"></i>
                 </div>
             </div>
 
@@ -149,10 +123,9 @@
             <div class="pb-24">
                 <div class="flex justify-between items-center mb-4 px-1">
                     <h3 class="font-bold text-xl flex items-center text-brand-900 brand-font">
-                        <i class="fas fa-fire text-gold-500 mr-2"></i> Best Sellers
+                        <i class="fas fa-fire text-gold-500 mr-2"></i> All Collections
                     </h3>
                 </div>
-                
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4" id="productContainer">
                     <!-- Products will be injected here via JS -->
                 </div>
@@ -160,18 +133,16 @@
         </main>
     </div>
 
-    <!-- ==================== FULL PAGE PRODUCT DETAIL ==================== -->
+    <!-- FULL PAGE PRODUCT DETAIL -->
     <div id="productDetailPage" class="fixed inset-0 bg-white z-[60] flex flex-col transform translate-y-full slide-up h-[100dvh]">
         <div class="bg-white/90 backdrop-blur-md px-4 py-3 flex justify-between items-center sticky top-0 z-10 border-b border-brand-100">
-            <h2 class="font-bold text-lg text-brand-900 brand-font truncate pr-4" id="pdHeaderTitle">Details</h2>
-            <button onclick="closeProductPage()" class="h-8 w-8 bg-brand-50 hover:bg-brand-100 rounded-full flex items-center justify-center text-brand-900 transition-colors shrink-0">
-                <i class="fas fa-times"></i>
-            </button>
+            <h2 class="font-bold text-lg text-brand-900 brand-font truncate pr-4">Details</h2>
+            <button onclick="closeProductPage()" class="h-8 w-8 bg-brand-50 hover:bg-brand-100 rounded-full flex items-center justify-center text-brand-900"><i class="fas fa-times"></i></button>
         </div>
         
         <div class="flex-1 overflow-y-auto pb-24 bg-brand-50">
             <div class="w-full h-80 bg-white flex items-center justify-center p-6 border-b border-brand-100 relative">
-                <div class="absolute top-4 left-4 bg-green-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm z-10 uppercase" id="pdDiscountTag">0% OFF</div>
+                <div class="absolute top-4 left-4 bg-green-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm z-10 uppercase" id="pdDiscountTag">0% OFF</div>
                 <img id="pdMainImg" src="" class="h-full w-full object-contain mix-blend-multiply transition-all duration-300">
             </div>
             
@@ -183,46 +154,52 @@
 
             <div class="px-5 mt-6 bg-white mx-4 rounded-2xl p-5 shadow-sm border border-brand-100 mb-6">
                 <h1 id="pdTitle" class="text-2xl font-bold text-brand-900 brand-font leading-tight mb-1">Product Name</h1>
-                <p id="pdWeight" class="text-sm text-gray-500 font-medium mb-4">Shade / Volume</p>
                 
-                <div class="flex items-end space-x-3 mb-6 border-b border-brand-50 pb-6">
+                <div class="flex items-end space-x-3 mt-3 mb-5">
                     <span id="pdPrice" class="text-3xl font-black text-brand-900">₹0</span>
                     <span id="pdOldPrice" class="text-lg text-gray-400 line-through mb-1">₹0</span>
                 </div>
 
-                <h3 class="font-bold text-brand-900 mb-2 brand-font text-lg">About the Product</h3>
+                <!-- Shade Selector UI -->
+                <div class="mb-6 border-t border-brand-50 pt-4" id="shadeSelectorSection">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-sm font-bold text-gray-800">Selected Option:</span>
+                        <span class="text-sm font-bold text-brand-600" id="pdSelectedShadeName">Shade Name</span>
+                    </div>
+                    <div class="flex flex-wrap gap-3" id="pdShadeSwatches"></div>
+                </div>
+
+                <h3 class="font-bold text-brand-900 mb-2 brand-font text-lg border-t border-brand-50 pt-5">About the Product</h3>
                 <p id="pdDesc" class="text-gray-600 text-sm leading-relaxed">Description goes here.</p>
             </div>
         </div>
 
         <div class="bg-white border-t border-brand-100 p-4 absolute bottom-0 w-full z-20 shadow-[0_-10px_20px_-5px_rgba(0,0,0,0.05)]">
-            <div id="pdActionContainer" class="max-w-md mx-auto">
-                <!-- Action Button injected via JS -->
-            </div>
+            <div id="pdActionContainer" class="max-w-md mx-auto"></div>
         </div>
     </div>
 
-    <!-- ==================== FLOATING CART SUMMARY (Mobile) ==================== -->
+    <!-- Floating Cart Summary -->
     <div id="cartSummary" class="fixed bottom-4 left-4 right-4 max-w-md mx-auto bg-brand-900 text-white rounded-xl p-3 shadow-2xl hidden flex justify-between items-center z-40 cursor-pointer lg:hidden border border-brand-800" onclick="openCart()">
         <div class="flex items-center space-x-3">
-            <div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm"><i class="fas fa-shopping-bag text-gold-500"></i></div>
+            <div class="bg-white/10 p-2 rounded-lg"><i class="fas fa-shopping-bag text-gold-400"></i></div>
             <div>
                 <div class="font-bold text-sm"><span id="summaryItemCount">0</span> Items Selected</div>
                 <div class="text-xs text-brand-100 font-medium">View Bag</div>
             </div>
         </div>
         <div class="flex items-center space-x-2">
-            <div class="font-bold text-lg text-gold-500">₹<span id="summaryTotal">0</span></div>
+            <div class="font-bold text-lg text-gold-400">₹<span id="summaryTotal">0</span></div>
             <i class="fas fa-chevron-right text-sm"></i>
         </div>
     </div>
 
-    <!-- ==================== CART SLIDE-OUT ==================== -->
+    <!-- Cart Slide-out Panel -->
     <div id="cartOverlay" class="fixed inset-0 bg-black/60 z-50 hidden modal-fade backdrop-blur-sm" onclick="closeCart()"></div>
     <div id="cartPanel" class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-brand-50 z-50 translate-x-full slide-up flex flex-col shadow-2xl transition-transform duration-300">
         <div class="bg-white px-4 py-4 flex justify-between items-center shadow-sm z-10 border-b border-brand-100">
             <h2 class="font-bold text-xl text-brand-900 brand-font flex items-center"><i class="fas fa-shopping-bag mr-2 text-brand-500"></i> Shopping Bag</h2>
-            <button onclick="closeCart()" class="h-8 w-8 bg-brand-50 hover:bg-brand-100 rounded-full flex items-center justify-center text-brand-900 transition-colors"><i class="fas fa-times"></i></button>
+            <button onclick="closeCart()" class="h-8 w-8 bg-brand-50 hover:bg-brand-100 rounded-full"><i class="fas fa-times"></i></button>
         </div>
         
         <div class="flex-1 overflow-y-auto p-4 pb-32 custom-scrollbar">
@@ -243,7 +220,7 @@
         <div class="bg-white border-t border-brand-100 p-4 pb-6 absolute bottom-0 w-full z-20 shadow-[0_-4px_15px_-3px_rgba(0,0,0,0.05)]">
             <button onclick="openPaymentModal()" class="w-full bg-brand-900 hover:bg-brand-800 text-white font-bold py-3.5 rounded-xl shadow-lg flex justify-between items-center px-5 transition-colors">
                 <div class="text-left flex flex-col">
-                    <span class="text-[10px] text-gold-500 uppercase tracking-wider font-bold">Proceed to checkout</span>
+                    <span class="text-[10px] text-gold-400 uppercase tracking-wider font-bold">Proceed to checkout</span>
                     <span class="text-lg leading-tight">₹<span id="checkoutBtnTotal">0</span></span>
                 </div>
                 <div class="flex items-center space-x-2"><span>Confirm Order</span><i class="fas fa-arrow-right"></i></div>
@@ -251,55 +228,7 @@
         </div>
     </div>
 
-    <!-- ==================== OTP LOGIN MODAL (Restored) ==================== -->
-    <div id="loginModal" class="fixed inset-0 bg-black/60 z-[70] hidden flex items-end sm:items-center justify-center modal-fade backdrop-blur-sm">
-        <div class="bg-white w-full sm:w-[400px] rounded-t-3xl sm:rounded-2xl p-7 relative shadow-2xl border-t-4 border-brand-900 sm:border-0 slide-up">
-            <button onclick="closeLoginModal()" class="absolute top-5 right-5 text-gray-400 hover:text-brand-900 transition-colors bg-brand-50 h-8 w-8 rounded-full flex items-center justify-center"><i class="fas fa-times text-sm"></i></button>
-            
-            <div class="text-center mb-6">
-                <div class="h-12 w-12 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-3 border border-brand-100 text-gold-500">
-                    <i class="fas fa-crown text-xl"></i>
-                </div>
-                <h2 class="text-2xl font-bold text-brand-900 brand-font">Al Kaynat</h2>
-            </div>
-
-            <!-- Phone Input Step -->
-            <div id="loginStep1">
-                <h3 class="text-lg font-bold mb-1 text-gray-800">Login or Signup</h3>
-                <p class="text-sm text-gray-500 mb-6">Enter your phone number to proceed</p>
-                <div class="flex border-b-2 border-brand-200 focus-within:border-brand-900 mb-6 pb-2 transition-colors">
-                    <span class="text-gray-500 font-bold mr-3">+91</span>
-                    <input type="tel" id="phoneInput" placeholder="10 digit mobile number" class="w-full outline-none font-bold text-gray-800 bg-transparent tracking-widest text-lg" maxlength="10">
-                </div>
-                <button onclick="sendOTP()" class="w-full bg-gray-200 text-gray-500 py-3.5 rounded-xl font-bold transition-colors shadow-sm" id="sendOtpBtn" disabled>
-                    Get OTP
-                </button>
-            </div>
-            
-            <!-- OTP Input Step -->
-            <div id="loginStep2" class="hidden">
-                <div class="flex items-center mb-4 cursor-pointer text-gray-400 hover:text-brand-900 w-max transition-colors" onclick="backToPhone()">
-                    <i class="fas fa-arrow-left mr-2"></i> <span class="text-sm font-bold">Back</span>
-                </div>
-                <h3 class="text-lg font-bold mb-1 text-gray-800">Verify details</h3>
-                <p class="text-sm text-gray-500 mb-6">OTP sent to <span id="displayPhone" class="font-bold text-brand-900"></span></p>
-                <div class="flex space-x-3 mb-8 justify-center">
-                    <input type="number" class="otp-input w-12 h-14 border-2 border-brand-200 rounded-xl text-center text-2xl font-bold focus:border-brand-900 focus:bg-brand-50 outline-none transition-all" maxlength="1" oninput="moveToNext(this, 0)">
-                    <input type="number" class="otp-input w-12 h-14 border-2 border-brand-200 rounded-xl text-center text-2xl font-bold focus:border-brand-900 focus:bg-brand-50 outline-none transition-all" maxlength="1" oninput="moveToNext(this, 1)">
-                    <input type="number" class="otp-input w-12 h-14 border-2 border-brand-200 rounded-xl text-center text-2xl font-bold focus:border-brand-900 focus:bg-brand-50 outline-none transition-all" maxlength="1" oninput="moveToNext(this, 2)">
-                    <input type="number" class="otp-input w-12 h-14 border-2 border-brand-200 rounded-xl text-center text-2xl font-bold focus:border-brand-900 focus:bg-brand-50 outline-none transition-all" maxlength="1" oninput="moveToNext(this, 3)">
-                </div>
-                <button onclick="verifyOTP()" class="w-full bg-brand-900 hover:bg-brand-800 text-gold-500 py-3.5 rounded-xl font-bold shadow-md transition-colors text-lg">
-                    Verify & Login
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- OTP Toast Notification Container -->
-    <div id="otpToastContainer" class="fixed top-0 left-0 right-0 flex justify-center z-[100] pointer-events-none"></div>
-
-    <!-- ==================== ADDRESS MODAL ==================== -->
+    <!-- Address Modal -->
     <div id="addressModal" class="fixed inset-0 bg-black/70 z-[60] hidden flex items-end sm:items-center justify-center modal-fade backdrop-blur-sm" onclick="if(event.target === this) closeAddressModal()">
         <div class="bg-white w-full sm:w-[400px] rounded-t-3xl sm:rounded-2xl p-6 transform transition-transform slide-up shadow-2xl border border-brand-100">
             <div class="flex justify-between items-center mb-5">
@@ -311,20 +240,50 @@
                 <label class="text-xs font-bold text-brand-800 uppercase tracking-wider mb-1 block">Full Address</label>
                 <textarea id="manualAddressInput" rows="3" placeholder="House No, Area, Landmark, Pincode..." class="w-full bg-brand-50/50 border border-brand-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-brand-500 focus:bg-white resize-none transition-colors mb-4"></textarea>
                 
-                <label class="text-xs font-bold text-brand-800 uppercase tracking-wider mb-1 block">WhatsApp Number (For tracking)</label>
-                <input type="tel" id="customerPhoneInput" placeholder="10-digit number" class="w-full bg-brand-50/50 border border-brand-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-brand-500 focus:bg-white transition-colors mb-6" maxlength="10">
-                
-                <button onclick="setCustomAddress()" class="w-full bg-brand-900 hover:bg-brand-800 text-gold-500 px-4 py-3.5 rounded-xl text-sm font-bold shadow-md transition-colors">Save Details</button>
+                <button onclick="setCustomAddress()" class="w-full bg-brand-900 hover:bg-brand-800 text-gold-400 px-4 py-3.5 rounded-xl text-sm font-bold shadow-md transition-colors">Save Details</button>
             </div>
         </div>
     </div>
 
-    <!-- ==================== PAYMENT / WHATSAPP CHECKOUT MODAL ==================== -->
+    <!-- Login / OTP Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black/70 z-[80] hidden flex items-end sm:items-center justify-center modal-fade backdrop-blur-sm">
+        <div class="bg-white w-full sm:w-[400px] rounded-t-3xl sm:rounded-2xl p-6 relative shadow-2xl slide-up">
+            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-brand-600 bg-brand-50 h-8 w-8 rounded-full flex items-center justify-center"><i class="fas fa-times"></i></button>
+            
+            <div id="loginStep1">
+                <h2 class="text-xl font-bold mb-1 text-brand-900 brand-font">Login to Al Kaynat</h2>
+                <p class="text-sm text-gray-500 mb-6">Enter your phone number to proceed</p>
+                <div class="flex border-b-2 border-brand-200 focus-within:border-brand-600 mb-6 pb-2 transition-colors">
+                    <span class="text-gray-500 font-medium mr-2">+91</span>
+                    <input type="tel" id="phoneInput" placeholder="Enter 10 digit mobile number" class="w-full outline-none font-medium text-gray-800 bg-transparent" maxlength="10">
+                </div>
+                <button onclick="sendOTP()" class="w-full bg-brand-200 text-brand-800 py-3.5 rounded-xl font-bold transition-colors" id="sendOtpBtn" disabled>Get OTP</button>
+            </div>
+            
+            <div id="loginStep2" class="hidden">
+                <i class="fas fa-arrow-left text-brand-400 mb-4 cursor-pointer hover:text-brand-900" onclick="backToPhone()"></i>
+                <h2 class="text-xl font-bold mb-1 text-brand-900 brand-font">Verify OTP</h2>
+                <p class="text-sm text-gray-500 mb-6">OTP sent to <span id="displayPhone" class="font-bold text-gray-800"></span></p>
+                <div class="flex space-x-3 mb-6 justify-center">
+                    <input type="number" class="otp-input w-12 h-12 border-2 border-brand-200 rounded-xl text-center text-xl font-bold focus:border-brand-600 outline-none transition-colors" maxlength="1" oninput="moveToNext(this, 0)">
+                    <input type="number" class="otp-input w-12 h-12 border-2 border-brand-200 rounded-xl text-center text-xl font-bold focus:border-brand-600 outline-none transition-colors" maxlength="1" oninput="moveToNext(this, 1)">
+                    <input type="number" class="otp-input w-12 h-12 border-2 border-brand-200 rounded-xl text-center text-xl font-bold focus:border-brand-600 outline-none transition-colors" maxlength="1" oninput="moveToNext(this, 2)">
+                    <input type="number" class="otp-input w-12 h-12 border-2 border-brand-200 rounded-xl text-center text-xl font-bold focus:border-brand-600 outline-none transition-colors" maxlength="1" oninput="moveToNext(this, 3)">
+                </div>
+                <button onclick="verifyOTP()" class="w-full bg-brand-900 text-white py-3.5 rounded-xl font-bold shadow-md hover:bg-brand-800">Verify & Login</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- OTP Toast Container -->
+    <div id="otpToastContainer" class="fixed top-0 left-0 right-0 flex justify-center z-[90] pointer-events-none"></div>
+
+    <!-- Payment Setup Modal -->
     <div id="paymentModal" class="fixed inset-0 bg-black/70 z-[70] hidden flex items-end sm:items-center justify-center modal-fade backdrop-blur-sm" onclick="if(event.target === this) closePaymentModal()">
         <div class="bg-white w-full sm:w-[400px] rounded-t-3xl sm:rounded-2xl relative shadow-2xl flex flex-col slide-up border border-brand-100">
             <div class="p-6 border-b border-brand-50 flex justify-between items-center bg-brand-50/30 rounded-t-3xl sm:rounded-t-2xl">
                 <div>
-                    <h2 class="text-xl font-bold text-brand-900 brand-font">Confirm Order</h2>
+                    <h2 class="text-xl font-bold text-brand-900 brand-font">Final Step</h2>
                     <p class="text-xs text-gray-500 mt-1">Amount to pay: <span class="font-bold text-brand-800 text-sm">₹<span id="payModalTotal"></span></span></p>
                 </div>
                 <button onclick="closePaymentModal()" class="h-8 w-8 bg-white shadow-sm rounded-full text-brand-600"><i class="fas fa-times"></i></button>
@@ -332,7 +291,7 @@
             
             <div class="p-6 space-y-5">
                 <div class="bg-green-50 border border-green-100 p-4 rounded-xl flex items-start space-x-3">
-                    <i class="fab fa-whatsapp text-green-600 text-xl mt-0.5"></i>
+                    <i class="fab fa-whatsapp text-green-500 text-xl mt-0.5"></i>
                     <div>
                         <h4 class="font-bold text-gray-800 text-sm">Order via WhatsApp</h4>
                         <p class="text-xs text-gray-600 mt-1">Send your cart details securely to our team. We'll confirm your order and dispatch it safely.</p>
@@ -347,7 +306,7 @@
         </div>
     </div>
 
-    <!-- ==================== SECRET PIN MODAL (ADMIN) ==================== -->
+    <!-- SECRET PIN MODAL -->
     <div id="pinModal" class="fixed inset-0 bg-black/80 z-[100] hidden flex items-center justify-center modal-fade backdrop-blur-sm">
         <div class="bg-white p-6 rounded-3xl w-72 shadow-2xl text-center transform scale-95 transition-transform duration-300" id="pinBox">
             <div class="bg-brand-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-brand-100">
@@ -356,32 +315,29 @@
             <h3 class="font-bold text-brand-900 brand-font text-xl mb-4">Admin Panel</h3>
             <input type="password" id="adminPinInput" placeholder="PIN" class="w-full border-2 border-brand-100 rounded-xl px-4 py-3 text-center tracking-[0.5em] font-bold outline-none focus:border-brand-500 mb-5" maxlength="4">
             <div class="flex space-x-3">
-                <button onclick="closePinModal()" class="w-1/2 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-200 transition-colors">Cancel</button>
-                <button onclick="verifyAdminPin()" class="w-1/2 bg-brand-900 text-gold-500 py-3 rounded-xl font-bold hover:bg-brand-800 shadow-md transition-colors">Login</button>
+                <button onclick="closePinModal()" class="w-1/2 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-200">Cancel</button>
+                <button onclick="verifyAdminPin()" class="w-1/2 bg-brand-900 text-white py-3 rounded-xl font-bold hover:bg-brand-800 shadow-md">Verify</button>
             </div>
         </div>
     </div>
 
-    <!-- ==================== HISAAB (ADMIN DASHBOARD) ==================== -->
+    <!-- HISAAB MODAL -->
     <div id="hisaabModal" class="fixed inset-0 bg-black/70 z-[90] hidden flex items-end sm:items-center justify-center modal-fade backdrop-blur-sm" onclick="if(event.target === this) closeHisaab()">
         <div class="bg-brand-50 w-full sm:w-[500px] rounded-t-3xl sm:rounded-2xl shadow-2xl flex flex-col h-[85vh] sm:h-[650px] transform translate-y-full transition-transform duration-300 overflow-hidden" id="hisaabSlide">
-            <!-- Header -->
             <div class="bg-white pt-3 pb-4 px-5 border-b border-brand-100 flex flex-col sticky top-0 z-10 shadow-sm rounded-t-3xl sm:rounded-t-2xl">
-                <div class="w-12 h-1.5 bg-brand-200 rounded-full mx-auto mb-4 sm:hidden"></div>
+                <div class="w-12 h-1.5 bg-brand-100 rounded-full mx-auto mb-4 sm:hidden"></div>
                 <div class="flex justify-between items-center">
-                    <h2 class="text-lg font-black text-brand-900 brand-font flex items-center tracking-tight"><i class="fas fa-chart-pie text-gold-500 mr-2.5 text-xl"></i> Store Dashboard</h2>
-                    <button onclick="closeHisaab()" class="h-8 w-8 bg-brand-50 hover:bg-brand-100 rounded-full flex items-center justify-center text-brand-800 transition-colors"><i class="fas fa-times"></i></button>
+                    <h2 class="text-lg font-black text-brand-900 brand-font flex items-center tracking-tight"><i class="fas fa-chart-pie text-brand-600 mr-2.5 text-xl"></i> Store Dashboard</h2>
+                    <button onclick="closeHisaab()" class="h-8 w-8 bg-brand-50 hover:bg-brand-100 rounded-full flex items-center justify-center text-brand-900 transition-colors"><i class="fas fa-times"></i></button>
                 </div>
             </div>
             
-            <!-- Content -->
-            <div class="flex-1 overflow-y-auto p-4 custom-scrollbar bg-brand-50" id="hisaabContent">
+            <div class="flex-1 overflow-y-auto p-4 custom-scrollbar" id="hisaabContent">
                 <!-- Content rendered via JS -->
             </div>
             
-            <!-- Footer -->
             <div class="bg-white p-4 border-t border-brand-100 sticky bottom-0 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)]">
-                <button onclick="clearHisaab()" id="clearHisaabBtn" class="w-full bg-red-50 text-red-600 border border-red-200 font-bold py-3.5 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                <button onclick="clearHisaab()" id="clearHisaabBtn" class="w-full bg-brand-50 text-brand-800 border border-brand-200 font-bold py-3.5 rounded-xl hover:bg-brand-600 hover:text-white transition-all shadow-sm">
                     Clear Today's Hisaab
                 </button>
             </div>
@@ -390,172 +346,214 @@
 
     <script>
         // =========================================================================
-        // DATA: PRODUCTS LIST (10+ Luxury Items)
+        // DATA: PRODUCTS WITH SHADES + 6 NEW SIMPLE ITEMS (Without Shades)
         // =========================================================================
         const products = [
+            // ORIGINAL 6 ITEMS WITH MULTIPLE SHADES
             { 
-                id: 1, name: "Velvet Matte Liquid Lipstick", weight: "Shade: Ruby Nikaah", price: 299, oldPrice: 499, 
-                desc: "Highly pigmented matte formula that glides on smoothly. Lasts up to 12 hours without drying your lips.",
-                images: ["https://www.lifestylestores.com/in/en/SHOP-Forever52-Cheese-Cake-BUF001-DAILY-LIFE-FOREVER52-Pro-Artist-Ultra-Definition-Liquid-Foundation--Cheesecake-BUF001--60ml-For-Women/p/1000014324609?srsltid=AU7gw4XzDvUq2FvC3w8huzbTIToNWWl238qKTI_wsve1fhk644wibmxw", "https://placehold.co/400x400/F2E8E8/541627?text=Open", "https://placehold.co/400x400/E6D3D3/3A0D19?text=Swatch"]
+                id: 1, name: "Forever 52 Pro Artist Foundation", price: 1299, oldPrice: 1499, 
+                desc: "Professional artist foundation for flawless, long-lasting coverage. Blends easily into the skin.",
+                shades: [
+                    { id: "p1-s1", name: "BUF001 Cheese cake", color: "#F4D5B6", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Cheese+cake+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Cheese+cake+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Cheese+cake+3"] },
+                    { id: "p1-s2", name: "FUF002 Custard", color: "#E8C396", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Custard+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Custard+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Custard+3"] },
+                    { id: "p1-s3", name: "FUF004 French Toast", color: "#D29B72", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=French+Toast+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=French+Toast+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=French+Toast+3"] },
+                    { id: "p1-s4", name: "FUF012 Brownie", color: "#6A4028", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Brownie+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Brownie+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Brownie+3"] }
+                ]
             },
             { 
-                id: 2, name: "Royal Rose Gold Bullet Lipstick", weight: "Shade: Nude Chai", price: 249, oldPrice: 399, 
-                desc: "Creamy bullet lipstick enclosed in a luxurious rose gold casing. Delivers a soft satin finish.",
-                images: ["https://tse1.explicit.bing.net/th/id/OIP.kv-sAJIfq38AF1SsxrkZSgHaLH?r=0&rs=1&pid=ImgDetMain&o=7&rm=3", "https://placehold.co/400x400/FFF9E6/B8860B?text=Open", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Shade"]
+                id: 2, name: "Forever 52 Coverup Foundation", price: 1199, oldPrice: 1399, 
+                desc: "High coverage foundation to conceal imperfections and even out skin tone perfectly.",
+                shades: [
+                    { id: "p2-s1", name: "FCU20.1 Desert", color: "#E1BB93", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Desert+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Desert+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Desert+3"] },
+                    { id: "p2-s2", name: "FCU20.6 Toast", color: "#D49E71", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Toast+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Toast+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Toast+3"] },
+                    { id: "p2-s3", name: "FCU30.1 Olive", color: "#C6986A", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Olive+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Olive+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Olive+3"] },
+                    { id: "p2-s4", name: "FCU30.4", color: "#B37D53", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=FCU30.4+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=FCU30.4+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=FCU30.4+3"] }
+                ]
             },
             { 
-                id: 3, name: "Crystal Plumping Lip Gloss", weight: "Shade: Clear Dew", price: 199, oldPrice: 299, 
-                desc: "Non-sticky, high-shine gloss that visibly plumps lips for a fuller look.",
-                images: ["https://assets.ajio.com/medias/sys_master/root/20230927/DGi5/65146e34afa4cf41f513ec54/daily_life_forever52_multicoloured_pro_artist_ultra_definition_liquid_foundation_buf007_-_honey.jpg", "https://media6.ppl-media.com/tr:h-235,w-235,c-at_max,dpr-2,q-40/static/img/product/276847/daily-life-forever52-pro-artist-ultra-definition-long-lasting-waterproof-full-coverage-liquid-foundation-buf005-60ml-99_1_display_1745403823_0ddffbff.jpg", "https://share.google/1ItuA0UBwuglrWlx4"]
+                id: 3, name: "Forever 52 Ultra Def Liquid Foundation", price: 1099, oldPrice: 1299, 
+                desc: "Ultra definition liquid formula for a natural, skin-like finish that lasts all day long.",
+                shades: [
+                    { id: "p3-s1", name: "FLF011 Cheese cake", color: "#F4D5B6", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Cheese+cake+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Cheese+cake+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Cheese+cake+3"] }
+                ]
             },
             { 
-                id: 4, name: "24Hr HD Studio Pro Foundation", weight: "Shade: Ivory Fair", price: 549, oldPrice: 899, 
-                desc: "Full coverage, waterproof foundation that provides a flawless, airbrushed look all day.",
-                images: ["https://easyfairsassets.com/sites/61/2023/06/Article-website-Cosmogen-Clarins.png", "https://placehold.co/400x400/FED7AA/92400E?text=spring", "https://placehold.co/400x400/FED7AA/92400E?text=Blend"]
+                id: 4, name: "Forever 52 Complete Coverage Concealer", price: 699, oldPrice: 899, 
+                desc: "Complete coverage concealer for dark circles and spots. Creamy texture that doesn't crease.",
+                shades: [
+                    { id: "p4-s1", name: "COV001 Vanilla", color: "#FAE1CD", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Vanilla+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Vanilla+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Vanilla+3"] },
+                    { id: "p4-s2", name: "COV003 Iced coffee", color: "#E6B892", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Iced+coffee+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Iced+coffee+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Iced+coffee+3"] },
+                    { id: "p4-s3", name: "COV005 Caramel", color: "#CA8C56", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Caramel+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Caramel+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Caramel+3"] }
+                ]
             },
             { 
-                id: 5, name: "Flawless HD Liquid Concealer", weight: "Shade: Warm Sand", price: 349, oldPrice: 599, 
-                desc: "Crease-proof liquid concealer that hides dark circles and blemishes effortlessly.",
-                images: ["https://obsessioncosmetics.com/wp-content/uploads/2024/04/COV001.jpeg", "https://placehold.co/400x400/FFEDD5/B45309?text=Applicator", "https://placehold.co/400x400/FED7AA/92400E?text=Swatch"]
+                id: 5, name: "Forever 52 Coverup Concealer", price: 749, oldPrice: 949, 
+                desc: "Smooth coverup concealer offering a flawless matte finish and strong pigmentation.",
+                shades: [
+                    { id: "p5-s1", name: "CCU10.5 Mandel", color: "#E1B690", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Mandel+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Mandel+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Mandel+3"] },
+                    { id: "p5-s2", name: "CCU30.2 Sienna", color: "#AD6D44", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Sienna+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Sienna+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Sienna+3"] }
+                ]
             },
             { 
-                id: 6, name: "24K Gold Blur Face Primer", weight: "30 ml", price: 399, oldPrice: 650, 
-                desc: "Gel-based primer infused with gold flakes to blur pores and create a smooth canvas.",
-                images: ["https://tse4.mm.bing.net/th/id/OIP.pgfKSHeAPo_HvE2QNFjLTgHaHB?r=0&rs=1&pid=ImgDetMain&o=7&rm=3", "https://placehold.co/400x400/FEF08A/A16207?text=Texture", "https://placehold.co/400x400/FDE047/854D0E?text=Bottle"]
+                id: 6, name: "Forever 52 Translucent Setting Powder", price: 899, oldPrice: 1199, 
+                desc: "Finely milled loose powder to set makeup, control shine, and blur fine lines.",
+                shades: [
+                    { id: "p6-s1", name: "TLM006 Classic Beige", color: "#EBD0B3", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Classic+Beige+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Classic+Beige+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Classic+Beige+3"] },
+                    { id: "p6-s2", name: "TLM001 White", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=White+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=White+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=White+3"] }
+                ]
+            },
+
+            // ==========================================
+            // 6 NEW SIMPLE ITEMS (No Multiple Shades)
+            // ==========================================
+            { 
+                id: 7, name: "New Item Placeholder 1 (Facewash)", price: 350, oldPrice: 499, 
+                desc: "This is a simple item without multiple shades. Perfect for facewash or skincare.",
+                shades: [
+                    { id: "p7-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+7+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+7+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+7+Pic+3"] }
+                ]
             },
             { 
-                id: 7, name: "Nikaah 18-Shade Eyeshadow Palette", weight: "Bridal Collection", price: 899, oldPrice: 1499, 
-                desc: "18 highly pigmented mattes and shimmers specifically curated for bridal and heavy glam looks.",
-                images: ["https://tse3.mm.bing.net/th/id/OIP.Othe0W-IKw2X41HS-OkfgwHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3", "https://placehold.co/400x400/F2E8E8/9B2D45?text=Open", "https://placehold.co/400x400/E6D3D3/D4AF37?text=Colors"]
+                id: 8, name: "New Item Placeholder 2", price: 450, oldPrice: 599, 
+                desc: "Item details will go here. You can edit this text easily.",
+                shades: [
+                    { id: "p8-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+8+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+8+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+8+Pic+3"] }
+                ]
             },
             { 
-                id: 8, name: "Jet Black Liquid Eyeliner", weight: "Waterproof", price: 249, oldPrice: 350, 
-                desc: "Precision tip eyeliner that delivers intense black color and lasts for 24 hours.",
-                images: ["https://www.australianglow.com/_next/image?url=%2Fhome%2Fmousse-open.jpg&w=1080&q=75&dpl=dpl_7WYLXXRJoH5aABVWZAwc9e5JZu2u", "https://placehold.co/400x400/E2E8F0/1E293B?text=Tip", "https://placehold.co/400x400/CBD5E1/334155?text=Swatch"]
+                id: 9, name: "New Item Placeholder 3", price: 299, oldPrice: 399, 
+                desc: "Item details will go here. You can edit this text easily.",
+                shades: [
+                    { id: "p9-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+9+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+9+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+9+Pic+3"] }
+                ]
             },
             { 
-                id: 9, name: "10% Vitamin C + Saffron Serum", weight: "30 ml Dropper", price: 499, oldPrice: 850, 
-                desc: "Brightening skin serum that reduces dark spots and brings out a natural glow.",
-                images: ["https://m.media-amazon.com/images/S/aplus-media-library-service-media/d9907630-b836-40c1-b4a9-1ffac53ae8d4.__CR0,0,970,600_PT0_SX970_V1___.jpg", "https://placehold.co/400x400/FFEDD5/9A3412?text=Dropper", "https://placehold.co/400x400/FED7AA/7C2D12?text=Texture"]
+                id: 10, name: "New Item Placeholder 4", price: 550, oldPrice: 750, 
+                desc: "Item details will go here. You can edit this text easily.",
+                shades: [
+                    { id: "p10-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+10+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+10+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+10+Pic+3"] }
+                ]
             },
             { 
-                id: 10, name: "Oud Al Kaynat Roll-On Attar", weight: "12 ml Pure Oil", price: 449, oldPrice: 799, 
-                desc: "Alcohol-free premium fragrance with notes of white oud, amber, and rich rose.",
-                images: ["https://tse3.mm.bing.net/th/id/OIP.e9BlVJJ_axrnK-uzkbNc2gHaJQ?r=0&w=713&h=891&rs=1&pid=ImgDetMain&o=7&rm=3", "https://placehold.co/400x400/E6D3D3/D4AF37?text=Bottle", "https://placehold.co/400x400/F2E8E8/9B2D45?text=Box"]
+                id: 11, name: "New Item Placeholder 5", price: 199, oldPrice: 299, 
+                desc: "Item details will go here. You can edit this text easily.",
+                shades: [
+                    { id: "p11-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+11+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+11+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+11+Pic+3"] }
+                ]
+            },
+            { 
+                id: 12, name: "New Item Placeholder 6", price: 899, oldPrice: 1099, 
+                desc: "Item details will go here. You can edit this text easily.",
+                shades: [
+                    { id: "p12-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+12+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+12+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+12+Pic+3"] }
+                ]
             }
         ];
 
         // =========================================================================
-        // STATE VARIABLES
+        // LOGIC & STATE
         // =========================================================================
         const ownerWhatsAppNumber = "919527652098"; 
-        let cart = {};
+        let cart = {}; 
         let currentAddress = "Select Location";
         let customerPhone = "";
-        let currentOpenProductId = null; 
-        
-        // OTP Login Variables
         let userLoggedIn = false;
         let generatedOTP = "";
         
-        // Admin Variables
-        let isConfirmingClear = false;
+        let currentOpenProductId = null; 
+        let currentSelectedShadeId = null;
 
-        // =========================================================================
-        // RENDERING
-        // =========================================================================
-        function renderGrid(searchQuery = '') {
+        // --- GRID RENDERING ---
+        function renderGrid() {
             const container = document.getElementById('productContainer');
             container.innerHTML = '';
             
-            const filtered = products.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
-
-            filtered.forEach(p => {
-                const qty = cart[p.id] ? cart[p.id].quantity : 0;
-                let btnHTML = qty > 0 
-                    ? `<div class="bg-brand-900 text-white rounded-md flex justify-between items-center w-full h-8 px-1 font-bold shadow-sm" onclick="event.stopPropagation()">
-                        <button onclick="updateCart(event, ${p.id}, -1)" class="px-2 w-1/3 hover:bg-brand-800 rounded text-lg">-</button>
-                        <span class="w-1/3 text-center text-sm">${qty}</span>
-                        <button onclick="updateCart(event, ${p.id}, 1)" class="px-2 w-1/3 hover:bg-brand-800 rounded text-lg">+</button>
-                       </div>`
-                    : `<button onclick="updateCart(event, ${p.id}, 1)" class="border border-brand-900 text-brand-900 bg-white hover:bg-brand-50 rounded-md w-full h-8 font-bold text-xs uppercase shadow-sm transition-colors flex items-center justify-center"><i class="fas fa-plus mr-1 text-[10px]"></i> Add</button>`;
+            products.forEach(p => {
+                let btnHTML = "";
+                
+                // MULTI-SHADE vs SINGLE-SHADE (Simple Item) LOGIC
+                if (p.shades.length > 1) {
+                    // Agar ek se zyada shade hai toh 'Select Shade' button aayega
+                    btnHTML = `<button onclick="openProductPage(${p.id}); event.stopPropagation();" class="border border-brand-900 text-brand-900 bg-white hover:bg-brand-50 rounded-md w-full h-8 font-bold text-[10px] uppercase shadow-sm transition-colors flex items-center justify-center">Select Shade</button>`;
+                } else {
+                    // Agar ek hi shade (Simple Item) hai toh bahar se hi 'Add/+- ' button aayega
+                    const singleShadeId = p.shades[0].id;
+                    const singleQty = cart[singleShadeId] ? cart[singleShadeId].quantity : 0;
+                    
+                    if(singleQty > 0) {
+                        btnHTML = `<div class="bg-brand-900 text-white rounded-md flex justify-between items-center w-full h-8 px-1 font-bold shadow-sm" onclick="event.stopPropagation()">
+                            <button onclick="updateCart(event, ${p.id}, '${singleShadeId}', -1)" class="px-2 w-1/3 hover:bg-brand-800 rounded text-lg">-</button>
+                            <span class="w-1/3 text-center text-sm">${singleQty}</span>
+                            <button onclick="updateCart(event, ${p.id}, '${singleShadeId}', 1)" class="px-2 w-1/3 hover:bg-brand-800 rounded text-lg">+</button>
+                        </div>`;
+                    } else {
+                        btnHTML = `<button onclick="updateCart(event, ${p.id}, '${singleShadeId}', 1)" class="border border-brand-900 text-brand-900 bg-white hover:bg-brand-50 rounded-md w-full h-8 font-bold text-[10px] uppercase shadow-sm transition-colors flex items-center justify-center"><i class="fas fa-plus mr-1 text-[10px]"></i> Add</button>`;
+                    }
+                }
 
                 const discount = Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100);
+                const displayImage = p.shades[0].images[0];
+                
+                // Agar single shade hai toh uske neeche '1 Shade' ki jagah uska naam 'Standard' dikhayenge ya chupayenge
+                const shadeText = p.shades.length > 1 ? `${p.shades.length} Shades Available` : `Standard Size`;
 
                 const card = `
                     <div class="bg-white p-3 rounded-2xl shadow-sm hover:shadow-md transition-all border border-brand-100 flex flex-col relative overflow-hidden group cursor-pointer" onclick="openProductPage(${p.id})">
-                        <div class="absolute top-2 left-2 bg-green-500 text-white text-[9px] font-bold px-2 py-0.5 rounded z-10 uppercase tracking-wider">
-                            ${discount}% OFF
-                        </div>
+                        <div class="absolute top-2 left-2 bg-green-500 text-white text-[9px] font-bold px-2 py-0.5 rounded z-10 uppercase tracking-wider">${discount}% OFF</div>
                         <div class="h-32 w-full bg-brand-50 rounded-xl mb-3 overflow-hidden flex items-center justify-center p-2 relative">
-                            <img src="${p.images[0]}" alt="${p.name}" class="h-full w-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500">
+                            <img src="${displayImage}" class="h-full w-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500">
                         </div>
                         <h4 class="font-bold text-sm text-brand-900 leading-tight mb-1 line-clamp-2 min-h-[2.5rem]">${p.name}</h4>
-                        <p class="text-[11px] text-gray-500 mb-3 font-medium truncate">${p.weight}</p>
+                        <p class="text-[10px] text-gray-500 mb-3 font-medium">${shadeText}</p>
                         <div class="mt-auto flex justify-between items-center">
-                            <div class="flex flex-col">
-                                <span class="font-black text-base text-gray-900">₹${p.price}</span>
-                                <span class="text-[10px] text-gray-400 line-through">₹${p.oldPrice}</span>
-                            </div>
+                            <div class="flex flex-col"><span class="font-black text-base text-gray-900">₹${p.price}</span><span class="text-[10px] text-gray-400 line-through">₹${p.oldPrice}</span></div>
                             <div class="w-16">${btnHTML}</div>
                         </div>
                     </div>`;
                 container.innerHTML += card;
             });
-            renderRateList(searchQuery);
+            renderRateList();
         }
 
-        function filterProducts(val) {
-            renderGrid(val);
-        }
-
-        function renderRateList(searchQuery = '') {
+        // --- SIDE RATE LIST ---
+        function renderRateList() {
             const container = document.getElementById('rateListContainer');
             container.innerHTML = '';
-            
             let totalSelected = 0;
-            const filtered = products.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
-            filtered.forEach(p => {
-                const qty = cart[p.id] ? cart[p.id].quantity : 0;
-                if(qty > 0) totalSelected += qty;
+            products.forEach(p => {
+                p.shades.forEach(s => {
+                    const qty = cart[s.id] ? cart[s.id].quantity : 0;
+                    if(qty > 0) totalSelected += qty;
 
-                let btnHTML = qty > 0 
-                    ? `<div class="bg-brand-900 text-white rounded flex justify-between items-center w-14 h-7 px-1 font-bold shadow-sm">
-                        <button onclick="updateCart(event, ${p.id}, -1)" class="px-1.5 hover:bg-brand-800 text-sm">-</button>
-                        <span class="text-xs">${qty}</span>
-                        <button onclick="updateCart(event, ${p.id}, 1)" class="px-1.5 hover:bg-brand-800 text-sm">+</button>
-                       </div>`
-                    : `<button onclick="updateCart(event, ${p.id}, 1)" class="border border-brand-200 text-brand-900 bg-white hover:bg-brand-50 rounded w-14 h-7 font-bold text-[10px] uppercase transition-colors">Add</button>`;
+                    let btnHTML = qty > 0 
+                        ? `<div class="bg-brand-900 text-white rounded flex justify-between items-center w-14 h-7 px-1 font-bold shadow-sm">
+                            <button onclick="updateCart(event, ${p.id}, '${s.id}', -1)" class="px-1.5 hover:bg-brand-800 text-sm">-</button><span class="text-xs">${qty}</span><button onclick="updateCart(event, ${p.id}, '${s.id}', 1)" class="px-1.5 hover:bg-brand-800 text-sm">+</button>
+                           </div>`
+                        : `<button onclick="updateCart(event, ${p.id}, '${s.id}', 1)" class="border border-brand-200 text-brand-900 bg-white hover:bg-brand-50 rounded w-14 h-7 font-bold text-[10px] uppercase transition-colors">Add</button>`;
 
-                const row = `
-                    <div class="flex items-center justify-between p-2 hover:bg-brand-50 rounded-lg border-b border-brand-50 last:border-0 transition-colors cursor-pointer bg-white mb-1" onclick="openProductPage(${p.id})">
-                        <div class="flex items-center space-x-3 w-3/4">
-                            <div class="h-10 w-10 bg-brand-50 rounded border border-brand-100 p-0.5 shrink-0">
-                                <img src="${p.images[0]}" class="h-full w-full object-contain mix-blend-multiply">
-                            </div>
-                            <div class="truncate">
-                                <h4 class="text-xs font-bold text-gray-800 truncate">${p.name}</h4>
-                                <div class="flex items-center space-x-1.5 mt-0.5">
-                                    <span class="text-[11px] font-black text-brand-900">₹${p.price}</span>
-                                    <span class="text-[9px] text-gray-400 line-through">₹${p.oldPrice}</span>
+                    const row = `
+                        <div class="flex items-center justify-between p-2 hover:bg-brand-50 rounded-lg border-b border-brand-50 last:border-0 transition-colors cursor-pointer bg-white mb-1" onclick="openProductPage(${p.id}, '${s.id}')">
+                            <div class="flex items-center space-x-3 w-3/4">
+                                <div class="h-10 w-10 bg-brand-50 rounded border border-brand-100 p-0.5 shrink-0"><img src="${s.images[0]}" class="h-full w-full object-contain mix-blend-multiply"></div>
+                                <div class="truncate">
+                                    <h4 class="text-xs font-bold text-gray-800 truncate">${p.name}</h4>${p.shades.length > 1 ? `<div class="text-[9px] text-brand-600 font-bold truncate mt-0.5 flex items-center"><div class="w-2 h-2 rounded-full mr-1 inline-block border border-gray-300" style="background-color: ${s.color}"></div>${s.name}</div>` : ''}
+                                    <div class="flex items-center space-x-1.5 mt-0.5"><span class="text-[11px] font-black text-brand-900">₹${p.price}</span></div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="w-14 shrink-0" onclick="event.stopPropagation()">${btnHTML}</div>
-                    </div>`;
-                container.innerHTML += row;
+                            <div class="w-14 shrink-0" onclick="event.stopPropagation()">${btnHTML}</div>
+                        </div>`;
+                    container.innerHTML += row;
+                });
             });
-
             document.getElementById('sideListSelectedCount').innerText = totalSelected;
         }
 
         function toggleRateList() {
             const list = document.getElementById('sideRateList');
             if(list.classList.contains('hidden') || list.classList.contains('lg:flex')) {
-                list.classList.remove('hidden');
+                list.classList.remove('hidden', 'lg:flex', 'sticky', 'rounded-2xl');
                 list.classList.add('flex', 'fixed', 'inset-0', 'z-[70]', 'w-full', 'h-full', 'rounded-none');
-                list.classList.remove('lg:flex', 'sticky', 'rounded-2xl');
                 document.body.style.overflow = 'hidden';
             } else {
                 list.classList.add('hidden', 'lg:flex', 'sticky', 'rounded-2xl');
@@ -564,16 +562,50 @@
             }
         }
 
-        // =========================================================================
-        // FULL PAGE PRODUCT DETAIL
-        // =========================================================================
-        function openProductPage(id) {
-            const p = products.find(x => x.id === id);
+        // --- PRODUCT PAGE & SHADE SELECTION ---
+        function openProductPage(productId, shadeId = null) {
+            const p = products.find(x => x.id === productId);
             if(!p) return;
-            currentOpenProductId = id;
+            currentOpenProductId = productId;
 
-            document.getElementById('pdMainImg').src = p.images[0];
+            document.getElementById('pdTitle').innerText = p.name;
+            document.getElementById('pdPrice').innerText = "₹" + p.price;
+            document.getElementById('pdOldPrice').innerText = "₹" + p.oldPrice;
+            document.getElementById('pdDiscountTag').innerText = Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100) + "% OFF";
+            document.getElementById('pdDesc').innerText = p.desc;
+
+            const swatchesContainer = document.getElementById('pdShadeSwatches');
+            swatchesContainer.innerHTML = '';
             
+            // Hide shade selector block completely if there's only 1 option
+            if(p.shades.length > 1) {
+                document.getElementById('shadeSelectorSection').classList.remove('hidden');
+                p.shades.forEach(s => {
+                    swatchesContainer.innerHTML += `<div id="swatch-${s.id}" onclick="selectShade('${s.id}')" class="w-8 h-8 rounded-full cursor-pointer transition-all border border-gray-300 hover:scale-110" style="background-color: ${s.color};" title="${s.name}"></div>`;
+                });
+            } else {
+                document.getElementById('shadeSelectorSection').classList.add('hidden');
+            }
+
+            selectShade(shadeId ? shadeId : p.shades[0].id);
+
+            document.getElementById('productDetailPage').classList.remove('translate-y-full');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function selectShade(shadeId) {
+            currentSelectedShadeId = shadeId;
+            const p = products.find(x => x.id === currentOpenProductId);
+            const shade = p.shades.find(s => s.id === shadeId);
+
+            document.getElementById('pdSelectedShadeName').innerText = shade.name;
+
+            if(p.shades.length > 1) {
+                p.shades.forEach(s => document.getElementById(`swatch-${s.id}`).classList.remove('shade-active'));
+                document.getElementById(`swatch-${shadeId}`).classList.add('shade-active');
+            }
+
+            document.getElementById('pdMainImg').src = shade.images[0];
             const setThumb = (index, src) => {
                 const el = document.getElementById(`pdThumb${index}`);
                 el.src = src;
@@ -583,72 +615,66 @@
                     el.classList.replace('border-transparent', 'border-brand-900');
                 };
             };
-            setThumb(0, p.images[0]);
-            setThumb(1, p.images[1]);
-            setThumb(2, p.images[2]);
+            setThumb(0, shade.images[0]);
+            setThumb(1, shade.images[1]);
+            setThumb(2, shade.images[2]);
+            
+            [0,1,2].forEach(i => document.getElementById(`pdThumb${i}`).classList.replace('border-brand-900', 'border-transparent'));
             document.getElementById('pdThumb0').classList.replace('border-transparent', 'border-brand-900');
 
-            document.getElementById('pdTitle').innerText = p.name;
-            document.getElementById('pdWeight').innerText = p.weight;
-            document.getElementById('pdPrice').innerText = "₹" + p.price;
-            document.getElementById('pdOldPrice').innerText = "₹" + p.oldPrice;
-            document.getElementById('pdDiscountTag').innerText = Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100) + "% OFF";
-            document.getElementById('pdDesc').innerText = p.desc;
-
-            updatePdActionBtn(id);
-
-            const page = document.getElementById('productDetailPage');
-            page.classList.remove('translate-y-full');
-            document.body.style.overflow = 'hidden';
+            updatePdActionBtn();
         }
 
-        function closeProductPage() {
-            document.getElementById('productDetailPage').classList.add('translate-y-full');
-            document.body.style.overflow = '';
-            currentOpenProductId = null;
-        }
-
-        function updatePdActionBtn(id) {
+        function updatePdActionBtn() {
             const container = document.getElementById('pdActionContainer');
-            const qty = cart[id] ? cart[id].quantity : 0;
+            const qty = cart[currentSelectedShadeId] ? cart[currentSelectedShadeId].quantity : 0;
             
             if(qty > 0) {
                 container.innerHTML = `
                     <div class="flex justify-between items-center bg-brand-50 p-2 rounded-xl border border-brand-200 shadow-inner">
                         <div class="font-bold text-brand-900 ml-2 text-sm">Added to Bag</div>
                         <div class="bg-brand-900 text-white rounded-lg flex justify-between items-center w-32 h-11 px-2 font-bold shadow-md">
-                            <button onclick="updateCart(event, ${id}, -1)" class="px-3 hover:bg-brand-800 rounded text-xl">-</button>
+                            <button onclick="updateCart(event, ${currentOpenProductId}, '${currentSelectedShadeId}', -1)" class="px-3 hover:bg-brand-800 rounded text-xl">-</button>
                             <span class="text-lg">${qty}</span>
-                            <button onclick="updateCart(event, ${id}, 1)" class="px-3 hover:bg-brand-800 rounded text-xl">+</button>
+                            <button onclick="updateCart(event, ${currentOpenProductId}, '${currentSelectedShadeId}', 1)" class="px-3 hover:bg-brand-800 rounded text-xl">+</button>
                         </div>
                     </div>`;
             } else {
-                container.innerHTML = `
-                    <button onclick="updateCart(event, ${id}, 1)" class="w-full bg-brand-900 hover:bg-brand-800 text-white font-bold py-4 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition-transform active:scale-95">
-                        <i class="fas fa-shopping-bag"></i> <span>Add to Bag</span>
-                    </button>`;
+                container.innerHTML = `<button onclick="updateCart(event, ${currentOpenProductId}, '${currentSelectedShadeId}', 1)" class="w-full bg-brand-900 hover:bg-brand-800 text-white font-bold py-4 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition-transform active:scale-95"><i class="fas fa-shopping-bag"></i> <span>Add to Bag</span></button>`;
             }
         }
 
-        // =========================================================================
-        // CART LOGIC
-        // =========================================================================
-        function updateCart(event, productId, change) {
+        function closeProductPage() {
+            document.getElementById('productDetailPage').classList.add('translate-y-full');
+            document.body.style.overflow = '';
+            currentOpenProductId = null; currentSelectedShadeId = null;
+        }
+
+        // --- CART SYSTEM ---
+        function updateCart(event, productId, shadeId, change) {
             if(event) event.stopPropagation(); 
             
-            if (!cart[productId]) {
-                const prod = products.find(p => p.id === productId);
-                cart[productId] = { ...prod, quantity: 0 };
+            if (!cart[shadeId]) {
+                const p = products.find(x => x.id === productId);
+                const s = p.shades.find(x => x.id === shadeId);
+                cart[shadeId] = { 
+                    productId: p.id, 
+                    productName: p.name, 
+                    price: p.price, 
+                    shadeId: s.id, 
+                    shadeName: s.name, 
+                    color: s.color, 
+                    image: s.images[0], 
+                    quantity: 0,
+                    isSingle: p.shades.length === 1 // Helper variable for whatsapp text
+                };
             }
-            cart[productId].quantity += change;
-            if (cart[productId].quantity <= 0) { delete cart[productId]; }
             
-            const searchVal = document.getElementById('searchInput') ? document.getElementById('searchInput').value : '';
-            renderGrid(searchVal); 
-            updateCartUI();
-            if(currentOpenProductId === productId) {
-                updatePdActionBtn(productId);
-            }
+            cart[shadeId].quantity += change;
+            if (cart[shadeId].quantity <= 0) { delete cart[shadeId]; }
+            
+            renderGrid(); updateCartUI();
+            if(currentOpenProductId === productId && currentSelectedShadeId === shadeId) { updatePdActionBtn(); }
         }
 
         function updateCartUI() {
@@ -656,24 +682,24 @@
             const listContainer = document.getElementById('cartItemsList');
             listContainer.innerHTML = '';
 
-            for (let id in cart) {
-                const item = cart[id];
-                count += item.quantity;
-                itemTotal += (item.price * item.quantity);
+            for (let sId in cart) {
+                const item = cart[sId];
+                count += item.quantity; itemTotal += (item.price * item.quantity);
+                
+                let shadeTextHtml = item.isSingle ? `` : `<div class="text-[10px] text-brand-600 font-bold mt-0.5 flex items-center"><div class="w-2.5 h-2.5 rounded-full mr-1.5 border border-gray-300" style="background-color: ${item.color}"></div>${item.shadeName}</div>`;
 
                 listContainer.innerHTML += `
                     <div class="p-4 flex justify-between items-center">
                         <div class="flex items-center space-x-3 w-3/5">
-                            <img src="${item.images[0]}" class="h-14 w-14 object-cover rounded-lg border border-brand-100 bg-brand-50 p-1">
+                            <img src="${item.image}" class="h-14 w-14 object-cover rounded-lg border border-brand-100 bg-brand-50 p-1">
                             <div>
-                                <h4 class="text-sm font-bold text-gray-800 leading-tight line-clamp-1">${item.name}</h4>
-                                <p class="text-xs text-brand-600 mt-1 font-bold">₹${item.price}</p>
+                                <h4 class="text-sm font-bold text-gray-800 leading-tight line-clamp-1">${item.productName}</h4>
+                                ${shadeTextHtml}
+                                <p class="text-xs text-brand-900 mt-1 font-black">₹${item.price}</p>
                             </div>
                         </div>
                         <div class="border border-brand-200 bg-brand-50 text-brand-900 rounded-md flex justify-between items-center w-20 h-8 px-1 font-bold">
-                            <button onclick="updateCart(event, ${item.id}, -1)" class="px-2 w-1/3 hover:bg-brand-100 rounded">-</button>
-                            <span class="w-1/3 text-center text-sm">${item.quantity}</span>
-                            <button onclick="updateCart(event, ${item.id}, 1)" class="px-2 w-1/3 hover:bg-brand-100 rounded">+</button>
+                            <button onclick="updateCart(event, ${item.productId}, '${item.shadeId}', -1)" class="px-2 w-1/3 hover:bg-brand-100 rounded">-</button><span class="w-1/3 text-center text-sm">${item.quantity}</span><button onclick="updateCart(event, ${item.productId}, '${item.shadeId}', 1)" class="px-2 w-1/3 hover:bg-brand-100 rounded">+</button>
                         </div>
                     </div>`;
             }
@@ -685,11 +711,10 @@
             document.getElementById('summaryTotal').innerText = itemTotal;
             
             const navBadge = document.getElementById('navCartBadge');
-            if(count > 0) { navBadge.innerText = count; navBadge.classList.remove('hidden'); } 
-            else { navBadge.classList.add('hidden'); }
+            if(count > 0) { navBadge.innerText = count; navBadge.classList.remove('hidden'); } else { navBadge.classList.add('hidden'); }
 
             document.getElementById('billItemTotal').innerText = itemTotal;
-            document.getElementById('billDeliveryFee').innerHTML = deliveryFee === 0 ? `<span class="text-green-600 bg-green-50 px-2 py-0.5 rounded font-bold text-[10px] uppercase border border-green-200">Free</span>` : `₹${deliveryFee}`;
+            document.getElementById('billDeliveryFee').innerHTML = deliveryFee === 0 ? `<span class="text-green-600 bg-green-50 px-2 py-0.5 rounded font-bold text-[10px] uppercase">Free</span>` : `₹${deliveryFee}`;
             document.getElementById('billGrandTotal').innerText = grandTotal;
             document.getElementById('checkoutBtnTotal').innerText = grandTotal;
             document.getElementById('payModalTotal').innerText = grandTotal;
@@ -710,30 +735,21 @@
             document.body.style.overflow = '';
         }
 
-        // =========================================================================
-        // OTP LOGIN SYSTEM (Restored & Integrated)
-        // =========================================================================
+        // --- OTP LOGIN SYSTEM ---
         function showCustomToast(htmlContent) {
             const container = document.getElementById('otpToastContainer');
             const toast = document.createElement('div');
-            toast.className = 'bg-white rounded-2xl shadow-2xl p-4 m-4 max-w-sm w-full flex items-start space-x-3 border-l-4 border-brand-900 otp-toast';
+            toast.className = 'bg-white rounded-2xl shadow-2xl p-4 m-4 max-w-sm w-full flex items-start space-x-3 border-l-4 border-brand-500 otp-toast';
             toast.innerHTML = htmlContent;
             container.appendChild(toast);
-            setTimeout(() => { if(toast.parentElement) toast.remove(); }, 5000);
-        }
-
-        function showMessage(msg) {
-            showCustomToast(`
-                <div class="bg-brand-50 rounded-full p-2 h-9 w-9 flex items-center justify-center shrink-0 border border-brand-100"><i class="fas fa-info-circle text-brand-900"></i></div>
-                <div class="flex-1 mt-0.5"><p class="text-sm font-bold text-gray-800">${msg}</p></div>
-            `);
+            setTimeout(() => { if(toast.parentElement) toast.remove(); }, 6000);
         }
 
         function openLoginModal() {
             document.getElementById('loginModal').classList.remove('hidden');
             document.getElementById('phoneInput').value = '';
             document.getElementById('sendOtpBtn').disabled = true;
-            document.getElementById('sendOtpBtn').className = "w-full bg-gray-200 text-gray-500 py-3.5 rounded-xl font-bold transition-colors shadow-sm";
+            document.getElementById('sendOtpBtn').className = "w-full bg-brand-100 text-brand-300 py-3.5 rounded-xl font-bold transition-colors";
             document.getElementById('loginStep1').classList.remove('hidden');
             document.getElementById('loginStep2').classList.add('hidden');
         }
@@ -745,19 +761,17 @@
             const btn = document.getElementById('sendOtpBtn');
             if (this.value.length === 10) {
                 btn.disabled = false;
-                btn.className = "w-full bg-brand-900 hover:bg-brand-800 text-gold-500 py-3.5 rounded-xl font-bold shadow-md transition-colors text-lg tracking-wider";
+                btn.className = "w-full bg-brand-900 text-white py-3.5 rounded-xl font-bold shadow-md hover:bg-brand-800 transition-colors";
             } else {
                 btn.disabled = true;
-                btn.className = "w-full bg-gray-200 text-gray-500 py-3.5 rounded-xl font-bold transition-colors shadow-sm text-lg";
+                btn.className = "w-full bg-brand-100 text-brand-300 py-3.5 rounded-xl font-bold transition-colors";
             }
         });
 
         function sendOTP() {
             const phone = document.getElementById('phoneInput').value;
-            if(!/^[6-9]\d{9}$/.test(phone)){ showMessage("Enter a valid 10-digit mobile number."); return; }
-            customerPhone = phone; // Preset phone for address
-            document.getElementById('customerPhoneInput').value = phone; 
-            
+            if(!/^[6-9]\d{9}$/.test(phone)){ alert("Enter a valid 10-digit mobile number."); return; }
+            customerPhone = phone;
             document.getElementById('displayPhone').innerText = "+91 " + phone;
             document.getElementById('loginStep1').classList.add('hidden');
             document.getElementById('loginStep2').classList.remove('hidden');
@@ -768,16 +782,13 @@
             generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
             setTimeout(() => {
                 showCustomToast(`
-                    <div class="bg-brand-50 rounded-full h-11 w-11 flex items-center justify-center shrink-0 border border-brand-100"><i class="fas fa-comment-sms text-brand-900 text-lg"></i></div>
-                    <div class="flex-1"><p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-0.5">Messages • Now</p><p class="text-sm font-bold text-gray-800 leading-snug">Your Al Kaynat OTP is <span class="text-brand-900 text-lg border-b-2 border-gold-500 mx-1">${generatedOTP}</span>. Do not share.</p></div>
+                    <div class="bg-brand-50 rounded-full h-10 w-10 flex items-center justify-center shrink-0"><i class="fas fa-comment-sms text-brand-600"></i></div>
+                    <div class="flex-1"><p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-0.5">Messages • Now</p><p class="text-sm font-bold text-gray-800 leading-tight">Your Al Kaynat login OTP is <span class="text-brand-600 text-lg">${generatedOTP}</span>. Do not share.</p></div>
                 `);
             }, 800);
         }
 
-        function backToPhone() { 
-            document.getElementById('loginStep2').classList.add('hidden'); 
-            document.getElementById('loginStep1').classList.remove('hidden'); 
-        }
+        function backToPhone() { document.getElementById('loginStep2').classList.add('hidden'); document.getElementById('loginStep1').classList.remove('hidden'); }
 
         function moveToNext(current, index) {
             current.value = current.value.replace(/[^0-9]/g, '');
@@ -794,31 +805,28 @@
             if (entered === generatedOTP) {
                 userLoggedIn = true;
                 closeLoginModal();
-                document.getElementById('loginNavBtn').classList.add('hidden');
-                document.getElementById('userProfileIcon').classList.remove('hidden');
-                showMessage("Logged in successfully!");
+                if(document.getElementById('loginNavBtn')) document.getElementById('loginNavBtn').classList.add('hidden');
+                if(document.getElementById('userProfileIcon')) document.getElementById('userProfileIcon').classList.remove('hidden');
+                
+                showCustomToast(`<div class="bg-green-100 rounded-full h-10 w-10 flex items-center justify-center shrink-0"><i class="fas fa-check text-green-600"></i></div>
+                    <div class="flex-1 mt-2"><p class="text-sm font-bold text-gray-800 leading-tight">Logged in successfully!</p></div>`);
             } else {
-                showMessage("Invalid OTP. Check SMS.");
+                alert("Invalid OTP. Check SMS.");
                 document.querySelectorAll('.otp-input').forEach(i => i.value = '');
                 document.querySelectorAll('.otp-input')[0].focus();
             }
         }
 
-        // =========================================================================
-        // ADDRESS & CHECKOUT
-        // =========================================================================
+        // --- CHECKOUT & WHATSAPP ---
         function openAddressModal() { document.getElementById('addressModal').classList.remove('hidden'); }
         function closeAddressModal() { document.getElementById('addressModal').classList.add('hidden'); }
 
         function setCustomAddress() {
             const addVal = document.getElementById('manualAddressInput').value;
-            const phVal = document.getElementById('customerPhoneInput').value;
-            if (addVal.trim() === "" || phVal.length !== 10) { showMessage("Please enter complete address and 10-digit valid phone number."); return; }
+            if (addVal.trim() === "") { alert("Please enter complete address."); return; }
             currentAddress = addVal.trim();
-            customerPhone = phVal.trim();
             document.getElementById('topAddressText').innerText = "Delivery Saved";
             closeAddressModal();
-            showMessage("Delivery details saved!");
         }
 
         function openPaymentModal() {
@@ -834,8 +842,15 @@
             waMsg += `📞 *Phone:* ${customerPhone}\n`;
             waMsg += `📍 *Address:* ${currentAddress}\n\n`;
             waMsg += `🛍️ *ORDER DETAILS:*\n`;
-            for(let id in cart) { waMsg += `▪️ ${cart[id].name} (x${cart[id].quantity})\n`; }
-            waMsg += `\n💰 *Grand Total: ₹${document.getElementById('billGrandTotal').innerText}*\n`;
+            
+            for(let sId in cart) { 
+                waMsg += `▪️ ${cart[sId].productName}\n`;
+                if(!cart[sId].isSingle) {
+                    waMsg += `   🎨 Shade: ${cart[sId].shadeName}\n`;
+                }
+                waMsg += `   📦 Qty: ${cart[sId].quantity} x ₹${cart[sId].price}\n\n`;
+            }
+            waMsg += `💰 *Grand Total: ₹${document.getElementById('billGrandTotal').innerText}*\n`;
             waMsg += `\n_Please confirm my order._`;
             
             saveOrderToHistory();
@@ -843,23 +858,7 @@
             cart = {}; renderGrid(); updateCartUI(); closePaymentModal();
         }
 
-        // =========================================================================
-        // ADMIN PANEL & HISAAB (Restored from Apna Store)
-        // =========================================================================
-        function saveOrderToHistory() {
-            let history = JSON.parse(localStorage.getItem('alKaynatHistory') || '[]');
-            const newOrder = {
-                id: 'AK' + Math.floor(100000 + Math.random() * 900000),
-                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                grandTotal: parseInt(document.getElementById('billGrandTotal').innerText),
-                itemTotal: parseInt(document.getElementById('billItemTotal').innerText),
-                deliveryFee: parseInt(document.getElementById('billDeliveryFee').innerText.replace('₹', '')) || 0,
-                method: "WHATSAPP"
-            };
-            history.push(newOrder);
-            localStorage.setItem('alKaynatHistory', JSON.stringify(history));
-        }
-
+        // --- ADMIN PANEL (HISAAB) ---
         let adminTapCount = 0; let adminTapTimer;
         function handleAdminTap() {
             adminTapCount++; clearTimeout(adminTapTimer);
@@ -868,7 +867,6 @@
                 document.getElementById('pinModal').classList.remove('hidden');
                 setTimeout(() => { document.getElementById('pinBox').classList.remove('scale-95'); document.getElementById('pinBox').classList.add('scale-100'); }, 10);
                 document.getElementById('adminPinInput').value = '';
-                document.getElementById('adminPinInput').focus();
                 return;
             }
             adminTapTimer = setTimeout(() => { adminTapCount = 0; }, 2000); 
@@ -882,21 +880,28 @@
         function verifyAdminPin() {
             if(document.getElementById('adminPinInput').value === "9999") { 
                 closePinModal(); 
-                openHisaab(); 
+                openHisaab();
             } else { 
-                showMessage("Incorrect Admin PIN!"); 
+                alert("Incorrect Admin PIN!"); 
                 document.getElementById('adminPinInput').value = ''; 
             }
+        }
+
+        function saveOrderToHistory() {
+            let history = JSON.parse(localStorage.getItem('alKaynatHistory') || '[]');
+            history.push({
+                id: 'AK' + Math.floor(10000 + Math.random() * 90000),
+                total: parseInt(document.getElementById('billGrandTotal').innerText),
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                date: new Date().toLocaleDateString()
+            });
+            localStorage.setItem('alKaynatHistory', JSON.stringify(history));
         }
 
         function openHisaab() {
             document.getElementById('hisaabModal').classList.remove('hidden');
             setTimeout(() => { document.getElementById('hisaabSlide').classList.remove('translate-y-full'); }, 10);
             renderHisaab();
-            isConfirmingClear = false;
-            const btn = document.getElementById('clearHisaabBtn');
-            btn.innerText = "Clear Today's Hisaab";
-            btn.className = "w-full bg-red-50 text-red-600 border border-red-200 font-bold py-3.5 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm";
         }
 
         function closeHisaab() {
@@ -909,62 +914,51 @@
             const container = document.getElementById('hisaabContent');
             
             if (history.length === 0) {
-                container.innerHTML = `<div class="text-center text-gray-500 mt-24 flex flex-col items-center"><div class="bg-white shadow-sm h-24 w-24 rounded-full flex items-center justify-center mb-5 border border-brand-100"><i class="fas fa-receipt text-4xl text-gray-300"></i></div><p class="font-bold text-gray-800 text-xl mb-1 brand-font">No Orders Yet</p></div>`;
+                container.innerHTML = `<div class="text-center text-gray-500 mt-24 flex flex-col items-center"><div class="bg-white shadow-sm h-24 w-24 rounded-full flex items-center justify-center mb-5 border border-brand-100"><i class="fas fa-receipt text-4xl text-brand-200"></i></div><p class="font-bold text-gray-800 text-xl mb-1">No Orders Yet</p></div>`;
                 return;
             }
 
-            let totalCollection = 0; let vendorShare = 0; let myProfit = 0;
+            let totalCollection = 0;
             let historyHTML = `<h3 class="font-bold text-brand-900 mb-3 text-sm flex items-center px-1"><i class="fas fa-history text-brand-400 mr-2"></i> Recent Orders</h3>`;
             
             for (let i = history.length - 1; i >= 0; i--) {
                 let order = history[i];
-                totalCollection += order.grandTotal;
-                vendorShare += order.itemTotal;
-                myProfit += order.deliveryFee;
-
+                totalCollection += order.total;
                 historyHTML += `
                     <div class="bg-white p-4 rounded-2xl shadow-sm border border-brand-100 mb-3 transition-all hover:shadow-md">
-                        <div class="flex justify-between items-center border-b border-brand-50 pb-3 mb-3">
-                            <div class="flex items-center space-x-3"><div class="bg-brand-50 text-brand-600 h-10 w-10 rounded-full flex items-center justify-center font-bold text-sm shadow-inner"><i class="fas fa-box"></i></div><div><span class="font-bold text-gray-900 block text-sm tracking-tight">#${order.id}</span><span class="text-gray-400 text-xs font-medium">${order.time}</span></div></div>
-                            <div class="text-right"><span class="font-black text-brand-900 block text-lg">₹${order.grandTotal}</span><span class="text-[9px] uppercase font-bold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200 mt-1 inline-block">${order.method}</span></div>
-                        </div>
-                        <div class="flex justify-between items-center text-xs bg-brand-50/80 p-2.5 rounded-lg border border-brand-100">
-                            <span class="text-gray-500 flex items-center"><i class="fas fa-store text-gold-500 mr-1.5"></i>Vendor: <strong class="text-gray-800 ml-1">₹${order.itemTotal}</strong></span>
-                            <span class="text-gray-500 flex items-center"><i class="fas fa-plus-circle text-green-500 mr-1.5"></i>App Fee: <strong class="text-green-600 ml-1">+₹${order.deliveryFee}</strong></span>
+                        <div class="flex justify-between items-center mb-1">
+                            <div class="flex items-center space-x-3">
+                                <div class="bg-brand-50 text-brand-600 h-10 w-10 rounded-full flex items-center justify-center font-bold text-sm border border-brand-100"><i class="fas fa-box"></i></div>
+                                <div><span class="font-bold text-gray-900 block text-sm tracking-tight">#${order.id}</span><span class="text-gray-400 text-xs font-medium">${order.time}</span></div>
+                            </div>
+                            <div class="text-right"><span class="font-black text-brand-900 block text-lg">₹${order.total}</span></div>
                         </div>
                     </div>`;
             }
 
             container.innerHTML = `
                 <div class="bg-brand-900 text-white p-6 rounded-3xl shadow-xl mb-6 relative overflow-hidden">
-                    <div class="absolute -top-10 -right-10 w-32 h-32 bg-brand-600 rounded-full blur-3xl opacity-50"></div>
-                    <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-gold-500 rounded-full blur-3xl opacity-20"></div>
-                    <p class="text-brand-200 text-xs font-bold uppercase tracking-widest mb-1">Total Collection (Dhanda)</p>
-                    <div class="flex items-baseline space-x-1 mb-5"><span class="text-2xl font-medium text-gold-400">₹</span><h2 class="text-4xl font-black tracking-tight text-white">${totalCollection}</h2></div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="bg-white/10 rounded-2xl p-3.5 backdrop-blur-md border border-white/10 flex flex-col justify-between"><p class="text-gold-400 text-[10px] font-bold uppercase tracking-wide mb-2 flex items-center"><i class="fas fa-store mr-1.5"></i> Vendor Amt</p><p class="text-xl font-bold text-white">₹${vendorShare}</p></div>
-                        <div class="bg-gradient-to-br from-gold-500/30 to-brand-500/20 rounded-2xl p-3.5 backdrop-blur-md border border-white/10 flex flex-col justify-between"><p class="text-green-300 text-[10px] font-bold uppercase tracking-wide mb-2 flex items-center"><i class="fas fa-wallet mr-1.5"></i> My Profit</p><p class="text-xl font-bold text-white">₹${myProfit}</p></div>
-                    </div>
+                    <i class="fas fa-chart-line absolute -right-4 -bottom-4 text-[100px] text-brand-800 opacity-50"></i>
+                    <p class="text-gold-400 text-xs font-bold uppercase tracking-widest mb-1 relative z-10">Total Collection (Dhanda)</p>
+                    <div class="flex items-baseline space-x-1 relative z-10"><span class="text-2xl font-medium text-brand-200">₹</span><h2 class="text-4xl font-black tracking-tight">${totalCollection}</h2></div>
                 </div>` + historyHTML;
         }
 
+        let isConfirmingClear = false;
         function clearHisaab() {
             const btn = document.getElementById('clearHisaabBtn');
             if(!isConfirmingClear) {
                 isConfirmingClear = true;
                 btn.innerText = "Are you sure? Click again to delete";
                 btn.className = "w-full bg-red-600 text-white border border-red-600 font-bold py-3.5 rounded-xl transition-all shadow-sm";
-                setTimeout(() => { if(isConfirmingClear) { isConfirmingClear = false; btn.innerText = "Clear Today's Hisaab"; btn.className = "w-full bg-red-50 text-red-600 border border-red-200 font-bold py-3.5 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm"; } }, 3000);
+                setTimeout(() => { if(isConfirmingClear) { isConfirmingClear = false; btn.innerText = "Clear Today's Hisaab"; btn.className = "w-full bg-brand-50 text-brand-800 border border-brand-200 font-bold py-3.5 rounded-xl hover:bg-brand-600 hover:text-white transition-all shadow-sm"; } }, 3000);
             } else {
                 localStorage.removeItem('alKaynatHistory'); isConfirmingClear = false;
-                btn.innerText = "Clear Today's Hisaab"; btn.className = "w-full bg-red-50 text-red-600 border border-red-200 font-bold py-3.5 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm";
-                renderHisaab(); showMessage("Hisaab cleared successfully.");
+                btn.innerText = "Clear Today's Hisaab"; btn.className = "w-full bg-brand-50 text-brand-800 border border-brand-200 font-bold py-3.5 rounded-xl hover:bg-brand-600 hover:text-white transition-all shadow-sm";
+                renderHisaab();
             }
         }
 
-        // =========================================================================
-        // INIT
-        // =========================================================================
         window.onload = () => { renderGrid(); };
     </script>
 </body>
