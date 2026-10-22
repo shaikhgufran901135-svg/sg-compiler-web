@@ -77,11 +77,15 @@
                     </div>
                 </div>
                 
-                <!-- Right Side (Desktop Only for Nav Items, Mobile uses Bottom Nav) -->
+                <!-- Right Side -->
                 <div class="flex items-center space-x-3 sm:space-x-4 shrink-0 pl-1">
                     <button onclick="toggleRateList()" class="text-brand-800 font-bold text-[10px] sm:text-xs uppercase tracking-wider flex items-center lg:hidden bg-brand-100 px-2 py-1.5 sm:px-3 sm:py-1.5 rounded-lg whitespace-nowrap">
                         <i class="fas fa-list-ul mr-1"></i> List
                     </button>
+                    
+                    <div class="hidden sm:flex items-center text-brand-800 text-xs font-bold uppercase tracking-wider cursor-pointer hover:text-brand-500" onclick="openMyOrders()">
+                        <i class="fas fa-map-marker-alt mr-1"></i> Track Order
+                    </div>
                     
                     <div class="relative cursor-pointer hidden lg:block" onclick="openCart()">
                         <i class="fas fa-shopping-bag text-xl sm:text-2xl text-brand-900 hover:text-brand-600 transition-colors"></i>
@@ -93,10 +97,9 @@
                         <i class="fas fa-user text-xs sm:text-sm"></i>
                     </div>
                 </div>
-                
             </div>
             
-            <!-- STICKY SEARCH BAR (Mobile Ke Liye) -->
+            <!-- STICKY SEARCH BAR -->
             <div class="px-3 pb-3 lg:hidden w-full max-w-6xl mx-auto pt-2">
                 <div class="bg-brand-50 border border-brand-200 rounded-xl px-4 py-3 flex items-center shadow-inner focus-within:border-brand-500 focus-within:bg-white focus-within:shadow-md transition-all w-full">
                     <i class="fas fa-search text-brand-500 mr-3 text-base"></i>
@@ -105,7 +108,7 @@
             </div>
         </div>
         
-        <!-- BRAND MARQUEE (Patti) -->
+        <!-- BRAND MARQUEE -->
         <div class="bg-brand-900 text-gold-400 overflow-hidden py-1.5 border-y border-gold-500/30">
             <div class="animate-marquee text-xs font-bold uppercase tracking-[0.2em]">
                 FOREVER 52 &nbsp; • &nbsp; MARS &nbsp; • &nbsp; RECODE &nbsp; • &nbsp; SWISS BEAUTY &nbsp; • &nbsp; MARY JO K &nbsp; • &nbsp; LOREAL PROFESSIONAL PARIS &nbsp; • &nbsp; PILGRIM &nbsp; • &nbsp; DOT&KEY &nbsp; • &nbsp; NOVA GOLD
@@ -166,34 +169,28 @@
     <!-- BOTTOM NAVIGATION BAR (Mobile Only) -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-[45] lg:hidden pb-[env(safe-area-inset-bottom)] shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
         <div class="flex justify-around items-center h-[60px] px-2">
-            <!-- Home -->
             <div class="flex flex-col items-center justify-center w-full h-full cursor-pointer text-navblue" onclick="navToHome()">
                 <i class="fas fa-home text-xl mb-0.5"></i>
                 <span class="text-[10px] font-semibold">Home</span>
                 <div class="absolute bottom-1 w-6 h-1 bg-navblue rounded-full"></div>
             </div>
             
-            <!-- Wishlist -->
             <div class="flex flex-col items-center justify-center w-full h-full cursor-pointer text-gray-500 hover:text-navblue transition-colors" onclick="openWishlist()">
                 <div class="relative">
                     <i class="far fa-heart text-xl mb-0.5"></i>
-                    <!-- Wishlist Badge -->
                     <span id="navWishlistBadge" class="absolute -top-1 -right-2 bg-navblue text-white text-[9px] font-bold h-4 w-4 rounded-full flex items-center justify-center hidden border border-white">0</span>
                 </div>
                 <span class="text-[10px] font-semibold">Wishlist</span>
             </div>
             
-            <!-- Cart -->
             <div class="flex flex-col items-center justify-center w-full h-full cursor-pointer text-gray-500 hover:text-navblue transition-colors" onclick="openCart()">
                 <div class="relative">
                     <i class="fas fa-shopping-cart text-xl mb-0.5"></i>
-                    <!-- Cart Badge -->
                     <span id="bottomCartBadge" class="absolute -top-1 -right-2 bg-navblue text-white text-[9px] font-bold h-4 w-4 rounded-full flex items-center justify-center hidden border border-white">0</span>
                 </div>
                 <span class="text-[10px] font-semibold">Cart</span>
             </div>
             
-            <!-- Profile -->
             <div class="flex flex-col items-center justify-center w-full h-full cursor-pointer text-gray-500 hover:text-navblue transition-colors" onclick="openMyOrders()">
                 <i class="far fa-user text-xl mb-0.5"></i>
                 <span class="text-[10px] font-semibold">Profile</span>
@@ -211,9 +208,6 @@
         <div class="flex-1 overflow-y-auto pb-24 bg-brand-50">
             <div class="w-full h-80 bg-white flex items-center justify-center p-6 border-b border-brand-100 relative group cursor-pointer" onclick="openImagePreview()">
                 <div class="absolute top-4 left-4 bg-green-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm z-10 uppercase" id="pdDiscountTag">0% OFF</div>
-                <div class="absolute bottom-4 right-4 bg-white/90 text-brand-900 text-[10px] font-bold px-3 py-1.5 rounded-full shadow-md z-10 flex items-center border border-brand-100">
-                    <i class="fas fa-expand-alt mr-1.5"></i> Tap to Zoom
-                </div>
                 <img id="pdMainImg" src="" class="h-full w-full object-contain mix-blend-multiply transition-transform duration-300 group-hover:scale-105">
             </div>
             
@@ -226,7 +220,6 @@
             <div class="px-5 mt-6 bg-white mx-4 rounded-2xl p-5 shadow-sm border border-brand-100 mb-6 relative">
                 <h1 id="pdTitle" class="text-2xl font-bold text-brand-900 brand-font leading-tight mb-1 pr-8">Product Name</h1>
                 
-                <!-- Wishlist Heart on Product Page -->
                 <button id="pdWishlistBtn" class="absolute top-5 right-5 h-8 w-8 bg-brand-50 rounded-full flex items-center justify-center text-gray-400 hover:text-brand-600 transition-colors">
                     <i class="far fa-heart text-xl"></i>
                 </button>
@@ -369,6 +362,18 @@
         </div>
     </div>
 
+    <!-- WHATSAPP PROMPT MODAL (Prevents Popup Blocker Issue) -->
+    <div id="whatsappPromptOverlay" class="fixed inset-0 bg-black/80 z-[120] hidden flex flex-col items-center justify-center modal-fade px-4 backdrop-blur-sm">
+        <div class="bg-white p-6 rounded-3xl w-full max-w-sm text-center shadow-2xl relative border-2 border-brand-100">
+            <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner"><i class="fab fa-whatsapp"></i></div>
+            <h2 class="text-xl font-bold text-brand-900 brand-font mb-2">Send Order Receipt</h2>
+            <p class="text-gray-500 text-sm mb-6 font-medium">Your payment has been initiated. Please send the order receipt on WhatsApp to confirm.</p>
+            <button onclick="document.getElementById('whatsappPromptOverlay').classList.add('hidden'); processWhatsAppOrder();" class="w-full bg-green-500 text-white font-bold py-3.5 rounded-xl shadow-md hover:bg-green-600 transition-colors flex items-center justify-center">
+                <i class="fas fa-paper-plane mr-2"></i> Send on WhatsApp
+            </button>
+        </div>
+    </div>
+
     <!-- Login / OTP Modal -->
     <div id="loginModal" class="fixed inset-0 bg-black/70 z-[80] hidden flex items-center justify-center modal-fade backdrop-blur-sm px-4">
         <div class="bg-white w-full max-w-[400px] rounded-3xl p-6 relative shadow-2xl">
@@ -428,13 +433,13 @@
         </div>
     </div>
 
-    <!-- MY ORDERS MODAL -->
+    <!-- MY ORDERS MODAL WITH TRACKING -->
     <div id="myOrdersModal" class="fixed inset-0 bg-black/70 z-[80] hidden flex flex-col justify-end modal-fade backdrop-blur-sm" onclick="if(event.target === this) closeMyOrders()">
         <div id="myOrdersSlide" class="bg-brand-50 w-full h-[90dvh] rounded-t-3xl relative shadow-2xl transform translate-y-full transition-transform duration-300 flex flex-col overflow-hidden">
             <div class="bg-white px-5 py-4 flex justify-between items-center border-b border-brand-100 sticky top-0 z-10 rounded-t-3xl">
                 <div>
                     <h2 class="text-xl font-bold text-brand-900 brand-font">My Profile & Orders</h2>
-                    <p class="text-xs text-gray-500 font-medium mt-0.5">Your order history and status</p>
+                    <p class="text-xs text-gray-500 font-medium mt-0.5">Track your order status</p>
                 </div>
                 <button onclick="closeMyOrders()" class="h-8 w-8 bg-brand-50 hover:bg-brand-100 rounded-full flex items-center justify-center text-brand-900"><i class="fas fa-times"></i></button>
             </div>
@@ -446,319 +451,21 @@
         // =========================================================================
         // DATA: PRODUCTS
         // =========================================================================
- const products = [
+        const products = [
             { 
-                id: 1, name: "Forever 52 Pro Artist Foundation", price: 1299, oldPrice: 1499, 
+                id: 1, name: "Forever 52 Pro Artist Foundation", price: 1, oldPrice: 1499, 
                 desc: "Professional artist foundation for flawless, long-lasting coverage.",
                 shades: [
-                    { id: "p1-s1", name: "BUF001 Cheese cake", color: "#F4D5B6", images: ["https://cdn.tirabeauty.com/v2/billowing-snowflake-434234/tira-p/wrkr/products/pictures/item/free/original/1120200/Oxyvklxy82-1120200_1.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Cheese+cake+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Cheese+cake+3"] },
-                    { id: "p1-s2", name: "FUF002 Custard", color: "#E8C396", images: ["https://cdn.tirabeauty.com/v2/billowing-snowflake-434234/tira-p/wrkr/products/pictures/item/free/original/daily-life-forever52/964451/0/4BKBNW6l5g-lZ4vSEKzF_-1.png", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Custard+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Custard+3"] },
-                    { id: "p1-s3", name: "FUF004 French Toast", color: "#D29B72", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=French+Toast+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=French+Toast+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=French+Toast+3"] },
-                    { id: "p1-s4", name: "FUF012 Brownie", color: "#6A4028", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Brownie+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Brownie+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Brownie+3"] }
+                    { id: "p1-s1", name: "BUF001 Cheese cake", color: "#F4D5B6", images: ["https://cdn.tirabeauty.com/v2/billowing-snowflake-434234/tira-p/wrkr/products/pictures/item/free/original/1120200/Oxyvklxy82-1120200_1.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Cheese+cake+2"] },
+                    { id: "p1-s2", name: "FUF002 Custard", color: "#E8C396", images: ["https://cdn.tirabeauty.com/v2/billowing-snowflake-434234/tira-p/wrkr/products/pictures/item/free/original/daily-life-forever52/964451/0/4BKBNW6l5g-lZ4vSEKzF_-1.png"] }
                 ]
             },
             { 
-                id: 2, name: "Forever 52 Coverup Foundation", price: 1199, oldPrice: 1399, 
-                desc: "High coverage foundation to conceal imperfections.",
-                shades: [
-                    { id: "p2-s1", name: "FCU20.1 Desert", color: "#E1BB93", images: ["https://m.media-amazon.com/images/I/51P96GvKcDL._SL1000_.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Desert+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Desert+3"] },
-                    { id: "p2-s2", name: "FCU20.6 Toast", color: "#D49E71", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Toast+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Toast+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Toast+3"] },
-                    { id: "p2-s3", name: "FCU30.1 Olive", color: "#C6986A", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Olive+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Olive+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Olive+3"] },
-                    { id: "p2-s4", name: "FCU30.4", color: "#B37D53", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=FCU30.4+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=FCU30.4+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=FCU30.4+3"] }
-                ]
-            },
-            { 
-                id: 3, name: "Forever 52 Ultra Def Liquid Foundation", price: 1099, oldPrice: 1299, 
-                desc: "Ultra definition liquid formula for a natural finish.",
-                shades: [
-                    { id: "p3-s1", name: "FLF011 Cheese cake", color: "#F4D5B6", images: ["https://tse1.mm.bing.net/th/id/OIP.bj9sIe42yqh3buUl39pjvAHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Cheese+cake+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Cheese+cake+3"] }
-                ]
-            },
-            { 
-                id: 4, name: "Forever 52 Complete Coverage Concealer", price: 699, oldPrice: 899, 
-                desc: "Complete coverage concealer for dark circles and spots.",
-                shades: [
-                    { id: "p4-s1", name: "COV001 Vanilla", color: "#FAE1CD", images: ["https://www.mypurefind.com/cdn/shop/files/COV001.png?v=1769708470&width=533", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Vanilla+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Vanilla+3"] },
-                    { id: "p4-s2", name: "COV003 Iced coffee", color: "#E6B892", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Iced+coffee+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Iced+coffee+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Iced+coffee+3"] },
-                    { id: "p4-s3", name: "COV005 Caramel", color: "#CA8C56", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Caramel+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Caramel+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Caramel+3"] }
-                ]
-            },
-            { 
-                id: 5, name: "Forever 52 Coverup Concealer", price: 749, oldPrice: 949, 
-                desc: "Smooth coverup concealer offering a flawless matte finish.",
-                shades: [
-                    { id: "p5-s1", name: "CCU10.5 Mandel", color: "#E1B690", images: ["https://static-01.daraz.com.np/p/9e2d777104b012f94c2162efdaf5fddc.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Mandel+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Mandel+3"] },
-                    { id: "p5-s2", name: "CCU30.2 Sienna", color: "#AD6D44", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Sienna+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Sienna+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Sienna+3"] }
-                ]
-            },
-            { 
-                id: 6, name: "Forever 52 Translucent Setting Powder", price: 899, oldPrice: 1199, 
-                desc: "Finely milled loose powder to set makeup.",
-                shades: [
-                    { id: "p6-s1", name: "TLM006 Classic Beige", color: "#EBD0B3", images: ["https://images-static.nykaa.com/media/catalog/product/6/a/6ac2ec5DAIAA00000112_6.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Classic+Beige+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Classic+Beige+3"] },
-                    { id: "p6-s2", name: "TLM001 White", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=White+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=White+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=White+3"] }
-                ]
-            },
-            { 
-        id: 7, name: "MARS SPF50 PA++++ High Coverage Foundation Tested by IN-VIVO (40ml)", price: 349, oldPrice: 499, 
-        desc: "High coverage foundation with SPF50 PA++++ sun protection.",
-        shades: [
-            { id: "p7-s1", name: "Shade 01", color: "#F5D6B8", images: ["https://m.media-amazon.com/images/I/51mbmgyI3AL._SL1500_.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S01+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S01+3"] },
-            { id: "p7-s2", name: "Shade 02", color: "#E8C19D", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S02+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S02+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S02+3"] },
-            { id: "p7-s3", name: "Shade 05", color: "#C88F65", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S05+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S05+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S05+3"] },
-            { id: "p7-s4", name: "Shade 06", color: "#B3774E", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S06+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S06+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S06+3"] }
-        ]
-    },
-    { 
-        id: 8, name: "MARS Infinity Matte Lip Color Palette", price: 299, oldPrice: 399, 
-        desc: "Multi-shade matte lip color palette for versatile lip looks.",
-        shades: [
-            { id: "p8-s1", name: "Variant 01", color: "#C94A50", images: ["https://marscosmetics.in/cdn/shop/files/Artboard16.jpg?v=1721212844&width=1500", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Lip+Palette+01+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Lip+Palette+01+3"] },
-            { id: "p8-s2", name: "Variant 03", color: "#A8384B", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Lip+Palette+03+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Lip+Palette+03+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Lip+Palette+03+3"] }
-        ]
-    },
-    { 
-        id: 9, name: "MARS Women Fantasy Highlighter Blusher & Contour Intense Pigmented Face Palette", price: 399, oldPrice: 499, 
-        desc: "All-in-one intense pigmented face palette with highlighter, blusher, and contour.",
-        shades: [{ id: "p9-s1", name: "Standard", color: "#FFFFFF", images: ["https://tse1.mm.bing.net/th/id/OIP.j2TGPIYS1V9nu-z9xK056gHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+9+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+9+Pic+3"] }]
-    },
-    { 
-        id: 10, name: "MARS Jashn-e-Shringaar 36 Color Eyeshadow Palette", price: 599, oldPrice: 799, 
-        desc: "Vibrant 36-color eyeshadow palette with matte and shimmer shades.",
-        shades: [{ id: "p10-s1", name: "Standard", color: "#FFFFFF", images: ["https://m.media-amazon.com/images/S/aplus-media-library-service-media/cac566de-4d17-4a73-ab2e-2202aac1bd50.__CR0,0,970,600_PT0_SX970_V1___.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+10+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+10+Pic+3"] }]
-    },
-    { 
-        id: 11, name: "MARS Its Glow Clock Primer Griping Glow", price: 329, oldPrice: 399, 
-        desc: "Hydrating gripping primer that gives a dewy, long-lasting makeup base.",
-        shades: [{ id: "p11-s1", name: "Standard", color: "#FFFFFF", images: ["https://www.indiangoods.shop/cdn/shop/files/e9c1d7aMARSX00000218x_1_1280x.jpg?v=1772686474", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+11+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+11+Pic+3"] }]
-    },
-    { 
-        id: 12, name: "MARS Color Changing Waterproof Satin Finish Foundation", price: 349, oldPrice: 449, 
-        desc: "Smart color-adapting waterproof foundation with a smooth satin finish.",
-        shades: [{ id: "p12-s1", name: "Standard", color: "#FFFFFF", images: ["https://image.cdn.shpy.in/365412/mars-color-changing-foundation-20ml-waterproof-li-1764688228605_SKU-12725_0.jpg?format=webp", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+12+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+12+Pic+3"] }]
-    },
-    { 
-        id: 13, name: "MARS TRIO Treat 3-IN-1 Eye Makeup Kit with Eyeliner", price: 399, oldPrice: 499, 
-        desc: "Complete 3-in-1 eye makeup combo kit with eyeliner, mascara, and kajal.",
-        shades: [{ id: "p13-s1", name: "Standard", color: "#FFFFFF", images: ["https://m.media-amazon.com/images/I/61D+O0rtErL._SL1500_.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+13+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+13+Pic+3"] }]
-    },
-    { 
-        id: 14, name: "MARS Trend Setting Loose Powder", price: 249, oldPrice: 299, 
-        desc: "Ultra-fine loose setting powder for a shine-free, smooth finish.",
-        shades: [{ id: "p14-s1", name: "Standard", color: "#FFFFFF", images: ["https://drive.brodox.com/uploads/1625/26/01/696f5c85efa3d2001261768905861.webp", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+14+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+14+Pic+3"] }]
-    },
-    { 
-        id: 15, name: "MARS Born To Bake Setting Powder With Matte Finish", price: 279, oldPrice: 349, 
-        desc: "Matte finish baking and setting powder to lock makeup in place.",
-        shades: [{ id: "p15-s1", name: "Standard", color: "#FFFFFF", images: ["https://marscosmetics.in/cdn/shop/files/Artboard_1_2048f431-c146-4464-a318-e230f0987180.jpg?v=1753272112&width=1500", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+15+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+15+Pic+3"] }]
-    },
-    { 
-        id: 16, name: "MARS Melody Compact Powder | Full Natural Coverage", price: 229, oldPrice: 299, 
-        desc: "Pressed compact powder offering full natural coverage.",
-        shades: [
-            { id: "p16-s1", name: "No.01", color: "#F7DEC8", images: ["https://tse2.mm.bing.net/th/id/OIP.zhlDH46O-DYnin5u8hydaQHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.01+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.01+3"] },
-            { id: "p16-s2", name: "No.02", color: "#EBC5A4", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.02+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.02+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.02+3"] },
-            { id: "p16-s3", name: "No.04", color: "#CFA07A", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.04+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.04+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.04+3"] }
-        ]
-    },
-    { 
-        id: 17, name: "MARS 3in1 Air Brush Compact Powder", price: 299, oldPrice: 399, 
-        desc: "3-in-1 airbrush finish compact powder for poreless skin.",
-        shades: [
-            { id: "p17-s1", name: "Shade 03", color: "#DFB38C", images: ["https://m.media-amazon.com/images/S/aplus-media-library-service-media/d89caeda-9adf-4d14-a36e-2a97907ed097.__CR0,0,970,600_PT0_SX970_V1___.png", "https://placehold.co/400x400/FDF6F6/9B2D45?text=AirBrush+S03+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=AirBrush+S03+3"] }
-        ]
-    },
-    { 
-        id: 18, name: "MARS 4 in 1 Eyebrow Powder Palette (8 gm)", price: 249, oldPrice: 329, 
-        desc: "4-in-1 eyebrow shaping and filling powder palette.",
-        shades: [{ id: "p18-s1", name: "Standard", color: "#FFFFFF", images: ["https://www.bigbasket.com/media/uploads/flatpages/mailer-images-aug/40340948_170625_1.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+18+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+18+Pic+3"] }]
-    },
-    { 
-        id: 19, name: "MARS Seal the Deal Long-Lasting Makeup Fixer Spray", price: 249, oldPrice: 299, 
-        desc: "Long-lasting makeup setting spray to keep makeup fresh all day.",
-        shades: [{ id: "p19-s1", name: "Standard", color: "#FFFFFF", images: ["https://images-static.nykaa.com/media/catalog/product/0/c/0cffee80MARSX00000290_1.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+19+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+19+Pic+3"] }]
-    },
-    { 
-        id: 20, name: "MARS Zero Pore Perfection Non-Sticky Silicone-Based Primer (25ml)", price: 299, oldPrice: 399, 
-        desc: "Non-sticky silicone-based primer that blurs pores instantly.",
-        shades: [{ id: "p20-s1", name: "Standard", color: "#FFFFFF", images: ["https://5.imimg.com/data5/SELLER/Default/2026/1/577377708/GH/GD/MN/93202015/mars-zero-pore-perfection-primer-1000x1000.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+20+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+20+Pic+3"] }]
-    },
-    { 
-        id: 21, name: "MARS SPF50 PA++++ Cancel Concealer with Radiant Finish (6 ml)", price: 229, oldPrice: 299, 
-        desc: "Radiant finish concealer with SPF50 PA++++ protection.",
-        shades: [
-            { id: "p21-s1", name: "Ivory Veil 01", color: "#F9E4CF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Ivory+Veil+01+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Ivory+Veil+01+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Ivory+Veil+01+3"] },
-            { id: "p21-s2", name: "Neutral Charm 04", color: "#E0B58E", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Neutral+Charm+04+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Neutral+Charm+04+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Neutral+Charm+04+3"] },
-            { id: "p21-s3", name: "Honey Glow 06", color: "#C69065", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Honey+Glow+06+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Honey+Glow+06+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Honey+Glow+06+3"] }
-        ]
-    },
-    { 
-        id: 22, name: "L'Oreal Paris Infallible 3-Second Setting Spray Mist (75 ml)", price: 799, oldPrice: 999, 
-        desc: "Micro-fine setting mist that locks makeup in just 3 seconds without transfer.",
-        shades: [{ id: "p22-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+22+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+22+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+22+Pic+3"] }]
-    },
-    { 
-        id: 23, name: "KRYOLAN Fixing Spray (75 ml)", price: 1150, oldPrice: 1350, 
-        desc: "Professional makeup fixing spray for smudge-proof, waterproof wear (75 ml).",
-        shades: [{ id: "p23-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+23+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+23+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+23+Pic+3"] }]
-    },
-    { 
-        id: 24, name: "KRYOLAN Fixing Spray (300 ml)", price: 2450, oldPrice: 2800, 
-        desc: "Full-size professional fixing spray for long-lasting bridal and stage makeup (300 ml).",
-        shades: [{ id: "p24-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+24+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+24+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+24+Pic+3"] }]
-    },
-    { 
-        id: 25, name: "The UCANBE Pretty All Set 2 Eyeshadow Palette", price: 1299, oldPrice: 1599, 
-        desc: "Complete multi-color professional eyeshadow palette with high pigmentation.",
-        shades: [{ id: "p25-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+25+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+25+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+25+Pic+3"] }]
-    },
-    { 
-        id: 26, name: "DE'LANCI Matte Lipstick Palette", price: 999, oldPrice: 1299, 
-        desc: "Professional lip color palette with rich, blendable matte shades.",
-        shades: [{ id: "p26-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+26+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+26+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+26+Pic+3"] }]
-    },
-    { 
-        id: 27, name: "IMAGIC Professional Cosmetic Touch Blush Palette 6 Color (80g)", price: 699, oldPrice: 899, 
-        desc: "6-color professional blush palette for a natural, flushed glow.",
-        shades: [{ id: "p27-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+27+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+27+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+27+Pic+3"] }]
-    },
-    { 
-        id: 28, name: "FLiCKA Silk Touch 3-in-1 Primer + Moisturizer", price: 399, oldPrice: 499, 
-        desc: "3-in-1 primer and moisturizer that blurs 100% of pores for a silky finish.",
-        shades: [{ id: "p28-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+28+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+28+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+28+Pic+3"] }]
-    },
-    { 
-        id: 29, name: "Recode Ace of Base Concealer", price: 499, oldPrice: 650, 
-        desc: "Full coverage color-correcting and base concealer.",
-        shades: [
-            { id: "p29-s1", name: "08 Orange", color: "#E86F38", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Ace+08+Orange+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Ace+08+Orange+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Ace+08+Orange+3"] }
-        ]
-    },
-    { 
-        id: 30, name: "Recode Silky Moisturizer Cum Primer (60 G)", price: 599, oldPrice: 750, 
-        desc: "Nourishing silky moisturizer cum primer for a smooth makeup canvas.",
-        shades: [{ id: "p30-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+30+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+30+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+30+Pic+3"] }]
-    },
-    { 
-        id: 31, name: "Recode Hyaluronic Acid Glow Mist (100 ML)", price: 450, oldPrice: 595, 
-        desc: "Hydrating hyaluronic acid face mist for an instant dewy glow.",
-        shades: [{ id: "p31-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+31+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+31+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+31+Pic+3"] }]
-    },
-    { 
-        id: 32, name: "Recode Perfect Grip Spray - Makeup Fixer (100 ML)", price: 550, oldPrice: 699, 
-        desc: "High-hold makeup fixer spray that locks your look in place.",
-        shades: [{ id: "p32-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+32+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+32+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+32+Pic+3"] }]
-    },
-    { 
-        id: 33, name: "Recode Perfect Grip Primer (12 ML)", price: 350, oldPrice: 450, 
-        desc: "Travel-friendly gripping primer for long-lasting makeup adherence.",
-        shades: [{ id: "p33-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+33+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+33+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+33+Pic+3"] }]
-    },
-    { 
-        id: 34, name: "Recode We Stole Da Show Concealer (6 ML)", price: 499, oldPrice: 650, 
-        desc: "High-definition liquid concealer to brighten and correct dark spots.",
-        shades: [
-            { id: "p34-s1", name: "01 Light", color: "#F5D8BE", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Recode+01+Light+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Recode+01+Light+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Recode+01+Light+3"] },
-            { id: "p34-s2", name: "06 Orange", color: "#E86F38", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Recode+06+Orange+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Recode+06+Orange+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Recode+06+Orange+3"] }
-        ]
-    },
-    { 
-        id: 35, name: "Recode Clay Matte Liquid Lipsticks (2 ML x 10)", price: 1199, oldPrice: 1499, 
-        desc: "Set of 10 smudge-proof clay matte liquid lipsticks.",
-        shades: [{ id: "p35-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+35+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+35+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+35+Pic+3"] }]
-    },
-    { 
-        id: 36, name: "Recode Concealer Refill (3.50 G)", price: 299, oldPrice: 399, 
-        desc: "Creamy concealer pan refill for custom makeup palettes.",
-        shades: [
-            { id: "p36-s1", name: "Shade - 1", color: "#F6DEC6", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+1+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+1+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+1+3"] },
-            { id: "p36-s2", name: "Shade - 2", color: "#E6C29F", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+2+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+2+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+2+3"] },
-            { id: "p36-s3", name: "Shade - 17", color: "#B87B50", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+17+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+17+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+17+3"] }
-        ]
-    },
-    { 
-        id: 37, name: "Recode 10 Silky Matte Mini Liquid Lipsticks - 12.50 ML (1.25ML x 10)", price: 999, oldPrice: 1299, 
-        desc: "Pack of 10 mini silky matte liquid lipsticks for everyday wear.",
-        shades: [{ id: "p37-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+37+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+37+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+37+Pic+3"] }]
-    },
-
-    // --- 15 EXTRA PLACEHOLDER ITEMS (ID 38 TO 52) ---
-    { 
-        id: 38, name: "Item Placeholder 1", price: 350, oldPrice: 499, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p38-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+38+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+38+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+38+Pic+3"] }]
-    },
-    { 
-        id: 39, name: "Item Placeholder 2", price: 450, oldPrice: 599, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p39-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+39+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+39+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+39+Pic+3"] }]
-    },
-    { 
-        id: 40, name: "Item Placeholder 3", price: 299, oldPrice: 399, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p40-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+40+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+40+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+40+Pic+3"] }]
-    },
-    { 
-        id: 41, name: "Item Placeholder 4", price: 550, oldPrice: 750, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p41-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+41+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+41+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+41+Pic+3"] }]
-    },
-    { 
-        id: 42, name: "Item Placeholder 5", price: 199, oldPrice: 299, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p42-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+42+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+42+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+42+Pic+3"] }]
-    },
-    { 
-        id: 43, name: "Item Placeholder 6", price: 899, oldPrice: 1099, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p43-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+43+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+43+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+43+Pic+3"] }]
-    },
-    { 
-        id: 44, name: "Item Placeholder 7", price: 399, oldPrice: 499, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p44-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+44+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+44+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+44+Pic+3"] }]
-    },
-    { 
-        id: 45, name: "Item Placeholder 8", price: 499, oldPrice: 649, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p45-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+45+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+45+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+45+Pic+3"] }]
-    },
-    { 
-        id: 46, name: "Item Placeholder 9", price: 650, oldPrice: 799, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p46-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+46+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+46+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+46+Pic+3"] }]
-    },
-    { 
-        id: 47, name: "Item Placeholder 10", price: 250, oldPrice: 349, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p47-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+47+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+47+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+47+Pic+3"] }]
-    },
-    { 
-        id: 48, name: "Item Placeholder 11", price: 799, oldPrice: 999, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p48-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+48+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+48+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+48+Pic+3"] }]
-    },
-    { 
-        id: 49, name: "Item Placeholder 12", price: 320, oldPrice: 420, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p49-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+49+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+49+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+49+Pic+3"] }]
-    },
-    { 
-        id: 50, name: "Item Placeholder 13", price: 599, oldPrice: 749, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p50-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+50+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+50+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+50+Pic+3"] }]
-    },
-    { 
-        id: 51, name: "Item Placeholder 14", price: 420, oldPrice: 550, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p51-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+51+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+51+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+51+Pic+3"] }]
-    },
-    { 
-        id: 52, name: "Item Placeholder 15", price: 950, oldPrice: 1199, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p52-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+52+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+52+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+52+Pic+3"] }]
-    }
-];
+                id: 52, name: "Item Placeholder 15", price: 950, oldPrice: 1199, 
+                desc: "Item details will go here.",
+                shades: [{ id: "p52-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+52+Pic+1"] }]
+            }
+        ];
         
         // =========================================================================
         // LOGIC & STATE
@@ -1020,7 +727,6 @@
             document.getElementById('pdDiscountTag').innerText = Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100) + "% OFF";
             document.getElementById('pdDesc').innerText = p.desc;
 
-            // Update Wishlist button on Product Page
             const pdWishlistBtn = document.getElementById('pdWishlistBtn');
             pdWishlistBtn.onclick = (e) => toggleWishlist(e, p.id);
             if (wishlist.includes(p.id)) {
@@ -1190,7 +896,6 @@
             let deliveryFee = (count > 0 && itemTotal < 500) ? 49 : 0; 
             let grandTotal = itemTotal + deliveryFee;
 
-            // Nav badges update
             const navBadge = document.getElementById('navCartBadge');
             const bottomBadge = document.getElementById('bottomCartBadge');
             if(count > 0) { 
@@ -1321,7 +1026,7 @@
             }
         }
 
-        // --- MY ORDERS SYSTEM ---
+        // --- MY ORDERS SYSTEM (WITH LIVE TRACKING) ---
         function openMyOrders() {
             if (!userLoggedIn) { openLoginModal(); return; }
             pushAppModal('myorders');
@@ -1357,7 +1062,7 @@
                     <p class="text-gray-500 text-sm font-medium">+91 ${customerPhone}</p>
                 </div>
             </div>
-            <h3 class="font-bold text-brand-900 mb-3 brand-font text-lg">Order History</h3>`;
+            <h3 class="font-bold text-brand-900 mb-3 brand-font text-lg">Track Your Orders</h3>`;
 
             if (myOrders.length === 0) {
                 container.innerHTML = profileHtml + `<div class="text-center py-10 flex flex-col items-center bg-white rounded-2xl border border-brand-50"><div class="h-16 w-16 bg-brand-50 rounded-full flex items-center justify-center mb-3"><i class="fas fa-shopping-bag text-3xl text-brand-200"></i></div><p class="text-gray-800 font-bold">No orders yet</p></div>`;
@@ -1366,6 +1071,18 @@
 
             let html = profileHtml;
             myOrders.forEach(order => {
+                // Determine Simulated Tracking Step based on Time Passed
+                let step = 1; // 1: Placed, 2: Shipped, 3: Out for Delivery, 4: Delivered
+                let statusText = "Order Placed";
+                let progressWidth = 10;
+                
+                if(order.timestamp) {
+                    let daysPassed = Math.floor((new Date().getTime() - order.timestamp) / (1000 * 3600 * 24));
+                    if(daysPassed >= 7) { step = 4; statusText = "Delivered"; progressWidth = 100; }
+                    else if(daysPassed >= 4) { step = 3; statusText = "Out for Delivery"; progressWidth = 66; }
+                    else if(daysPassed >= 2) { step = 2; statusText = "Shipped"; progressWidth = 33; }
+                }
+
                 let itemsHtml = '';
                 order.items.forEach(item => {
                    itemsHtml += `<div class="flex items-center space-x-3 mt-3 border-t border-gray-100 pt-3">
@@ -1377,12 +1094,43 @@
                         <div class="font-black text-brand-900 text-sm">₹${item.price}</div>
                    </div>`;
                 });
+
+                // TRACKING TIMELINE UI
+                let trackingHtml = `
+                <div class="mt-5 mb-2 px-1">
+                    <div class="flex justify-between items-center relative">
+                        <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-200 z-0 rounded"></div>
+                        <div class="absolute left-0 top-1/2 transform -translate-y-1/2 h-1 bg-green-500 z-0 transition-all rounded" style="width: ${progressWidth}%"></div>
+                        
+                        <div class="relative z-10 flex flex-col items-center">
+                            <div class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] ${step >= 1 ? 'bg-green-500 text-white shadow-md' : 'bg-gray-200 text-gray-400'}"><i class="fas fa-check"></i></div>
+                        </div>
+                        <div class="relative z-10 flex flex-col items-center">
+                            <div class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] ${step >= 2 ? 'bg-green-500 text-white shadow-md' : 'bg-gray-200 text-gray-400'}"><i class="fas fa-box"></i></div>
+                        </div>
+                        <div class="relative z-10 flex flex-col items-center">
+                            <div class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] ${step >= 3 ? 'bg-green-500 text-white shadow-md' : 'bg-gray-200 text-gray-400'}"><i class="fas fa-truck"></i></div>
+                        </div>
+                        <div class="relative z-10 flex flex-col items-center">
+                            <div class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] ${step >= 4 ? 'bg-green-500 text-white shadow-md' : 'bg-gray-200 text-gray-400'}"><i class="fas fa-home"></i></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center mt-1.5 px-1">
+                        <span class="text-[9px] font-bold ${step >= 1 ? 'text-green-600' : 'text-gray-400'}">Placed</span>
+                        <span class="text-[9px] font-bold ${step >= 2 ? 'text-green-600' : 'text-gray-400'}">Shipped</span>
+                        <span class="text-[9px] font-bold ${step >= 3 ? 'text-green-600' : 'text-gray-400'} pl-2">Out for Delivery</span>
+                        <span class="text-[9px] font-bold ${step >= 4 ? 'text-green-600' : 'text-gray-400'}">Delivered</span>
+                    </div>
+                    ${step < 4 ? `<p class="text-[10px] text-gray-500 mt-3 text-center bg-gray-50 py-1 rounded-md border border-gray-100"><i class="fas fa-clock text-brand-400 mr-1"></i> Expected Delivery in 7 Days</p>` : `<p class="text-[10px] text-green-600 mt-3 text-center bg-green-50 py-1 rounded-md border border-green-100 font-bold"><i class="fas fa-check-circle mr-1"></i> Order Delivered Successfully</p>`}
+                </div>`;
+
                 html += `
                 <div class="bg-white rounded-2xl p-4 shadow-sm border border-brand-100 mb-4 transition-all hover:shadow-md">
-                    <div class="flex justify-between items-center mb-3 pb-3 border-b border-brand-50">
-                        <div><span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Order ID: ${order.orderId}</span><div class="text-xs font-bold text-gray-800 mt-0.5">${order.date} • ${order.time}</div></div>
-                        <div class="bg-green-50 text-green-700 px-2.5 py-1 rounded-md font-bold text-[10px] uppercase tracking-wider flex items-center"><i class="fas fa-check-circle mr-1.5"></i> ${order.status}</div>
+                    <div class="flex justify-between items-center mb-1 pb-1">
+                        <div><span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Order ID: ${order.orderId}</span><div class="text-xs font-bold text-gray-800 mt-0.5">${order.date}</div></div>
+                        <div class="bg-${step === 4 ? 'green' : 'blue'}-50 text-${step === 4 ? 'green' : 'blue'}-700 px-2.5 py-1 rounded-md font-bold text-[10px] uppercase tracking-wider flex items-center border border-${step === 4 ? 'green' : 'blue'}-100">${statusText}</div>
                     </div>
+                    ${trackingHtml}
                     ${itemsHtml}
                     <div class="flex justify-between items-center mt-4 pt-3 border-t border-brand-50">
                         <span class="text-xs font-bold text-gray-500 uppercase">Grand Total</span>
@@ -1412,7 +1160,6 @@
             
             customerName = name; 
             customerPhone = phone; 
-            // FULL ADDRESS FORMAT
             currentAddress = `${house}, ${area}, ${city}, Pincode: ${pin}`;
             
             document.getElementById('topAddressText').innerText = city + " - " + pin; 
@@ -1432,26 +1179,28 @@
             popAppModal('payment');
         }
 
+        // STEP 1: OPEN UPI APP THEN SHOW WHATSAPP PROMPT
         function processOnlinePayment(appName) {
             selectedUPIApp = appName; 
             closePaymentModal(); 
             
             let merchantUpiId = "BHARATPE2C0V0R7T6Q19746@unitype"; 
-            
             let storeName = "Al Kaynat Cosmetic";
             let amountToPay = document.getElementById('billGrandTotal').innerText;
             let orderNote = "Order by " + customerName;
 
             let upiUrl = `upi://pay?pa=${merchantUpiId}&pn=${encodeURIComponent(storeName)}&am=${amountToPay}&tn=${encodeURIComponent(orderNote)}&cu=INR`;
             
+            // 1. Send to UPI App
             window.location.href = upiUrl;
             
+            // 2. Show WhatsApp Prompt safely after delay
             setTimeout(() => { 
-                processWhatsAppOrder(); 
-            }, 3500);
+                document.getElementById('whatsappPromptOverlay').classList.remove('hidden');
+            }, 3000);
         }
 
-        // --- WHATSAPP ORDER PROCESSING ---
+        // STEP 2: GENERATE ID AND OPEN WHATSAPP (USER CLICK TRIGGERED)
         function processWhatsAppOrder() {
             let orderId = 'ORD' + Math.floor(100000 + Math.random() * 900000);
             
@@ -1460,7 +1209,7 @@
             waMsg += `👤 *Customer Name:* ${customerName}\n`;
             waMsg += `📞 *Phone:* ${customerPhone}\n`;
             waMsg += `📍 *Delivery Address:*\n${currentAddress}\n\n`;
-            waMsg += `💳 *Payment Mode:* ${selectedUPIApp ? 'ONLINE ('+selectedUPIApp+')' : 'Cash on Delivery/Direct'}\n\n`;
+            waMsg += `💳 *Payment Mode:* ONLINE (${selectedUPIApp})\n\n`;
             waMsg += `🛍️ *ORDER DETAILS:*\n`;
             
             for(let sId in cart) { 
@@ -1484,7 +1233,7 @@
             }); 
             localStorage.setItem('alKaynatHistory', JSON.stringify(history)); 
             
-            // --- SAVE USER ORDER LOCALLY FOR MY ORDERS PAGE ---
+            // --- SAVE USER ORDER LOCALLY FOR MY ORDERS PAGE (WITH TIMESTAMP FOR TRACKING) ---
             let myOrders = JSON.parse(localStorage.getItem('alKaynat_Orders_' + customerPhone) || '[]');
             let orderItems = [];
             for(let sId in cart) { 
@@ -1495,12 +1244,14 @@
                 orderId: orderId,
                 date: new Date().toLocaleDateString(),
                 time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                timestamp: new Date().getTime(), // Tracking Calculation ke liye
                 total: document.getElementById('billGrandTotal').innerText,
                 status: 'Order Placed',
                 items: orderItems
             });
             localStorage.setItem('alKaynat_Orders_' + customerPhone, JSON.stringify(myOrders));
             
+            // SAFE WHATSAPP OPEN
             window.open(`https://api.whatsapp.com/send?phone=${ownerWhatsAppNumber}&text=${encodeURIComponent(waMsg)}`, '_blank');
             cart = {}; 
             renderGrid(); 
@@ -1614,7 +1365,7 @@
         }
 
         // ==========================================
-        // ANDROID BACK BUTTON FIX (HISTORY LOGIC)
+        // ANDROID BACK BUTTON FIX
         // ==========================================
         let activeModals = [];
 
