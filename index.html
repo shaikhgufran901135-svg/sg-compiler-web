@@ -163,8 +163,9 @@
     </div>
 
     <!-- FULL PAGE PRODUCT DETAIL -->
-    <div id="productDetailPage" class="fixed inset-0 bg-white z-[60] flex flex-col transform translate-y-full slide-up h-[100dvh]">
-        <div class="bg-white/90 backdrop-blur-md px-4 py-3 flex justify-between items-center sticky top-0 z-10 border-b border-brand-100">
+<div id="productDetailPage" class="fixed inset-0 bg-white z-[60] flex flex-col transform translate-y-full slide-up h-[100dvh]">
+        
+        <div class="bg-white/90 backdrop-blur-md px-4 pb-3 flex justify-between items-center sticky top-0 z-10 border-b border-brand-100" style="padding-top: max(env(safe-area-inset-top), 40px);">
             <h2 class="font-bold text-lg text-brand-900 brand-font truncate pr-4">Details</h2>
             <button onclick="closeProductPage()" class="h-8 w-8 bg-brand-50 hover:bg-brand-100 rounded-full flex items-center justify-center text-brand-900"><i class="fas fa-times"></i></button>
         </div>
@@ -208,7 +209,6 @@
             <div id="pdActionContainer" class="max-w-md mx-auto"></div>
         </div>
     </div>
-
     <!-- FULL SCREEN IMAGE PREVIEW MODAL -->
     <div id="imagePreviewModal" class="fixed inset-0 bg-black/95 z-[120] hidden flex justify-center items-center backdrop-blur-md" onclick="closeImagePreview()">
         <button class="absolute top-6 right-6 text-white bg-white/20 h-10 w-10 rounded-full flex items-center justify-center hover:bg-white/40 transition-colors z-[130]">
