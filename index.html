@@ -1628,7 +1628,7 @@
             popAppModal('payment');
         }
 
-        function processOnlinePayment(appName) {
+function processOnlinePayment(appName) {
             selectedUPIApp = appName; 
             closePaymentModal(); 
             
@@ -1637,7 +1637,11 @@
             let amountToPay = document.getElementById('billGrandTotal').innerText;
             let orderNote = "Order by " + customerName;
 
-            let upiUrl = `upi://pay?pa=${merchantUpiId}&pn=${encodeURIComponent(storeName)}&am=${amountToPay}&tn=${encodeURIComponent(orderNote)}&cu=INR`;
+            // Naya: Har order ke liye ek unique Transaction ID (tr) generate hogi
+            let transactionId = "TXN" + Date.now();
+            
+            // Naya: Link mein &tr=${transactionId} aur &mc=5499 add kiya gaya hai
+            let upiUrl = `upi://pay?pa=${merchantUpiId}&pn=${encodeURIComponent(storeName)}&am=${amountToPay}&tn=${encodeURIComponent(orderNote)}&tr=${transactionId}&mc=5499&cu=INR`;
             
             window.location.href = upiUrl;
             
