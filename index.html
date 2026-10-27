@@ -2,47 +2,68 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <!-- Status Bar Color ke liye -->
-    <meta name="theme-color" content="#5A0B1E">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#3A0D19">
     <title>Al Kaynat Cosmetic Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        brand: { 50: '#FCF6F6', 100: '#F2E8E8', 200: '#E6D3D3', 500: '#9B2D45', 600: '#802237', 800: '#541627', 900: '#3A0D19' },
-                        gold: { 400: '#E8C37D', 500: '#D4AF37' },
-                        navblue: '#0d6efd'
+                        brand: { 50: '#FDF8F8', 100: '#F5EBEB', 200: '#E8D5D5', 400: '#B85D70', 500: '#9B2D45', 600: '#802237', 800: '#541627', 900: '#3A0D19' },
+                        gold: { 300: '#F3DFB0', 400: '#E8C37D', 500: '#D4AF37' },
+                        navblue: '#9B2D45'
                     },
-                    fontFamily: { serif: ['"Playfair Display"', 'serif'], sans: ['Inter', 'sans-serif'] }
+                    fontFamily: { serif: ['"Playfair Display"', 'serif'], sans: ['"Plus Jakarta Sans"', 'sans-serif'] }
                 }
             }
         }
     </script>
 
     <style>
-        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; background-color: #fafafa; }
+        * {
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+        }
+        html, body {
+            max-width: 100vw;
+            overflow-x: hidden !important;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #FAF6F6;
+            scroll-behavior: smooth;
+        }
         h1, h2, h3, .brand-font { font-family: 'Playfair Display', serif; }
-        .slide-up { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .modal-fade { transition: opacity 0.2s ease-in-out; }
+        
+        /* OS Spring Animations */
+        .slide-up { transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1); }
+        .modal-fade { transition: opacity 0.25s ease-in-out; }
+        
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #E6D3D3; border-radius: 4px; }
-        .shade-active { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #3A0D19; }
+        
+        .shade-active { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #3A0D19; transform: scale(1.12); }
+
+        /* OS Card Hover & Press Physics */
+        .os-card {
+            transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+        }
+        .os-card:active {
+            transform: scale(0.97);
+        }
 
         @keyframes slideDownOTP { 
-            0% { transform: translateY(-100%); opacity: 0; } 
-            10% { transform: translateY(0); opacity: 1; } 
-            90% { transform: translateY(0); opacity: 1; } 
-            100% { transform: translateY(-100%); opacity: 0; } 
+            0% { transform: translateY(-120%) scale(0.95); opacity: 0; } 
+            12% { transform: translateY(0) scale(1); opacity: 1; } 
+            88% { transform: translateY(0) scale(1); opacity: 1; } 
+            100% { transform: translateY(-120%) scale(0.95); opacity: 0; } 
         }
-        .otp-toast { animation: slideDownOTP 6s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        .otp-toast { animation: slideDownOTP 6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
 
         @keyframes scrollMarquee { 
             0% { transform: translateX(100%); } 
@@ -50,255 +71,283 @@
         }
         .animate-marquee { 
             display: inline-block; 
-            animation: scrollMarquee 35s linear infinite; 
+            animation: scrollMarquee 32s linear infinite; 
             white-space: nowrap; 
             padding-right: 100%; 
+        }
+
+        .brand-pill.active {
+            background: linear-gradient(135deg, #541627 0%, #3A0D19 100%);
+            color: #E8C37D;
+            border-color: #3A0D19;
+            box-shadow: 0 4px 12px rgba(58, 13, 25, 0.2);
         }
     </style>
 </head>
 <body class="bg-brand-50 text-gray-800 pb-32 lg:pb-10">
 
-    <!-- HEADER -->
-    <header class="bg-brand-900 sticky top-0 z-40" style="padding-top: max(env(safe-area-inset-top), 28px);">
-        <!-- Navbar ka main white background -->
-        <div class="bg-white shadow-sm border-b border-brand-100">
-            <div class="px-3 py-2 sm:px-4 sm:py-3 flex justify-between items-center max-w-6xl mx-auto gap-2">
+    <!-- OS LUXURY STICKY HEADER -->
+    <header class="bg-brand-900 sticky top-0 z-40 shadow-sm" style="padding-top: max(env(safe-area-inset-top), 24px);">
+        <div class="bg-white/95 backdrop-blur-xl border-b border-brand-100">
+            <div class="px-3 py-2.5 sm:px-4 sm:py-3 flex justify-between items-center max-w-6xl mx-auto gap-2">
                 
-                <!-- Left Side -->
-                <div class="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
-                    <div onclick="handleAdminTap()" class="bg-brand-900 text-gold-400 rounded-xl w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center font-black text-lg sm:text-xl leading-none shadow-md cursor-pointer select-none active:scale-95 transition-transform shrink-0 brand-font">AK</div>
+                <!-- Left Side: AK Logo + Address -->
+                <div class="flex items-center space-x-2.5 sm:space-x-3 flex-1 min-w-0">
+                    <div onclick="handleAdminTap()" class="bg-gradient-to-br from-brand-800 to-brand-900 text-gold-400 rounded-2xl w-10 h-10 flex items-center justify-center font-black text-lg leading-none shadow-md border border-gold-500/30 cursor-pointer select-none active:scale-90 transition-transform shrink-0 brand-font">AK</div>
                     
-                    <div class="flex flex-col cursor-pointer min-w-0" onclick="openAddressModal()">
+                    <div class="flex flex-col cursor-pointer min-w-0 bg-brand-50/80 px-2.5 py-1 rounded-xl border border-brand-100 active:scale-95 transition-transform" onclick="openAddressModal()">
                         <div class="flex items-center space-x-1">
-                            <span class="font-bold text-xs sm:text-sm truncate text-brand-900 brand-font">Deliver to</span>
-                            <i class="fas fa-chevron-down text-[10px] sm:text-xs text-brand-500 shrink-0"></i>
+                            <i class="fas fa-location-dot text-[10px] text-brand-500"></i>
+                            <span class="font-extrabold text-[11px] sm:text-xs truncate text-brand-900 uppercase tracking-wider">Deliver to</span>
+                            <i class="fas fa-chevron-down text-[9px] text-brand-500 shrink-0"></i>
                         </div>
-                        <span class="text-[10px] sm:text-xs text-gray-500 truncate" id="topAddressText">Select Location</span>
+                        <span class="text-[11px] sm:text-xs font-semibold text-gray-600 truncate" id="topAddressText">Select Location</span>
                     </div>
                 </div>
                 
-                <!-- Right Side -->
-                <div class="flex items-center space-x-3 sm:space-x-4 shrink-0 pl-1">
-                    <button onclick="toggleRateList()" class="text-brand-800 font-bold text-[10px] sm:text-xs uppercase tracking-wider flex items-center lg:hidden bg-brand-100 px-2 py-1.5 sm:px-3 sm:py-1.5 rounded-lg whitespace-nowrap">
-                        <i class="fas fa-list-ul mr-1"></i> List
+                <!-- Right Side Controls -->
+                <div class="flex items-center space-x-2.5 sm:space-x-4 shrink-0">
+                    <button onclick="toggleRateList()" class="text-brand-900 font-extrabold text-[11px] uppercase tracking-wider flex items-center lg:hidden bg-brand-100/80 border border-brand-200 px-3 py-2 rounded-xl active:scale-95 transition-transform whitespace-nowrap shadow-sm">
+                        <i class="fas fa-bolt text-gold-500 mr-1.5"></i> Quick List
                     </button>
                     
                     <div class="hidden sm:flex items-center text-brand-800 text-xs font-bold uppercase tracking-wider cursor-pointer hover:text-brand-500" onclick="openMyOrders()">
-                        <i class="fas fa-map-marker-alt mr-1"></i> Track Order
+                        <i class="fas fa-box-open mr-1.5"></i> Track Order
                     </div>
                     
-                    <div class="relative cursor-pointer hidden lg:block" onclick="openCart()">
-                        <i class="fas fa-shopping-bag text-xl sm:text-2xl text-brand-900 hover:text-brand-600 transition-colors"></i>
-                        <span id="navCartBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] sm:text-[10px] font-bold h-3.5 w-3.5 sm:h-4 sm:w-4 rounded-full flex items-center justify-center hidden border border-white shadow-sm">0</span>
+                    <div class="relative cursor-pointer hidden lg:flex h-10 w-10 bg-brand-50 rounded-xl items-center justify-center border border-brand-100" onclick="openCart()">
+                        <i class="fas fa-shopping-bag text-lg text-brand-900"></i>
+                        <span id="navCartBadge" class="absolute -top-1.5 -right-1.5 bg-brand-600 text-white text-[10px] font-bold h-5 w-5 rounded-full flex items-center justify-center hidden border-2 border-white shadow-sm">0</span>
                     </div>
                     
-                    <button id="loginNavBtn" onclick="openLoginModal()" class="px-4 py-1.5 bg-brand-50 text-brand-900 rounded border border-brand-200 font-bold text-sm cursor-pointer hover:bg-brand-100">Login</button>
-                    <div id="userProfileIcon" onclick="openMyOrders()" class="hidden cursor-pointer h-7 w-7 sm:h-8 sm:w-8 bg-brand-100 rounded-full flex items-center justify-center text-brand-900 font-bold border border-brand-200 hover:bg-brand-200 transition-colors lg:flex">
-                        <i class="fas fa-user text-xs sm:text-sm"></i>
+                    <button id="loginNavBtn" onclick="openLoginModal()" class="px-3.5 py-2 bg-brand-900 text-gold-400 rounded-xl font-bold text-xs cursor-pointer shadow-sm active:scale-95 transition-transform">Login</button>
+                    <div id="userProfileIcon" onclick="openMyOrders()" class="hidden cursor-pointer h-9 w-9 bg-brand-100 rounded-xl flex items-center justify-center text-brand-900 font-bold border border-brand-200 hover:bg-brand-200 transition-colors lg:flex">
+                        <i class="fas fa-user text-xs"></i>
                     </div>
                 </div>
             </div>
             
-            <!-- STICKY SEARCH BAR -->
-            <div class="px-3 pb-3 lg:hidden w-full max-w-6xl mx-auto pt-2">
-                <div class="bg-brand-50 border border-brand-200 rounded-xl px-4 py-3 flex items-center shadow-inner focus-within:border-brand-500 focus-within:bg-white focus-within:shadow-md transition-all w-full">
-                    <i class="fas fa-search text-brand-500 mr-3 text-base"></i>
-                    <input type="text" id="mainSearchInput" oninput="updateSearch(this.value)" placeholder="Search products, brands..." class="w-full outline-none text-sm bg-transparent placeholder-brand-400 text-brand-900 font-bold">
+            <!-- STICKY OS SEARCH BAR (Mobile) -->
+            <div class="px-3 pb-2.5 lg:hidden w-full max-w-6xl mx-auto">
+                <div class="bg-brand-50/90 border border-brand-200/80 rounded-2xl px-4 py-2.5 flex items-center shadow-inner focus-within:border-brand-500 focus-within:bg-white focus-within:shadow-md transition-all w-full">
+                    <i class="fas fa-search text-brand-400 mr-3 text-sm"></i>
+                    <input type="text" id="mainSearchInput" oninput="updateSearch(this.value)" placeholder="Search foundations, lipsticks, MARS, Forever 52..." class="w-full outline-none text-sm bg-transparent placeholder-gray-400 text-brand-900 font-semibold">
                 </div>
             </div>
         </div>
         
-        <!-- BRAND MARQUEE -->
-        <div class="bg-brand-900 text-gold-400 overflow-hidden py-1.5 border-y border-gold-500/30">
-            <div class="animate-marquee text-xs font-bold uppercase tracking-[0.2em]">
-                FOREVER 52 &nbsp; • &nbsp; MARS &nbsp; • &nbsp; RECODE &nbsp; • &nbsp; SWISS BEAUTY &nbsp; • &nbsp; MARY JO K &nbsp; • &nbsp; LOREAL PROFESSIONAL PARIS &nbsp; • &nbsp; PILGRIM &nbsp; • &nbsp; DOT&KEY &nbsp; • &nbsp; NOVA GOLD
+        <!-- LUXURY GOLD MARQUEE -->
+        <div class="bg-gradient-to-r from-brand-900 via-brand-800 to-brand-900 text-gold-400 overflow-hidden py-1.5 border-y border-gold-500/20">
+            <div class="animate-marquee text-[10px] font-extrabold uppercase tracking-[0.22em]">
+                ✨ FOREVER 52 &nbsp; • &nbsp; MARS COSMETICS &nbsp; • &nbsp; RECODE STUDIOS &nbsp; • &nbsp; SWISS BEAUTY &nbsp; • &nbsp; L'OREAL PARIS &nbsp; • &nbsp; KRYOLAN PROFESSIONAL &nbsp; • &nbsp; 100% AUTHENTIC PRODUCTS ✨
             </div>
         </div>
     </header>
 
-    <div class="max-w-6xl mx-auto flex flex-col lg:flex-row mt-4 px-2 lg:px-4 gap-4">
-        <!-- SIDE RATE LIST -->
-        <aside id="sideRateList" class="hidden lg:flex flex-col w-full lg:w-80 bg-white rounded-2xl border border-brand-100 h-[calc(100vh-140px)] sticky top-[120px] overflow-hidden shadow-sm z-30 order-2 lg:order-1 transition-all">
-            <div class="p-4 bg-brand-900 text-white flex justify-between items-center rounded-t-2xl relative overflow-hidden">
+    <!-- MAIN WORKSPACE -->
+    <div class="max-w-6xl mx-auto flex flex-col lg:flex-row mt-3 px-3 lg:px-4 gap-5">
+        
+        <!-- SIDE QUICK RATE LIST -->
+        <aside id="sideRateList" class="hidden lg:flex flex-col w-full lg:w-80 bg-white rounded-3xl border border-brand-100 h-[calc(100vh-140px)] sticky top-[120px] overflow-hidden shadow-sm z-30 order-2 lg:order-1 transition-all">
+            <div class="p-4 bg-gradient-to-r from-brand-900 to-brand-800 text-white flex justify-between items-center relative overflow-hidden" style="padding-top: max(env(safe-area-inset-top), 16px);">
                 <div class="relative z-10">
-                    <h3 class="font-bold text-gold-400 brand-font text-lg">Quick Rate List</h3>
-                    <p class="text-[10px] text-brand-100 opacity-80 mt-0.5">Fast add multiple items</p>
+                    <h3 class="font-bold text-gold-400 brand-font text-lg flex items-center"><i class="fas fa-bolt mr-2 text-sm"></i> Quick Rate List</h3>
+                    <p class="text-[11px] text-brand-100 opacity-85 mt-0.5">Fast wholesale-style multi-add</p>
                 </div>
-                <button onclick="toggleRateList()" class="lg:hidden relative z-10 text-white opacity-70 hover:opacity-100"><i class="fas fa-times text-xl"></i></button>
+                <button onclick="toggleRateList()" class="lg:hidden relative z-10 h-8 w-8 rounded-full bg-white/15 text-white flex items-center justify-center"><i class="fas fa-times"></i></button>
             </div>
             
-            <div class="p-3 border-b border-brand-50 bg-brand-50/30">
-                <div class="bg-white border border-brand-100 rounded-lg px-3 py-2 flex items-center focus-within:border-brand-400 transition-colors shadow-sm">
-                    <i class="fas fa-search text-gray-300 mr-2 text-sm"></i>
-                    <input type="text" id="sideSearchInput" oninput="updateSearch(this.value)" placeholder="Search products..." class="w-full outline-none text-xs bg-transparent text-gray-700">
+            <div class="p-3 border-b border-brand-50 bg-brand-50/40">
+                <div class="bg-white border border-brand-200 rounded-xl px-3 py-2.5 flex items-center focus-within:border-brand-500 transition-colors shadow-sm">
+                    <i class="fas fa-search text-brand-400 mr-2 text-xs"></i>
+                    <input type="text" id="sideSearchInput" oninput="updateSearch(this.value)" placeholder="Filter rate list..." class="w-full outline-none text-xs bg-transparent text-gray-800 font-semibold">
                 </div>
             </div>
 
-            <div class="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar" id="rateListContainer"></div>
+            <div class="flex-1 overflow-y-auto p-2.5 space-y-1.5 custom-scrollbar" id="rateListContainer"></div>
 
-            <div class="p-3 border-t border-brand-100 bg-white flex justify-between items-center">
-                <div class="text-xs font-semibold text-gray-500"><span id="sideListSelectedCount">0</span> items selected</div>
-                <button onclick="openCart()" class="bg-brand-900 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-brand-800 transition-colors shadow-md flex items-center">
+            <div class="p-3.5 pb-[max(env(safe-area-inset-bottom),14px)] border-t border-brand-100 bg-white flex justify-between items-center shadow-lg">
+                <div class="text-xs font-bold text-gray-600"><span id="sideListSelectedCount" class="text-brand-900 font-black text-sm">0</span> items in bag</div>
+                <button onclick="if(window.innerWidth < 1024) toggleRateList(); openCart();" class="bg-brand-900 text-gold-400 px-5 py-2.5 rounded-xl text-xs font-extrabold hover:bg-brand-800 transition-colors shadow-md flex items-center">
                     View Bag <i class="fas fa-arrow-right ml-2"></i>
                 </button>
             </div>
         </aside>
 
         <!-- MAIN CONTENT AREA -->
-        <main class="flex-1 w-full order-1 lg:order-2">
-            <div class="mb-6">
-                <div class="bg-brand-800 rounded-2xl p-6 md:p-8 text-white shadow-md relative overflow-hidden flex flex-col justify-center min-h-[160px]">
+        <main class="flex-1 w-full min-w-0 order-1 lg:order-2">
+            
+            <!-- HERO BANNER CARD -->
+            <div class="mb-4">
+                <div class="bg-gradient-to-br from-brand-900 via-brand-800 to-brand-600 rounded-3xl p-5 md:p-8 text-white shadow-lg relative overflow-hidden flex flex-col justify-center min-h-[155px] border border-gold-500/20">
                     <div class="relative z-10">
-                        <span class="border border-gold-400 text-gold-400 px-2 py-1 rounded text-[9px] uppercase tracking-widest font-bold mb-3 inline-block">Premium Beauty</span>
-                        <h2 class="font-bold text-2xl md:text-3xl mb-2 brand-font">Al Kaynat Cosmetic Store</h2>
-                        <p class="text-brand-100 text-xs md:text-sm max-w-md opacity-90">Experience luxury makeup, skincare, and bridal essentials delivered safely to your doorstep.</p>
+                        <span class="bg-gold-500/20 border border-gold-400/50 text-gold-300 px-2.5 py-1 rounded-full text-[9px] uppercase tracking-widest font-extrabold mb-2.5 inline-flex items-center gap-1.5">
+                            <i class="fas fa-sparkles text-[8px]"></i> Official Beauty Store
+                        </span>
+                        <h2 class="font-bold text-2xl md:text-3xl mb-1.5 brand-font text-white tracking-tight">Al Kaynat Cosmetic</h2>
+                        <p class="text-brand-100 text-xs md:text-sm max-w-md opacity-90 leading-relaxed">Luxury bridal makeup, HD foundations & authentic skincare delivered to your doorstep.</p>
                     </div>
-                    <i class="fas fa-crown absolute -right-6 -bottom-6 text-[120px] text-brand-900 opacity-40"></i>
+                    <i class="fas fa-crown absolute -right-5 -bottom-5 text-[115px] text-gold-400 opacity-10 rotate-12"></i>
                 </div>
             </div>
 
+            <!-- OS DYNAMIC BRAND FILTER PILLS -->
+            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-3 mb-2">
+                <button onclick="filterByBrand('')" class="brand-pill active shrink-0 px-4 py-2 rounded-2xl text-xs font-extrabold border border-brand-200 bg-white text-brand-900 transition-all">All Brands</button>
+                <button onclick="filterByBrand('forever 52')" class="brand-pill shrink-0 px-4 py-2 rounded-2xl text-xs font-bold border border-brand-100 bg-white text-gray-700 transition-all">Forever 52</button>
+                <button onclick="filterByBrand('mars')" class="brand-pill shrink-0 px-4 py-2 rounded-2xl text-xs font-bold border border-brand-100 bg-white text-gray-700 transition-all">MARS</button>
+                <button onclick="filterByBrand('recode')" class="brand-pill shrink-0 px-4 py-2 rounded-2xl text-xs font-bold border border-brand-100 bg-white text-gray-700 transition-all">Recode</button>
+                <button onclick="filterByBrand('swiss beauty')" class="brand-pill shrink-0 px-4 py-2 rounded-2xl text-xs font-bold border border-brand-100 bg-white text-gray-700 transition-all">Swiss Beauty</button>
+                <button onclick="filterByBrand('kryolan')" class="brand-pill shrink-0 px-4 py-2 rounded-2xl text-xs font-bold border border-brand-100 bg-white text-gray-700 transition-all">Kryolan</button>
+            </div>
+
+            <!-- PRODUCT GRID -->
             <div class="pb-6">
-                <div class="flex justify-between items-center mb-4 px-1 lg:mt-0 mt-2">
-                    <h3 class="font-bold text-xl flex items-center text-brand-900 brand-font" id="collectionTitle"><i class="fas fa-fire text-gold-500 mr-2"></i> All Collections</h3>
+                <div class="flex justify-between items-center mb-3.5 px-1">
+                    <h3 class="font-bold text-lg sm:text-xl flex items-center text-brand-900 brand-font" id="collectionTitle">
+                        <i class="fas fa-fire text-gold-500 mr-2 text-base"></i> All Collections
+                    </h3>
+                    <span id="productCountBadge" class="text-[11px] font-bold text-brand-600 bg-brand-100/70 px-2.5 py-1 rounded-full"></span>
                 </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4" id="productContainer"></div>
             </div>
         </main>
     </div>
 
-    <!-- BOTTOM NAVIGATION BAR (Mobile Only) -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-[45] lg:hidden pb-[env(safe-area-inset-bottom)] shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
-        <div class="flex justify-around items-center h-[60px] px-2">
-            <div class="flex flex-col items-center justify-center w-full h-full cursor-pointer text-navblue" onclick="navToHome()">
-                <i class="fas fa-home text-xl mb-0.5"></i>
-                <span class="text-[10px] font-semibold">Home</span>
-                <div class="absolute bottom-1 w-6 h-1 bg-navblue rounded-full"></div>
+    <!-- FLOATING OS BOTTOM NAVIGATION BAR (Mobile Only) -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-brand-100 z-[45] lg:hidden pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_25px_rgba(58,13,25,0.08)]">
+        <div class="flex justify-around items-center h-[62px] px-2">
+            <div class="flex flex-col items-center justify-center w-full h-full cursor-pointer text-brand-900 relative" onclick="navToHome()">
+                <i class="fas fa-home text-lg mb-0.5"></i>
+                <span class="text-[10px] font-extrabold">Store</span>
+                <div class="absolute bottom-1 w-5 h-1 bg-brand-900 rounded-full"></div>
             </div>
             
-            <div class="flex flex-col items-center justify-center w-full h-full cursor-pointer text-gray-500 hover:text-navblue transition-colors" onclick="openWishlist()">
+            <div class="flex flex-col items-center justify-center w-full h-full cursor-pointer text-gray-400 hover:text-brand-800 transition-colors" onclick="openWishlist()">
                 <div class="relative">
-                    <i class="far fa-heart text-xl mb-0.5"></i>
-                    <span id="navWishlistBadge" class="absolute -top-1 -right-2 bg-navblue text-white text-[9px] font-bold h-4 w-4 rounded-full flex items-center justify-center hidden border border-white">0</span>
+                    <i class="far fa-heart text-lg mb-0.5"></i>
+                    <span id="navWishlistBadge" class="absolute -top-1.5 -right-2.5 bg-brand-600 text-white text-[9px] font-bold h-4 w-4 rounded-full flex items-center justify-center hidden border border-white">0</span>
                 </div>
-                <span class="text-[10px] font-semibold">Wishlist</span>
+                <span class="text-[10px] font-bold">Wishlist</span>
             </div>
             
-            <div class="flex flex-col items-center justify-center w-full h-full cursor-pointer text-gray-500 hover:text-navblue transition-colors" onclick="openCart()">
+            <div class="flex flex-col items-center justify-center w-full h-full cursor-pointer text-gray-400 hover:text-brand-800 transition-colors" onclick="openCart()">
                 <div class="relative">
-                    <i class="fas fa-shopping-cart text-xl mb-0.5"></i>
-                    <span id="bottomCartBadge" class="absolute -top-1 -right-2 bg-navblue text-white text-[9px] font-bold h-4 w-4 rounded-full flex items-center justify-center hidden border border-white">0</span>
+                    <i class="fas fa-shopping-bag text-lg mb-0.5"></i>
+                    <span id="bottomCartBadge" class="absolute -top-1.5 -right-2.5 bg-brand-600 text-white text-[9px] font-bold h-4 w-4 rounded-full flex items-center justify-center hidden border border-white">0</span>
                 </div>
-                <span class="text-[10px] font-semibold">Cart</span>
+                <span class="text-[10px] font-bold">Bag</span>
             </div>
             
-            <div class="flex flex-col items-center justify-center w-full h-full cursor-pointer text-gray-500 hover:text-navblue transition-colors" onclick="openMyOrders()">
-                <i class="far fa-user text-xl mb-0.5"></i>
-                <span class="text-[10px] font-semibold">Profile</span>
+            <div class="flex flex-col items-center justify-center w-full h-full cursor-pointer text-gray-400 hover:text-brand-800 transition-colors" onclick="openMyOrders()">
+                <i class="far fa-user text-lg mb-0.5"></i>
+                <span class="text-[10px] font-bold">Orders</span>
             </div>
         </div>
     </nav>
 
-<!-- FULL PAGE PRODUCT DETAIL -->
+    <!-- FULL PAGE OS PRODUCT DETAIL SHEET -->
     <div id="productDetailPage" class="fixed inset-0 bg-white z-[60] flex flex-col transform translate-y-full slide-up h-[100dvh]">
-        <div class="bg-white/90 backdrop-blur-md px-4 pb-3 flex justify-between items-center sticky top-0 z-10 border-b border-brand-100" style="padding-top: max(env(safe-area-inset-top), 40px);">
-            <h2 class="font-bold text-lg text-brand-900 brand-font truncate pr-4">Details</h2>
-            <button onclick="closeProductPage()" class="h-8 w-8 bg-brand-50 hover:bg-brand-100 rounded-full flex items-center justify-center text-brand-900"><i class="fas fa-times"></i></button>
+        <div class="bg-white/95 backdrop-blur-md px-4 pb-3 flex justify-between items-center sticky top-0 z-10 border-b border-brand-100" style="padding-top: max(env(safe-area-inset-top), 32px);">
+            <button onclick="closeProductPage()" class="h-9 w-9 bg-brand-50 hover:bg-brand-100 rounded-xl flex items-center justify-center text-brand-900 active:scale-90 transition-transform"><i class="fas fa-chevron-left"></i></button>
+            <h2 class="font-bold text-base text-brand-900 brand-font truncate px-2">Product Details</h2>
+            <button id="pdWishlistBtn" class="h-9 w-9 bg-brand-50 rounded-xl flex items-center justify-center text-gray-400 hover:text-brand-600 transition-colors">
+                <i class="far fa-heart text-lg"></i>
+            </button>
         </div>
         
-        <div class="flex-1 overflow-y-auto pb-24 bg-brand-50">
+        <div class="flex-1 overflow-y-auto pb-28 bg-brand-50/60">
             <div class="w-full h-80 bg-white flex items-center justify-center p-6 border-b border-brand-100 relative group cursor-pointer" onclick="openImagePreview()">
-                <div class="absolute top-4 left-4 bg-green-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm z-10 uppercase" id="pdDiscountTag">0% OFF</div>
+                <div class="absolute top-4 left-4 bg-emerald-600 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg shadow-sm z-10 uppercase tracking-wider" id="pdDiscountTag">0% OFF</div>
                 
-                <!-- TAP TO ZOOM WAPAS LAGA DIYA HAI 👇 -->
-                <div class="absolute bottom-4 right-4 bg-white/90 text-brand-900 text-[10px] font-bold px-3 py-1.5 rounded-full shadow-md z-10 flex items-center border border-brand-100">
-                    <i class="fas fa-expand-alt mr-1.5"></i> Tap to Zoom
+                <!-- TAP TO ZOOM -->
+                <div class="absolute bottom-4 right-4 bg-brand-900/85 backdrop-blur-md text-gold-400 text-[10px] font-bold px-3 py-1.5 rounded-full shadow-md z-10 flex items-center">
+                    <i class="fas fa-search-plus mr-1.5"></i> Tap to Zoom
                 </div>
 
                 <img id="pdMainImg" src="" class="h-full w-full object-contain mix-blend-multiply transition-transform duration-300 group-hover:scale-105">
             </div>
             
             <div class="flex justify-center space-x-3 mt-4 px-4">
-                <img id="pdThumb0" src="" class="h-16 w-16 object-cover bg-white border-2 border-brand-900 rounded-lg cursor-pointer shadow-sm">
-                <img id="pdThumb1" src="" class="h-16 w-16 object-cover bg-white border-2 border-transparent rounded-lg cursor-pointer shadow-sm">
-                <img id="pdThumb2" src="" class="h-16 w-16 object-cover bg-white border-2 border-transparent rounded-lg cursor-pointer shadow-sm">
+                <img id="pdThumb0" src="" class="h-16 w-16 object-contain p-1 bg-white border-2 border-brand-900 rounded-xl cursor-pointer shadow-sm">
+                <img id="pdThumb1" src="" class="h-16 w-16 object-contain p-1 bg-white border-2 border-transparent rounded-xl cursor-pointer shadow-sm">
+                <img id="pdThumb2" src="" class="h-16 w-16 object-contain p-1 bg-white border-2 border-transparent rounded-xl cursor-pointer shadow-sm">
             </div>
 
-            <div class="px-5 mt-6 bg-white mx-4 rounded-2xl p-5 shadow-sm border border-brand-100 mb-6 relative">
-                <h1 id="pdTitle" class="text-2xl font-bold text-brand-900 brand-font leading-tight mb-1 pr-8">Product Name</h1>
-                
-                <button id="pdWishlistBtn" class="absolute top-5 right-5 h-8 w-8 bg-brand-50 rounded-full flex items-center justify-center text-gray-400 hover:text-brand-600 transition-colors">
-                    <i class="far fa-heart text-xl"></i>
-                </button>
+            <div class="px-5 mt-5 bg-white mx-3.5 rounded-3xl p-5 shadow-sm border border-brand-100 mb-6 relative">
+                <h1 id="pdTitle" class="text-xl sm:text-2xl font-bold text-brand-900 brand-font leading-snug mb-2">Product Name</h1>
 
-                <div class="flex items-end space-x-3 mt-3 mb-5">
+                <div class="flex items-baseline space-x-3 mt-2 mb-5">
                     <span id="pdPrice" class="text-3xl font-black text-brand-900">₹0</span>
-                    <span id="pdOldPrice" class="text-lg text-gray-400 line-through mb-1">₹0</span>
+                    <span id="pdOldPrice" class="text-base text-gray-400 line-through font-semibold">₹0</span>
+                    <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">Inclusive of all taxes</span>
                 </div>
 
-                <div class="mb-6 border-t border-brand-50 pt-4" id="shadeSelectorSection">
+                <div class="mb-5 border-t border-brand-50 pt-4" id="shadeSelectorSection">
                     <div class="flex justify-between items-center mb-3">
-                        <span class="text-sm font-bold text-gray-800">Selected Option:</span>
-                        <span class="text-sm font-bold text-brand-600" id="pdSelectedShadeName">Shade Name</span>
+                        <span class="text-xs font-extrabold uppercase tracking-wider text-gray-500">Selected Shade</span>
+                        <span class="text-xs font-extrabold text-brand-800 bg-brand-50 px-2.5 py-1 rounded-lg border border-brand-100" id="pdSelectedShadeName">Shade Name</span>
                     </div>
-                    <div class="flex flex-wrap gap-3" id="pdShadeSwatches"></div>
+                    <div class="flex flex-wrap gap-3 pt-1" id="pdShadeSwatches"></div>
                 </div>
 
-                <h3 class="font-bold text-brand-900 mb-2 brand-font text-lg border-t border-brand-50 pt-5">About the Product</h3>
+                <h3 class="font-bold text-brand-900 mb-1.5 brand-font text-base border-t border-brand-50 pt-4">Product Description</h3>
                 <p id="pdDesc" class="text-gray-600 text-sm leading-relaxed">Description goes here.</p>
             </div>
         </div>
 
-        <div class="bg-white border-t border-brand-100 p-4 absolute bottom-0 w-full z-20 shadow-[0_-10px_20px_-5px_rgba(0,0,0,0.05)]">
+        <div class="bg-white/95 backdrop-blur-md border-t border-brand-100 p-3.5 pb-[max(env(safe-area-inset-bottom),14px)] absolute bottom-0 w-full z-20 shadow-[0_-10px_25px_rgba(0,0,0,0.06)]">
             <div id="pdActionContainer" class="max-w-md mx-auto"></div>
         </div>
     </div>
-    <!-- FULL SCREEN IMAGE PREVIEW MODAL -->
+
+    <!-- FULL SCREEN IMAGE PREVIEW MODAL (Triggers AdMob Interstitial) -->
     <div id="imagePreviewModal" class="fixed inset-0 bg-black/95 z-[120] hidden flex justify-center items-center backdrop-blur-md" onclick="closeImagePreview()">
-        <button class="absolute top-6 right-6 text-white bg-white/20 h-10 w-10 rounded-full flex items-center justify-center hover:bg-white/40 transition-colors z-[130]">
-            <i class="fas fa-times text-xl"></i>
+        <button class="absolute top-8 right-5 text-white bg-white/20 h-10 w-10 rounded-full flex items-center justify-center hover:bg-white/40 transition-colors z-[130]">
+            <i class="fas fa-times text-lg"></i>
         </button>
-        <img id="previewMainImg" src="" class="max-w-full max-h-[85vh] object-contain transform transition-transform duration-300 scale-90" onclick="event.stopPropagation()">
+        <img id="previewMainImg" src="" class="max-w-[94vw] max-h-[82vh] object-contain rounded-xl transform transition-transform duration-300 scale-90" onclick="event.stopPropagation()">
     </div>
 
-    <!-- Cart Slide-out Panel -->
+    <!-- CART SLIDE-OUT PANEL -->
     <div id="cartOverlay" class="fixed inset-0 bg-black/60 z-50 hidden modal-fade backdrop-blur-sm" onclick="closeCart()"></div>
-    <div id="cartPanel" class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-brand-50 z-50 translate-x-full slide-up flex flex-col shadow-2xl transition-transform duration-300">
-        <div class="bg-white px-4 py-4 flex justify-between items-center shadow-sm z-10 border-b border-brand-100">
-            <h2 class="font-bold text-xl text-brand-900 brand-font flex items-center"><i class="fas fa-shopping-bag mr-2 text-brand-500"></i> Shopping Bag</h2>
-            <button onclick="closeCart()" class="h-8 w-8 bg-brand-50 hover:bg-brand-100 rounded-full"><i class="fas fa-times"></i></button>
+    <div id="cartPanel" class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-brand-50 z-50 translate-x-full slide-up flex flex-col shadow-2xl">
+        <div class="bg-white px-4 pb-3.5 flex justify-between items-center shadow-sm z-10 border-b border-brand-100" style="padding-top: max(env(safe-area-inset-top), 24px);">
+            <h2 class="font-bold text-xl text-brand-900 brand-font flex items-center"><i class="fas fa-shopping-bag mr-2.5 text-brand-600"></i> Shopping Bag</h2>
+            <button onclick="closeCart()" class="h-8 w-8 bg-brand-50 hover:bg-brand-100 rounded-full text-brand-900"><i class="fas fa-times"></i></button>
         </div>
         
-        <div class="flex-1 overflow-y-auto p-4 pb-32 custom-scrollbar">
-            <div id="cartItemsList" class="bg-white rounded-xl shadow-sm border border-brand-100 mb-4 divide-y divide-brand-50"></div>
-            <div class="bg-white rounded-xl shadow-sm border border-brand-100 p-4">
-                <h3 class="font-bold text-sm mb-3 text-brand-900 brand-font uppercase tracking-wider">Order Summary</h3>
-                <div class="space-y-3 text-sm text-gray-600">
-                    <div class="flex justify-between"><span>Item Total</span><span class="font-medium text-gray-800">₹<span id="billItemTotal">0</span></span></div>
-                    <div class="flex justify-between"><span>Delivery Charges</span><span id="billDeliveryFee" class="font-medium">₹0</span></div>
-                    <div class="border-t border-brand-50 pt-3 mt-1 flex justify-between font-black text-brand-900 text-lg brand-font">
+        <div class="flex-1 overflow-y-auto p-4 pb-36 custom-scrollbar">
+            <div id="cartItemsList" class="bg-white rounded-2xl shadow-sm border border-brand-100 mb-4 divide-y divide-brand-50"></div>
+            <div class="bg-white rounded-2xl shadow-sm border border-brand-100 p-4">
+                <h3 class="font-extrabold text-xs mb-3 text-brand-900 uppercase tracking-wider">Bill Summary</h3>
+                <div class="space-y-2.5 text-sm text-gray-600">
+                    <div class="flex justify-between"><span>Item Total</span><span class="font-bold text-gray-800">₹<span id="billItemTotal">0</span></span></div>
+                    <div class="flex justify-between"><span>Delivery Fee</span><span id="billDeliveryFee" class="font-bold">₹0</span></div>
+                    <div class="border-t border-brand-100 pt-3 mt-2 flex justify-between font-black text-brand-900 text-lg brand-font">
                         <span>Grand Total</span><span>₹<span id="billGrandTotal">0</span></span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white border-t border-brand-100 p-4 pb-6 absolute bottom-0 w-full z-20 shadow-[0_-4px_15px_-3px_rgba(0,0,0,0.05)]">
-            <button onclick="openPaymentModal()" class="w-full bg-brand-900 hover:bg-brand-800 text-white font-bold py-3.5 rounded-xl shadow-lg flex justify-between items-center px-5 transition-colors">
+        <div class="bg-white border-t border-brand-100 p-4 pb-[max(env(safe-area-inset-bottom),18px)] absolute bottom-0 w-full z-20 shadow-[0_-8px_20px_rgba(0,0,0,0.06)]">
+            <button onclick="openPaymentModal()" class="w-full bg-gradient-to-r from-brand-900 to-brand-800 text-white font-bold py-3.5 rounded-2xl shadow-lg flex justify-between items-center px-5 active:scale-98 transition-transform">
                 <div class="text-left flex flex-col">
-                    <span class="text-[10px] text-gold-400 uppercase tracking-wider font-bold">Proceed to checkout</span>
-                    <span class="text-lg leading-tight">₹<span id="checkoutBtnTotal">0</span></span>
+                    <span class="text-[10px] text-gold-400 uppercase tracking-wider font-extrabold">Total Payable</span>
+                    <span class="text-lg font-black leading-tight">₹<span id="checkoutBtnTotal">0</span></span>
                 </div>
-                <div class="flex items-center space-x-2"><span>Select Payment</span><i class="fas fa-arrow-right"></i></div>
+                <div class="flex items-center space-x-2 text-sm font-extrabold text-gold-300"><span>Proceed to Pay</span><i class="fas fa-arrow-right"></i></div>
             </button>
         </div>
     </div>
 
     <!-- WISHLIST SLIDE PANEL -->
     <div id="wishlistOverlay" class="fixed inset-0 bg-black/60 z-50 hidden modal-fade backdrop-blur-sm" onclick="closeWishlist()"></div>
-    <div id="wishlistPanel" class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-brand-50 z-50 translate-x-full slide-up flex flex-col shadow-2xl transition-transform duration-300">
-        <div class="bg-white px-4 py-4 flex justify-between items-center shadow-sm z-10 border-b border-brand-100">
-            <h2 class="font-bold text-xl text-brand-900 brand-font flex items-center"><i class="fas fa-heart mr-2 text-brand-500"></i> My Wishlist</h2>
-            <button onclick="closeWishlist()" class="h-8 w-8 bg-brand-50 hover:bg-brand-100 rounded-full"><i class="fas fa-times"></i></button>
+    <div id="wishlistPanel" class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-brand-50 z-50 translate-x-full slide-up flex flex-col shadow-2xl">
+        <div class="bg-white px-4 pb-3.5 flex justify-between items-center shadow-sm z-10 border-b border-brand-100" style="padding-top: max(env(safe-area-inset-top), 24px);">
+            <h2 class="font-bold text-xl text-brand-900 brand-font flex items-center"><i class="fas fa-heart mr-2.5 text-brand-500"></i> Saved Wishlist</h2>
+            <button onclick="closeWishlist()" class="h-8 w-8 bg-brand-50 hover:bg-brand-100 rounded-full text-brand-900"><i class="fas fa-times"></i></button>
         </div>
         <div class="flex-1 overflow-y-auto p-4 pb-20 custom-scrollbar">
             <div id="wishlistItemsList" class="space-y-3"></div>
@@ -307,144 +356,146 @@
 
     <!-- ADDRESS MODAL -->
     <div id="addressModal" class="fixed inset-0 bg-black/70 z-[60] hidden flex items-end sm:items-center justify-center modal-fade backdrop-blur-sm" onclick="if(event.target === this) closeAddressModal()">
-        <div class="bg-white w-full sm:w-[450px] rounded-t-3xl sm:rounded-2xl p-6 transform transition-transform slide-up shadow-2xl border border-brand-100 max-h-[90vh] overflow-y-auto custom-scrollbar">
+        <div class="bg-white w-full sm:w-[450px] rounded-t-3xl sm:rounded-3xl p-6 transform transition-transform slide-up shadow-2xl border border-brand-100 max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <div class="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-3 sm:hidden"></div>
             <div class="flex justify-between items-center mb-5 sticky top-0 bg-white z-10 pb-2 border-b border-brand-50">
-                <h2 class="text-xl font-bold text-brand-900 brand-font flex items-center"><i class="fas fa-map-marker-alt text-brand-500 mr-2"></i> Delivery Details</h2>
+                <h2 class="text-xl font-bold text-brand-900 brand-font flex items-center"><i class="fas fa-map-marker-alt text-brand-500 mr-2"></i> Delivery Address</h2>
                 <button onclick="closeAddressModal()" class="text-gray-400 hover:text-brand-600 bg-brand-50 h-8 w-8 rounded-full"><i class="fas fa-times"></i></button>
             </div>
             
-            <div class="space-y-4">
+            <div class="space-y-3.5">
                 <div>
-                    <label class="text-xs font-bold text-brand-800 uppercase tracking-wider mb-1 block">Contact Details</label>
-                    <input type="text" id="custName" placeholder="Full Name" class="w-full bg-brand-50/50 border border-brand-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-brand-500 mb-2">
-                    <input type="tel" id="custPhone" placeholder="10-digit Mobile Number" class="w-full bg-brand-50/50 border border-brand-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-brand-500" maxlength="10">
+                    <label class="text-[11px] font-extrabold text-brand-800 uppercase tracking-wider mb-1.5 block">Receiver Info</label>
+                    <input type="text" id="custName" placeholder="Full Name" class="w-full bg-brand-50/60 border border-brand-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-brand-600 focus:bg-white mb-2.5">
+                    <input type="tel" id="custPhone" placeholder="10-digit Mobile Number" class="w-full bg-brand-50/60 border border-brand-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-brand-600 focus:bg-white" maxlength="10">
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-brand-800 uppercase tracking-wider mb-1 block mt-2">Address Info</label>
-                    <input type="text" id="custHouse" placeholder="Flat, House no., Building, Company" class="w-full bg-brand-50/50 border border-brand-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-brand-500 mb-2">
-                    <input type="text" id="custArea" placeholder="Area, Street, Sector, Village" class="w-full bg-brand-50/50 border border-brand-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-brand-500 mb-2">
-                    <div class="flex gap-2 mb-4">
-                        <input type="number" id="custPin" placeholder="Pincode" class="w-1/2 bg-brand-50/50 border border-brand-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-brand-500" maxlength="6">
-                        <input type="text" id="custCity" placeholder="Town/City" class="w-1/2 bg-brand-50/50 border border-brand-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-brand-500">
+                    <label class="text-[11px] font-extrabold text-brand-800 uppercase tracking-wider mb-1.5 block mt-1">Complete Address</label>
+                    <input type="text" id="custHouse" placeholder="Flat, House no., Building" class="w-full bg-brand-50/60 border border-brand-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-brand-600 focus:bg-white mb-2.5">
+                    <input type="text" id="custArea" placeholder="Area, Street, Landmark" class="w-full bg-brand-50/60 border border-brand-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-brand-600 focus:bg-white mb-2.5">
+                    <div class="flex gap-2.5 mb-4">
+                        <input type="number" id="custPin" placeholder="Pincode" class="w-1/2 bg-brand-50/60 border border-brand-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-brand-600 focus:bg-white" maxlength="6">
+                        <input type="text" id="custCity" placeholder="Town / City" class="w-1/2 bg-brand-50/60 border border-brand-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-brand-600 focus:bg-white">
                     </div>
                 </div>
-                <button onclick="setCustomAddress()" class="w-full bg-brand-900 hover:bg-brand-800 text-gold-400 px-4 py-3.5 rounded-xl text-sm font-bold shadow-md transition-colors mt-2">Save Details & Continue</button>
+                <button onclick="setCustomAddress()" class="w-full bg-brand-900 hover:bg-brand-800 text-gold-400 px-4 py-3.5 rounded-2xl text-sm font-extrabold shadow-lg transition-transform active:scale-98">Save Address & Continue</button>
             </div>
         </div>
     </div>
 
-    <!-- ONLY ONLINE PAYMENT MODAL -->
+    <!-- ONLINE UPI PAYMENT MODAL -->
     <div id="paymentModal" class="fixed inset-0 bg-black/70 z-[70] hidden flex items-end sm:items-center justify-center modal-fade backdrop-blur-sm" onclick="if(event.target === this) closePaymentModal()">
-        <div class="bg-white w-full sm:w-[400px] rounded-t-3xl sm:rounded-2xl relative shadow-2xl flex flex-col slide-up border border-brand-100">
-            <div class="p-6 border-b border-brand-50 flex justify-between items-center bg-brand-50/30 rounded-t-3xl sm:rounded-t-2xl">
+        <div class="bg-white w-full sm:w-[400px] rounded-t-3xl sm:rounded-3xl relative shadow-2xl flex flex-col slide-up border border-brand-100 overflow-hidden">
+            <div class="p-5 border-b border-brand-50 flex justify-between items-center bg-brand-50/40">
                 <div>
-                    <h2 class="text-xl font-bold text-brand-900 brand-font">Payment Mode</h2>
-                    <p class="text-xs text-gray-500 mt-1">Amount to pay: <span class="font-bold text-brand-800 text-sm">₹<span id="payModalTotal"></span></span></p>
+                    <h2 class="text-xl font-bold text-brand-900 brand-font">Select UPI App</h2>
+                    <p class="text-xs text-gray-500 mt-0.5">Total Amount: <span class="font-black text-brand-900 text-sm">₹<span id="payModalTotal">0</span></span></p>
                 </div>
                 <button onclick="closePaymentModal()" class="h-8 w-8 bg-white shadow-sm rounded-full text-brand-600"><i class="fas fa-times"></i></button>
             </div>
             
             <div class="p-6">
-                <h3 class="text-xs font-bold text-brand-500 uppercase tracking-wider mb-4">Pay securely via UPI (Online Only)</h3>
+                <h3 class="text-[11px] font-extrabold text-brand-500 uppercase tracking-wider mb-3.5">100% Instant UPI Checkout</h3>
                 <div class="space-y-3">
-                    <div onclick="processOnlinePayment('Google Pay')" class="border border-brand-100 rounded-xl p-3 flex justify-between items-center cursor-pointer hover:bg-brand-50 hover:border-brand-300 transition-colors shadow-sm">
-                        <div class="flex items-center space-x-3"><img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" class="h-8 w-8 object-contain bg-white rounded-full border border-gray-100 p-1"><span class="font-semibold text-gray-800">Google Pay</span></div>
+                    <div onclick="processOnlinePayment('Google Pay')" class="border border-brand-100 rounded-2xl p-3.5 flex justify-between items-center cursor-pointer hover:bg-brand-50 active:scale-98 transition-all shadow-sm">
+                        <div class="flex items-center space-x-3.5"><img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" class="h-8 w-8 object-contain bg-white rounded-full border border-gray-100 p-1"><span class="font-bold text-gray-800">Google Pay</span></div>
                         <i class="fas fa-chevron-right text-gray-300"></i>
                     </div>
-                    <div onclick="processOnlinePayment('PhonePe')" class="border border-brand-100 rounded-xl p-3 flex justify-between items-center cursor-pointer hover:bg-brand-50 hover:border-brand-300 transition-colors shadow-sm">
-                        <div class="flex items-center space-x-3"><div class="h-8 w-8 bg-purple-700 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-inner">Pe</div><span class="font-semibold text-gray-800">PhonePe</span></div>
+                    <div onclick="processOnlinePayment('PhonePe')" class="border border-brand-100 rounded-2xl p-3.5 flex justify-between items-center cursor-pointer hover:bg-brand-50 active:scale-98 transition-all shadow-sm">
+                        <div class="flex items-center space-x-3.5"><div class="h-8 w-8 bg-purple-700 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-inner">Pe</div><span class="font-bold text-gray-800">PhonePe</span></div>
                         <i class="fas fa-chevron-right text-gray-300"></i>
                     </div>
-                    <div onclick="processOnlinePayment('Paytm')" class="border border-brand-100 rounded-xl p-3 flex justify-between items-center cursor-pointer hover:bg-brand-50 hover:border-brand-300 transition-colors shadow-sm">
-                        <div class="flex items-center space-x-3"><div class="h-8 w-8 bg-[#002970] rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow-inner">Paytm</div><span class="font-semibold text-gray-800">Paytm</span></div>
+                    <div onclick="processOnlinePayment('Paytm')" class="border border-brand-100 rounded-2xl p-3.5 flex justify-between items-center cursor-pointer hover:bg-brand-50 active:scale-98 transition-all shadow-sm">
+                        <div class="flex items-center space-x-3.5"><div class="h-8 w-8 bg-[#002970] rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow-inner">Paytm</div><span class="font-bold text-gray-800">Paytm UPI</span></div>
                         <i class="fas fa-chevron-right text-gray-300"></i>
                     </div>
                 </div>
                 <div class="mt-6 flex items-center justify-center space-x-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest border-t border-brand-50 pt-4">
-                    <i class="fas fa-lock text-green-500"></i> <span>100% Secure Payments</span>
+                    <i class="fas fa-shield-alt text-emerald-500"></i> <span>Verified BharatPe Merchant</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- WHATSAPP PROMPT MODAL (Prevents Popup Blocker Issue) -->
+    <!-- WHATSAPP ORDER CONFIRMATION PROMPT -->
     <div id="whatsappPromptOverlay" class="fixed inset-0 bg-black/80 z-[120] hidden flex flex-col items-center justify-center modal-fade px-4 backdrop-blur-sm">
         <div class="bg-white p-6 rounded-3xl w-full max-w-sm text-center shadow-2xl relative border-2 border-brand-100">
-            <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner"><i class="fab fa-whatsapp"></i></div>
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner"><i class="fab fa-whatsapp"></i></div>
             <h2 class="text-xl font-bold text-brand-900 brand-font mb-2">Send Order Receipt</h2>
-            <p class="text-gray-500 text-sm mb-6 font-medium">Your payment has been initiated. Please send the order receipt on WhatsApp to confirm.</p>
-            <button onclick="document.getElementById('whatsappPromptOverlay').classList.add('hidden'); processWhatsAppOrder();" class="w-full bg-green-500 text-white font-bold py-3.5 rounded-xl shadow-md hover:bg-green-600 transition-colors flex items-center justify-center">
-                <i class="fas fa-paper-plane mr-2"></i> Send on WhatsApp
+            <p class="text-gray-500 text-sm mb-6 font-medium">Payment initiated! Tap below to send your order receipt on WhatsApp for instant dispatch.</p>
+            <button onclick="document.getElementById('whatsappPromptOverlay').classList.add('hidden'); processWhatsAppOrder();" class="w-full bg-emerald-500 text-white font-extrabold py-3.5 rounded-2xl shadow-lg hover:bg-emerald-600 transition-colors flex items-center justify-center">
+                <i class="fas fa-paper-plane mr-2"></i> Send Receipt on WhatsApp
             </button>
         </div>
     </div>
 
-    <!-- Login / OTP Modal -->
+    <!-- LOGIN / OTP MODAL -->
     <div id="loginModal" class="fixed inset-0 bg-black/70 z-[80] hidden flex items-center justify-center modal-fade backdrop-blur-sm px-4">
-        <div class="bg-white w-full max-w-[400px] rounded-3xl p-6 relative shadow-2xl">
+        <div class="bg-white w-full max-w-[390px] rounded-3xl p-6 relative shadow-2xl border border-brand-100">
             <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-brand-600 bg-brand-50 h-8 w-8 rounded-full flex items-center justify-center"><i class="fas fa-times"></i></button>
             <div id="loginStep1">
-                <h2 class="text-xl font-bold mb-1 text-brand-900 brand-font">Login to Al Kaynat</h2>
-                <p class="text-sm text-gray-500 mb-6">Enter your phone number to proceed</p>
-                <div class="flex border-b-2 border-brand-200 focus-within:border-brand-600 mb-6 pb-2 transition-colors">
-                    <span class="text-gray-500 font-medium mr-2">+91</span>
-                    <input type="tel" id="phoneInput" placeholder="Enter 10 digit mobile number" class="w-full outline-none font-medium text-gray-800 bg-transparent" maxlength="10">
+                <div class="w-12 h-12 bg-brand-50 text-brand-800 rounded-2xl flex items-center justify-center mb-3 text-xl font-bold border border-brand-100"><i class="fas fa-mobile-alt"></i></div>
+                <h2 class="text-xl font-bold mb-1 text-brand-900 brand-font">Welcome to Al Kaynat</h2>
+                <p class="text-xs text-gray-500 mb-6 font-medium">Enter your 10-digit mobile number for quick OTP login</p>
+                <div class="flex items-center bg-brand-50/70 border-2 border-brand-200 focus-within:border-brand-700 focus-within:bg-white rounded-2xl px-4 py-3 mb-5 transition-colors">
+                    <span class="text-brand-900 font-extrabold mr-2.5 text-sm">+91</span>
+                    <input type="tel" id="phoneInput" placeholder="Mobile Number" class="w-full outline-none font-bold text-gray-800 bg-transparent text-sm" maxlength="10">
                 </div>
-                <button onclick="sendOTP()" class="w-full bg-brand-200 text-brand-800 py-3.5 rounded-xl font-bold transition-colors" id="sendOtpBtn" disabled>Get OTP</button>
+                <button onclick="sendOTP()" class="w-full bg-brand-100 text-brand-300 py-3.5 rounded-2xl font-extrabold transition-colors" id="sendOtpBtn" disabled>Get Instant OTP</button>
             </div>
             <div id="loginStep2" class="hidden">
-                <i class="fas fa-arrow-left text-brand-400 mb-4 cursor-pointer hover:text-brand-900" onclick="backToPhone()"></i>
+                <button class="text-brand-600 mb-3 text-xs font-bold flex items-center" onclick="backToPhone()"><i class="fas fa-arrow-left mr-1.5"></i> Change Number</button>
                 <h2 class="text-xl font-bold mb-1 text-brand-900 brand-font">Verify OTP</h2>
-                <p class="text-sm text-gray-500 mb-6">OTP sent to <span id="displayPhone" class="font-bold text-gray-800"></span></p>
+                <p class="text-xs text-gray-500 mb-6">4-digit OTP sent to <span id="displayPhone" class="font-bold text-gray-800"></span></p>
                 <div class="flex space-x-3 mb-6 justify-center">
-                    <input type="number" class="otp-input w-12 h-12 border-2 border-brand-200 rounded-xl text-center text-xl font-bold focus:border-brand-600 outline-none transition-colors" maxlength="1" oninput="moveToNext(this, 0)">
-                    <input type="number" class="otp-input w-12 h-12 border-2 border-brand-200 rounded-xl text-center text-xl font-bold focus:border-brand-600 outline-none transition-colors" maxlength="1" oninput="moveToNext(this, 1)">
-                    <input type="number" class="otp-input w-12 h-12 border-2 border-brand-200 rounded-xl text-center text-xl font-bold focus:border-brand-600 outline-none transition-colors" maxlength="1" oninput="moveToNext(this, 2)">
-                    <input type="number" class="otp-input w-12 h-12 border-2 border-brand-200 rounded-xl text-center text-xl font-bold focus:border-brand-600 outline-none transition-colors" maxlength="1" oninput="moveToNext(this, 3)">
+                    <input type="number" class="otp-input w-12 h-12 border-2 border-brand-200 rounded-xl text-center text-xl font-bold focus:border-brand-700 outline-none transition-colors" maxlength="1" oninput="moveToNext(this, 0)">
+                    <input type="number" class="otp-input w-12 h-12 border-2 border-brand-200 rounded-xl text-center text-xl font-bold focus:border-brand-700 outline-none transition-colors" maxlength="1" oninput="moveToNext(this, 1)">
+                    <input type="number" class="otp-input w-12 h-12 border-2 border-brand-200 rounded-xl text-center text-xl font-bold focus:border-brand-700 outline-none transition-colors" maxlength="1" oninput="moveToNext(this, 2)">
+                    <input type="number" class="otp-input w-12 h-12 border-2 border-brand-200 rounded-xl text-center text-xl font-bold focus:border-brand-700 outline-none transition-colors" maxlength="1" oninput="moveToNext(this, 3)">
                 </div>
-                <button onclick="verifyOTP()" class="w-full bg-brand-900 text-white py-3.5 rounded-xl font-bold shadow-md hover:bg-brand-800">Verify & Login</button>
+                <button onclick="verifyOTP()" class="w-full bg-brand-900 text-gold-400 py-3.5 rounded-2xl font-extrabold shadow-md hover:bg-brand-800">Verify & Continue</button>
             </div>
         </div>
     </div>
-    <div id="otpToastContainer" class="fixed top-0 left-0 right-0 flex justify-center z-[90] pointer-events-none"></div>
+    <div id="otpToastContainer" class="fixed top-2 left-0 right-0 flex justify-center z-[110] pointer-events-none px-3"></div>
 
-    <!-- HISAAB MODAL -->
+    <!-- STORE ADMIN HISAAB MODAL -->
     <div id="hisaabModal" class="fixed inset-0 bg-black/70 z-[90] hidden flex items-end sm:items-center justify-center modal-fade backdrop-blur-sm" onclick="if(event.target === this) closeHisaab()">
-        <div class="bg-brand-50 w-full sm:w-[500px] rounded-t-3xl sm:rounded-2xl shadow-2xl flex flex-col h-[85vh] sm:h-[650px] transform translate-y-full transition-transform duration-300 overflow-hidden" id="hisaabSlide">
-            <div class="bg-white pt-3 pb-4 px-5 border-b border-brand-100 flex flex-col sticky top-0 z-10 shadow-sm rounded-t-3xl sm:rounded-t-2xl">
-                <div class="w-12 h-1.5 bg-brand-100 rounded-full mx-auto mb-4 sm:hidden"></div>
+        <div class="bg-brand-50 w-full sm:w-[500px] rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col h-[85vh] sm:h-[650px] transform translate-y-full transition-transform duration-300 overflow-hidden" id="hisaabSlide">
+            <div class="bg-white pt-3 pb-4 px-5 border-b border-brand-100 flex flex-col sticky top-0 z-10 shadow-sm">
+                <div class="w-12 h-1.5 bg-brand-100 rounded-full mx-auto mb-3 sm:hidden"></div>
                 <div class="flex justify-between items-center">
-                    <h2 class="text-lg font-black text-brand-900 brand-font flex items-center tracking-tight"><i class="fas fa-chart-pie text-brand-600 mr-2.5 text-xl"></i> Store Dashboard</h2>
-                    <button onclick="closeHisaab()" class="h-8 w-8 bg-brand-50 hover:bg-brand-100 rounded-full flex items-center justify-center text-brand-900 transition-colors"><i class="fas fa-times"></i></button>
+                    <h2 class="text-lg font-black text-brand-900 brand-font flex items-center"><i class="fas fa-chart-pie text-brand-600 mr-2.5 text-xl"></i> Store Dashboard</h2>
+                    <button onclick="closeHisaab()" class="h-8 w-8 bg-brand-50 hover:bg-brand-100 rounded-full flex items-center justify-center text-brand-900"><i class="fas fa-times"></i></button>
                 </div>
             </div>
             <div class="flex-1 overflow-y-auto p-4 custom-scrollbar" id="hisaabContent"></div>
-            <div class="bg-white p-4 border-t border-brand-100 sticky bottom-0 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)]">
-                <button onclick="clearHisaab()" id="clearHisaabBtn" class="w-full bg-brand-50 text-brand-800 border border-brand-200 font-bold py-3.5 rounded-xl hover:bg-brand-600 hover:text-white transition-all shadow-sm">Clear Today's Hisaab</button>
+            <div class="bg-white p-4 border-t border-brand-100 sticky bottom-0">
+                <button onclick="clearHisaab()" id="clearHisaabBtn" class="w-full bg-brand-50 text-brand-800 border border-brand-200 font-bold py-3.5 rounded-2xl hover:bg-brand-600 hover:text-white transition-all shadow-sm">Clear Today's Hisaab</button>
             </div>
         </div>
     </div>
 
-    <!-- SECRET PIN MODAL -->
+    <!-- SECRET ADMIN PIN MODAL (5 Taps on AK Logo) -->
     <div id="pinModal" class="fixed inset-0 bg-black/80 z-[100] hidden flex items-center justify-center modal-fade backdrop-blur-sm">
         <div class="bg-white p-6 rounded-3xl w-72 shadow-2xl text-center transform scale-95 transition-transform duration-300" id="pinBox">
             <div class="bg-brand-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-brand-100"><i class="fas fa-lock text-brand-800 text-2xl"></i></div>
-            <h3 class="font-bold text-brand-900 brand-font text-xl mb-4">Admin Panel</h3>
-            <input type="password" id="adminPinInput" placeholder="PIN" class="w-full border-2 border-brand-100 rounded-xl px-4 py-3 text-center tracking-[0.5em] font-bold outline-none focus:border-brand-500 mb-5" maxlength="4">
+            <h3 class="font-bold text-brand-900 brand-font text-xl mb-4">Admin Access</h3>
+            <input type="password" id="adminPinInput" placeholder="••••" class="w-full border-2 border-brand-100 rounded-xl px-4 py-3 text-center tracking-[0.5em] font-bold outline-none focus:border-brand-500 mb-5" maxlength="4">
             <div class="flex space-x-3">
                 <button onclick="closePinModal()" class="w-1/2 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-200">Cancel</button>
-                <button onclick="verifyAdminPin()" class="w-1/2 bg-brand-900 text-white py-3 rounded-xl font-bold hover:bg-brand-800 shadow-md">Verify</button>
+                <button onclick="verifyAdminPin()" class="w-1/2 bg-brand-900 text-gold-400 py-3 rounded-xl font-bold hover:bg-brand-800 shadow-md">Unlock</button>
             </div>
         </div>
     </div>
 
-    <!-- MY ORDERS MODAL WITH TRACKING -->
+    <!-- MY ORDERS & LIVE TRACKING MODAL -->
     <div id="myOrdersModal" class="fixed inset-0 bg-black/70 z-[80] hidden flex flex-col justify-end modal-fade backdrop-blur-sm" onclick="if(event.target === this) closeMyOrders()">
         <div id="myOrdersSlide" class="bg-brand-50 w-full h-[90dvh] rounded-t-3xl relative shadow-2xl transform translate-y-full transition-transform duration-300 flex flex-col overflow-hidden">
             <div class="bg-white px-5 py-4 flex justify-between items-center border-b border-brand-100 sticky top-0 z-10 rounded-t-3xl">
                 <div>
                     <h2 class="text-xl font-bold text-brand-900 brand-font">My Profile & Orders</h2>
-                    <p class="text-xs text-gray-500 font-medium mt-0.5">Track your order status</p>
+                    <p class="text-xs text-gray-500 font-medium mt-0.5">Live delivery status & history</p>
                 </div>
                 <button onclick="closeMyOrders()" class="h-8 w-8 bg-brand-50 hover:bg-brand-100 rounded-full flex items-center justify-center text-brand-900"><i class="fas fa-times"></i></button>
             </div>
@@ -454,11 +505,11 @@
 
     <script>
         // =========================================================================
-        // DATA: PRODUCTS - YAHAN APNE ASLI PRODUCTS DALEIN!
+        // 🛍️ DATA: PRODUCTS (SIRF 2 PRODUCTS RAKHE HAIN, BAAKI NICHE PASTE KAR LO)
         // =========================================================================
- const products = [
+        const products = [
             { 
-                id: 1, name: "Forever 52 Pro Artist Foundation", price: 12, oldPrice: 1499, 
+                id: 1, name: "Forever 52 Pro Artist Foundation", price: 1299, oldPrice: 1499, 
                 desc: "Professional artist foundation for flawless, long-lasting coverage.",
                 shades: [
                     { id: "p1-s1", name: "BUF001 Cheese cake", color: "#F4D5B6", images: ["https://cdn.tirabeauty.com/v2/billowing-snowflake-434234/tira-p/wrkr/products/pictures/item/free/original/1120200/Oxyvklxy82-1120200_1.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Cheese+cake+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Cheese+cake+3"] },
@@ -476,447 +527,10 @@
                     { id: "p2-s3", name: "FCU30.1 Olive", color: "#C6986A", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Olive+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Olive+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Olive+3"] },
                     { id: "p2-s4", name: "FCU30.4", color: "#B37D53", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=FCU30.4+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=FCU30.4+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=FCU30.4+3"] }
                 ]
-            },
-            { 
-                id: 3, name: "Forever 52 Ultra Def Liquid Foundation", price: 1099, oldPrice: 1299, 
-                desc: "Ultra definition liquid formula for a natural finish.",
-                shades: [
-                    { id: "p3-s1", name: "FLF011 Cheese cake", color: "#F4D5B6", images: ["https://tse1.mm.bing.net/th/id/OIP.bj9sIe42yqh3buUl39pjvAHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Cheese+cake+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Cheese+cake+3"] }
-                ]
-            },
-            { 
-                id: 4, name: "Forever 52 Complete Coverage Concealer", price: 699, oldPrice: 899, 
-                desc: "Complete coverage concealer for dark circles and spots.",
-                shades: [
-                    { id: "p4-s1", name: "COV001 Vanilla", color: "#FAE1CD", images: ["https://www.mypurefind.com/cdn/shop/files/COV001.png?v=1769708470&width=533", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Vanilla+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Vanilla+3"] },
-                    { id: "p4-s2", name: "COV003 Iced coffee", color: "#E6B892", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Iced+coffee+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Iced+coffee+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Iced+coffee+3"] },
-                    { id: "p4-s3", name: "COV005 Caramel", color: "#CA8C56", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Caramel+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Caramel+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Caramel+3"] }
-                ]
-            },
-            { 
-                id: 5, name: "Forever 52 Coverup Concealer", price: 749, oldPrice: 949, 
-                desc: "Smooth coverup concealer offering a flawless matte finish.",
-                shades: [
-                    { id: "p5-s1", name: "CCU10.5 Mandel", color: "#E1B690", images: ["https://static-01.daraz.com.np/p/9e2d777104b012f94c2162efdaf5fddc.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Mandel+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Mandel+3"] },
-                    { id: "p5-s2", name: "CCU30.2 Sienna", color: "#AD6D44", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Sienna+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Sienna+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Sienna+3"] }
-                ]
-            },
-            { 
-                id: 6, name: "Forever 52 Translucent Setting Powder", price: 899, oldPrice: 1199, 
-                desc: "Finely milled loose powder to set makeup.",
-                shades: [
-                    { id: "p6-s1", name: "TLM006 Classic Beige", color: "#EBD0B3", images: ["https://images-static.nykaa.com/media/catalog/product/6/a/6ac2ec5DAIAA00000112_6.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Classic+Beige+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Classic+Beige+3"] },
-                    { id: "p6-s2", name: "TLM001 White", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=White+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=White+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=White+3"] }
-                ]
-            },
-            { 
-        id: 7, name: "MARS SPF50 PA++++ High Coverage Foundation Tested by IN-VIVO (40ml)", price: 349, oldPrice: 499, 
-        desc: "High coverage foundation with SPF50 PA++++ sun protection.",
-        shades: [
-            { id: "p7-s1", name: "Shade 01", color: "#F5D6B8", images: ["https://m.media-amazon.com/images/I/51mbmgyI3AL._SL1500_.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S01+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S01+3"] },
-            { id: "p7-s2", name: "Shade 02", color: "#E8C19D", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S02+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S02+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S02+3"] },
-            { id: "p7-s3", name: "Shade 05", color: "#C88F65", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S05+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S05+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S05+3"] },
-            { id: "p7-s4", name: "Shade 06", color: "#B3774E", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S06+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S06+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S06+3"] }
-        ]
-    },
-    { 
-        id: 8, name: "MARS Infinity Matte Lip Color Palette", price: 299, oldPrice: 399, 
-        desc: "Multi-shade matte lip color palette for versatile lip looks.",
-        shades: [
-            { id: "p8-s1", name: "Variant 01", color: "#C94A50", images: ["https://marscosmetics.in/cdn/shop/files/Artboard16.jpg?v=1721212844&width=1500", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Lip+Palette+01+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Lip+Palette+01+3"] },
-            { id: "p8-s2", name: "Variant 03", color: "#A8384B", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Lip+Palette+03+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Lip+Palette+03+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Lip+Palette+03+3"] }
-        ]
-    },
-    { 
-        id: 9, name: "MARS Women Fantasy Highlighter Blusher & Contour Intense Pigmented Face Palette", price: 399, oldPrice: 499, 
-        desc: "All-in-one intense pigmented face palette with highlighter, blusher, and contour.",
-        shades: [{ id: "p9-s1", name: "Standard", color: "#FFFFFF", images: ["https://tse1.mm.bing.net/th/id/OIP.j2TGPIYS1V9nu-z9xK056gHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+9+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+9+Pic+3"] }]
-    },
-    { 
-        id: 10, name: "MARS Jashn-e-Shringaar 36 Color Eyeshadow Palette", price: 599, oldPrice: 799, 
-        desc: "Vibrant 36-color eyeshadow palette with matte and shimmer shades.",
-        shades: [{ id: "p10-s1", name: "Standard", color: "#FFFFFF", images: ["https://m.media-amazon.com/images/S/aplus-media-library-service-media/cac566de-4d17-4a73-ab2e-2202aac1bd50.__CR0,0,970,600_PT0_SX970_V1___.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+10+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+10+Pic+3"] }]
-    },
-    { 
-        id: 11, name: "MARS Its Glow Clock Primer Griping Glow", price: 329, oldPrice: 399, 
-        desc: "Hydrating gripping primer that gives a dewy, long-lasting makeup base.",
-        shades: [{ id: "p11-s1", name: "Standard", color: "#FFFFFF", images: ["https://www.indiangoods.shop/cdn/shop/files/e9c1d7aMARSX00000218x_1_1280x.jpg?v=1772686474", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+11+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+11+Pic+3"] }]
-    },
-    { 
-        id: 12, name: "MARS Color Changing Waterproof Satin Finish Foundation", price: 349, oldPrice: 449, 
-        desc: "Smart color-adapting waterproof foundation with a smooth satin finish.",
-        shades: [{ id: "p12-s1", name: "Standard", color: "#FFFFFF", images: ["https://image.cdn.shpy.in/365412/mars-color-changing-foundation-20ml-waterproof-li-1764688228605_SKU-12725_0.jpg?format=webp", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+12+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+12+Pic+3"] }]
-    },
-    { 
-        id: 13, name: "MARS TRIO Treat 3-IN-1 Eye Makeup Kit with Eyeliner", price: 399, oldPrice: 499, 
-        desc: "Complete 3-in-1 eye makeup combo kit with eyeliner, mascara, and kajal.",
-        shades: [{ id: "p13-s1", name: "Standard", color: "#FFFFFF", images: ["https://m.media-amazon.com/images/I/61D+O0rtErL._SL1500_.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+13+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+13+Pic+3"] }]
-    },
-    { 
-        id: 14, name: "MARS Trend Setting Loose Powder", price: 249, oldPrice: 299, 
-        desc: "Ultra-fine loose setting powder for a shine-free, smooth finish.",
-        shades: [{ id: "p14-s1", name: "Standard", color: "#FFFFFF", images: ["https://drive.brodox.com/uploads/1625/26/01/696f5c85efa3d2001261768905861.webp", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+14+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+14+Pic+3"] }]
-    },
-    { 
-        id: 15, name: "MARS Born To Bake Setting Powder With Matte Finish", price: 279, oldPrice: 349, 
-        desc: "Matte finish baking and setting powder to lock makeup in place.",
-        shades: [{ id: "p15-s1", name: "Standard", color: "#FFFFFF", images: ["https://marscosmetics.in/cdn/shop/files/Artboard_1_2048f431-c146-4464-a318-e230f0987180.jpg?v=1753272112&width=1500", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+15+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+15+Pic+3"] }]
-    },
-    { 
-        id: 16, name: "MARS Melody Compact Powder | Full Natural Coverage", price: 229, oldPrice: 299, 
-        desc: "Pressed compact powder offering full natural coverage.",
-        shades: [
-            { id: "p16-s1", name: "No.01", color: "#F7DEC8", images: ["https://tse2.mm.bing.net/th/id/OIP.zhlDH46O-DYnin5u8hydaQHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.01+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.01+3"] },
-            { id: "p16-s2", name: "No.02", color: "#EBC5A4", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.02+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.02+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.02+3"] },
-            { id: "p16-s3", name: "No.04", color: "#CFA07A", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.04+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.04+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.04+3"] }
-        ]
-    },
-    { 
-        id: 17, name: "MARS 3in1 Air Brush Compact Powder", price: 299, oldPrice: 399, 
-        desc: "3-in-1 airbrush finish compact powder for poreless skin.",
-        shades: [
-            { id: "p17-s1", name: "Shade 03", color: "#DFB38C", images: ["https://m.media-amazon.com/images/S/aplus-media-library-service-media/d89caeda-9adf-4d14-a36e-2a97907ed097.__CR0,0,970,600_PT0_SX970_V1___.png", "https://placehold.co/400x400/FDF6F6/9B2D45?text=AirBrush+S03+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=AirBrush+S03+3"] }
-        ]
-    },
-    { 
-        id: 18, name: "MARS 4 in 1 Eyebrow Powder Palette (8 gm)", price: 249, oldPrice: 329, 
-        desc: "4-in-1 eyebrow shaping and filling powder palette.",
-        shades: [{ id: "p18-s1", name: "Standard", color: "#FFFFFF", images: ["https://www.bigbasket.com/media/uploads/flatpages/mailer-images-aug/40340948_170625_1.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+18+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+18+Pic+3"] }]
-    },
-    { 
-        id: 19, name: "MARS Seal the Deal Long-Lasting Makeup Fixer Spray", price: 249, oldPrice: 299, 
-        desc: "Long-lasting makeup setting spray to keep makeup fresh all day.",
-        shades: [{ id: "p19-s1", name: "Standard", color: "#FFFFFF", images: ["https://images-static.nykaa.com/media/catalog/product/0/c/0cffee80MARSX00000290_1.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+19+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+19+Pic+3"] }]
-    },
-    { 
-        id: 20, name: "MARS Zero Pore Perfection Non-Sticky Silicone-Based Primer (25ml)", price: 299, oldPrice: 399, 
-        desc: "Non-sticky silicone-based primer that blurs pores instantly.",
-        shades: [{ id: "p20-s1", name: "Standard", color: "#FFFFFF", images: ["https://5.imimg.com/data5/SELLER/Default/2026/1/577377708/GH/GD/MN/93202015/mars-zero-pore-perfection-primer-1000x1000.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+20+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+20+Pic+3"] }]
-    },
-    { 
-        id: 21, name: "MARS SPF50 PA++++ Cancel Concealer with Radiant Finish (6 ml)", price: 229, oldPrice: 299, 
-        desc: "Radiant finish concealer with SPF50 PA++++ protection.",
-        shades: [
-            { id: "p21-s1", name: "Ivory Veil 01", color: "#F9E4CF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Ivory+Veil+01+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Ivory+Veil+01+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Ivory+Veil+01+3"] },
-            { id: "p21-s2", name: "Neutral Charm 04", color: "#E0B58E", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Neutral+Charm+04+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Neutral+Charm+04+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Neutral+Charm+04+3"] },
-            { id: "p21-s3", name: "Honey Glow 06", color: "#C69065", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Honey+Glow+06+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Honey+Glow+06+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Honey+Glow+06+3"] }
-        ]
-    },
-    { 
-        id: 22, name: "L'Oreal Paris Infallible 3-Second Setting Spray Mist (75 ml)", price: 799, oldPrice: 999, 
-        desc: "Micro-fine setting mist that locks makeup in just 3 seconds without transfer.",
-        shades: [{ id: "p22-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+22+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+22+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+22+Pic+3"] }]
-    },
-    { 
-        id: 23, name: "KRYOLAN Fixing Spray (75 ml)", price: 1150, oldPrice: 1350, 
-        desc: "Professional makeup fixing spray for smudge-proof, waterproof wear (75 ml).",
-        shades: [{ id: "p23-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+23+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+23+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+23+Pic+3"] }]
-    },
-    { 
-        id: 24, name: "KRYOLAN Fixing Spray (300 ml)", price: 2450, oldPrice: 2800, 
-        desc: "Full-size professional fixing spray for long-lasting bridal and stage makeup (300 ml).",
-        shades: [{ id: "p24-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+24+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+24+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+24+Pic+3"] }]
-    },
-    { 
-        id: 25, name: "The UCANBE Pretty All Set 2 Eyeshadow Palette", price: 1299, oldPrice: 1599, 
-        desc: "Complete multi-color professional eyeshadow palette with high pigmentation.",
-        shades: [{ id: "p25-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+25+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+25+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+25+Pic+3"] }]
-    },
-    { 
-        id: 26, name: "DE'LANCI Matte Lipstick Palette", price: 999, oldPrice: 1299, 
-        desc: "Professional lip color palette with rich, blendable matte shades.",
-        shades: [{ id: "p26-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+26+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+26+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+26+Pic+3"] }]
-    },
-    { 
-        id: 27, name: "IMAGIC Professional Cosmetic Touch Blush Palette 6 Color (80g)", price: 699, oldPrice: 899, 
-        desc: "6-color professional blush palette for a natural, flushed glow.",
-        shades: [{ id: "p27-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+27+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+27+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+27+Pic+3"] }]
-    },
-    { 
-        id: 28, name: "FLiCKA Silk Touch 3-in-1 Primer + Moisturizer", price: 399, oldPrice: 499, 
-        desc: "3-in-1 primer and moisturizer that blurs 100% of pores for a silky finish.",
-        shades: [{ id: "p28-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+28+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+28+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+28+Pic+3"] }]
-    },
-    { 
-        id: 29, name: "Recode Ace of Base Concealer", price: 499, oldPrice: 650, 
-        desc: "Full coverage color-correcting and base concealer.",
-        shades: [
-            { id: "p29-s1", name: "08 Orange", color: "#E86F38", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Ace+08+Orange+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Ace+08+Orange+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Ace+08+Orange+3"] }
-        ]
-    },
-    { 
-        id: 30, name: "Recode Silky Moisturizer Cum Primer (60 G)", price: 599, oldPrice: 750, 
-        desc: "Nourishing silky moisturizer cum primer for a smooth makeup canvas.",
-        shades: [{ id: "p30-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+30+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+30+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+30+Pic+3"] }]
-    },
-    { 
-        id: 31, name: "Recode Hyaluronic Acid Glow Mist (100 ML)", price: 450, oldPrice: 595, 
-        desc: "Hydrating hyaluronic acid face mist for an instant dewy glow.",
-        shades: [{ id: "p31-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+31+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+31+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+31+Pic+3"] }]
-    },
-    { 
-        id: 32, name: "Recode Perfect Grip Spray - Makeup Fixer (100 ML)", price: 550, oldPrice: 699, 
-        desc: "High-hold makeup fixer spray that locks your look in place.",
-        shades: [{ id: "p32-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+32+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+32+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+32+Pic+3"] }]
-    },
-    { 
-        id: 33, name: "Recode Perfect Grip Primer (12 ML)", price: 350, oldPrice: 450, 
-        desc: "Travel-friendly gripping primer for long-lasting makeup adherence.",
-        shades: [{ id: "p33-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+33+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+33+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+33+Pic+3"] }]
-    },
-    { 
-        id: 34, name: "Recode We Stole Da Show Concealer (6 ML)", price: 499, oldPrice: 650, 
-        desc: "High-definition liquid concealer to brighten and correct dark spots.",
-        shades: [
-            { id: "p34-s1", name: "01 Light", color: "#F5D8BE", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Recode+01+Light+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Recode+01+Light+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Recode+01+Light+3"] },
-            { id: "p34-s2", name: "06 Orange", color: "#E86F38", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Recode+06+Orange+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Recode+06+Orange+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Recode+06+Orange+3"] }
-        ]
-    },
-    { 
-        id: 35, name: "Recode Clay Matte Liquid Lipsticks (2 ML x 10)", price: 1199, oldPrice: 1499, 
-        desc: "Set of 10 smudge-proof clay matte liquid lipsticks.",
-        shades: [{ id: "p35-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+35+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+35+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+35+Pic+3"] }]
-    },
-    { 
-        id: 36, name: "Recode Concealer Refill (3.50 G)", price: 299, oldPrice: 399, 
-        desc: "Creamy concealer pan refill for custom makeup palettes.",
-        shades: [
-            { id: "p36-s1", name: "Shade - 1", color: "#F6DEC6", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+1+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+1+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+1+3"] },
-            { id: "p36-s2", name: "Shade - 2", color: "#E6C29F", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+2+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+2+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+2+3"] },
-            { id: "p36-s3", name: "Shade - 17", color: "#B87B50", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+17+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+17+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+17+3"] }
-        ]
-    },
-    { 
-        id: 37, name: "Recode 10 Silky Matte Mini Liquid Lipsticks - 12.50 ML (1.25ML x 10)", price: 999, oldPrice: 1299, 
-        desc: "Pack of 10 mini silky matte liquid lipsticks for everyday wear.",
-        shades: [{ id: "p37-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+37+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+37+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+37+Pic+3"] }]
-    },
+            }
+            // 👇 YAHAN COMMA (,) LAGA KAR APNE BAAKI PRODUCTS (ID 3 TO 78) PASTE KAR DEIN 👇
+        ];
 
-// --- NEW RECODE PRODUCTS (ID 38 TO 45) ---
-    { 
-        id: 38, name: "RECODE HD Luminous Matte Foundation (30 ML)", price: 799, oldPrice: 999, 
-        desc: "HD luminous matte finish foundation for a flawless, long-wearing base.",
-        shades: [
-            { id: "p38-s1", name: "1.01 Alhind", color: "#F4D5B6", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=1.01+Alhind+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=1.01+Alhind+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=1.01+Alhind+3"] }
-        ]
-    },
-    { 
-        id: 39, name: "Recode Makeup Primer for Oily & Dry Skin - Ace Of Base Primer (30 ML)", price: 699, oldPrice: 899, 
-        desc: "Smooth makeup primer suitable for both oily and dry skin types.",
-        shades: [{ id: "p39-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+39+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+39+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+39+Pic+3"] }]
-    },
-    { 
-        id: 40, name: "Recode Blush it Blush Stick (6 G)", price: 549, oldPrice: 699, 
-        desc: "Creamy, blendable blush stick for a natural flush of color.",
-        shades: [
-            { id: "p40-s1", name: "02 Peach Pop", color: "#F4978E", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Peach+Pop+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Peach+Pop+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Peach+Pop+3"] }
-        ]
-    },
-    { 
-        id: 41, name: "Recode 5 Silky Matte Mini Liquid Lipsticks - 6.25 ML (1.25ML x 5)", price: 599, oldPrice: 799, 
-        desc: "Set of 5 mini silky matte liquid lipsticks with rich pigmentation.",
-        shades: [{ id: "p41-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+41+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+41+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+41+Pic+3"] }]
-    },
-    { 
-        id: 42, name: "Recode Rose Gold Strobe Cream (19 ML)", price: 449, oldPrice: 599, 
-        desc: "Illuminating rose gold strobe cream for a radiant, dewy glow.",
-        shades: [{ id: "p42-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+42+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+42+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+42+Pic+3"] }]
-    },
-    { 
-        id: 43, name: "Recode Let Me Gloss U Lipstick Glosses (3 ML)", price: 399, oldPrice: 499, 
-        desc: "High-shine, non-sticky lip gloss for plump and hydrated lips.",
-        shades: [
-            { id: "p43-s1", name: "B.F.F 02", color: "#E28B97", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=B.F.F+02+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=B.F.F+02+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=B.F.F+02+3"] },
-            { id: "p43-s2", name: "L.O.L 04", color: "#C96A75", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=L.O.L+04+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=L.O.L+04+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=L.O.L+04+3"] },
-            { id: "p43-s3", name: "R.O.F.L 05", color: "#9E4752", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=R.O.F.L+05+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=R.O.F.L+05+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=R.O.F.L+05+3"] }
-        ]
-    },
-    { 
-        id: 44, name: "Recode Pookie Kajal - Everyday Makeup (0.3 G)", price: 249, oldPrice: 349, 
-        desc: "Smudge-proof, waterproof everyday kajal with a smooth glide.",
-        shades: [
-            { id: "p44-s1", name: "Black", color: "#1C1C1C", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+Black+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+Black+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+Black+3"] },
-            { id: "p44-s2", name: "White", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+White+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+White+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+White+3"] },
-            { id: "p44-s3", name: "Nude", color: "#E6C29F", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+Nude+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+Nude+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+Nude+3"] }
-        ]
-    },
-    { 
-        id: 45, name: "Recode Beauty Concealer, Colour Corrector & Contour Palette (52 G)", price: 1199, oldPrice: 1499, 
-        desc: "All-in-one professional concealer, colour corrector, and contour palette.",
-        shades: [{ id: "p45-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+45+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+45+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+45+Pic+3"] }]
-    },
-
-   // --- NEW SWISS BEAUTY PRODUCTS (ID 46 TO 63) ---
-    { 
-        id: 46, name: "Swiss Beauty Glow Up Makeup Fixer", price: 249, oldPrice: 349, 
-        desc: "Hydrating makeup fixer spray that locks makeup with a radiant, dewy glow.",
-        shades: [{ id: "p46-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+46+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+46+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+46+Pic+3"] }]
-    },
-    { 
-        id: 47, name: "Swiss Beauty Real Make-Up Base Highlighting Primer", price: 329, oldPrice: 399, 
-        desc: "Illuminating makeup base primer that minimizes pores and gives a natural glow.",
-        shades: [{ id: "p47-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+47+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+47+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+47+Pic+3"] }]
-    },
-    { 
-        id: 48, name: "Swiss Beauty High Performance Foundation", price: 399, oldPrice: 499, 
-        desc: "Long-wearing, water-resistant liquid foundation for a smooth, flawless finish.",
-        shades: [{ id: "p48-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+48+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+48+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+48+Pic+3"] }]
-    },
-    { 
-        id: 49, name: "Swiss Beauty Perfect Liquid Concealer", price: 229, oldPrice: 299, 
-        desc: "Full coverage, crease-resistant liquid concealer for dark circles and blemishes.",
-        shades: [{ id: "p49-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+49+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+49+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+49+Pic+3"] }]
-    },
-    { 
-        id: 50, name: "Swiss Beauty Long Lasting Makeup Fixer", price: 219, oldPrice: 279, 
-        desc: "Natural Aloe Vera and Vitamin-E enriched setting spray for all-day makeup hold.",
-        shades: [{ id: "p50-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+50+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+50+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+50+Pic+3"] }]
-    },
-    { 
-        id: 51, name: "Swiss Beauty Oil Free Long Lasting Make-Up Primer", price: 299, oldPrice: 399, 
-        desc: "Lightweight, oil-free primer that blurs imperfections and extends makeup wear.",
-        shades: [{ id: "p51-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+51+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+51+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+51+Pic+3"] }]
-    },
-    { 
-        id: 52, name: "Swiss Beauty Bake It Away Loose Powder", price: 279, oldPrice: 349, 
-        desc: "Ultra-fine translucent loose powder for baking and setting makeup with a matte finish.",
-        shades: [{ id: "p52-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+52+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+52+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+52+Pic+3"] }]
-    },
-    { 
-        id: 53, name: "Swiss Beauty Glow Up Strobe Cream", price: 349, oldPrice: 449, 
-        desc: "Moisturizing strobe cream for an instant luminous, dewy skin finish.",
-        shades: [{ id: "p53-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+53+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+53+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+53+Pic+3"] }]
-    },
-    { 
-        id: 54, name: "Swiss Beauty Awaken Mascara", price: 249, oldPrice: 329, 
-        desc: "Volumizing and lengthening mascara for wide-awake, dramatic lashes.",
-        shades: [{ id: "p54-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+54+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+54+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+54+Pic+3"] }]
-    },
-    { 
-        id: 55, name: "Swiss Beauty Awaken Pen Eyeliner", price: 199, oldPrice: 249, 
-        desc: "Precision felt-tip pen eyeliner for jet-black, smudge-proof winged lines.",
-        shades: [{ id: "p55-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+55+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+55+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+55+Pic+3"] }]
-    },
-    { 
-        id: 56, name: "Swiss Beauty Bold Eyes Super Lash Waterproof Mascara", price: 279, oldPrice: 349, 
-        desc: "Waterproof, clump-free mascara that delivers bold volume and curl.",
-        shades: [{ id: "p56-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+56+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+56+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+56+Pic+3"] }]
-    },
-    { 
-        id: 57, name: "Swiss Beauty Precision Mascara", price: 229, oldPrice: 299, 
-        desc: "High-definition precision brush mascara that coats every single lash evenly.",
-        shades: [{ id: "p57-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+57+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+57+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+57+Pic+3"] }]
-    },
-    { 
-        id: 58, name: "Swiss Beauty Care Korean Glow Facial Set", price: 599, oldPrice: 799, 
-        desc: "Complete Korean glow skincare facial set for glass-like, radiant skin.",
-        shades: [{ id: "p58-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+58+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+58+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+58+Pic+3"] }]
-    },
-    { 
-        id: 59, name: "Swiss Beauty Facial Kit", price: 499, oldPrice: 649, 
-        desc: "Multi-step nourishing facial kit for instant salon-like brightness and glow.",
-        shades: [{ id: "p59-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+59+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+59+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+59+Pic+3"] }]
-    },
-    { 
-        id: 60, name: "Swiss Beauty Bold Matte Lipliner (Pack Of 12 Pcs)", price: 449, oldPrice: 599, 
-        desc: "Set of 12 richly pigmented, smooth-gliding matte lip liner pencils.",
-        shades: [{ id: "p60-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+60+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+60+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+60+Pic+3"] }]
-    },
-    { 
-        id: 61, name: "Swiss Beauty Oil Control Compact Powder", price: 219, oldPrice: 279, 
-        desc: "Mattifying compact powder that controls excess oil and gives an even skin tone.",
-        shades: [{ id: "p61-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+61+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+61+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+61+Pic+3"] }]
-    },
-    { 
-        id: 62, name: "Swiss Beauty Cream It Up Blush", price: 299, oldPrice: 399, 
-        desc: "Velvety, easily blendable liquid-cream blush for a natural flushed look.",
-        shades: [{ id: "p62-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+62+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+62+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+62+Pic+3"] }]
-    },
-    { 
-        id: 63, name: "Swiss Beauty Power Stage Eyeshadow Palette", price: 499, oldPrice: 649, 
-        desc: "High-pigment eyeshadow palette featuring a mix of matte and shimmer shades.",
-        shades: [{ id: "p63-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+63+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+63+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+63+Pic+3"] }]
-    },
-
-    // --- 15 EXTRA PLACEHOLDER ITEMS (ID 64 TO 78) ---
-    { 
-        id: 64, name: "Item Placeholder 1", price: 350, oldPrice: 499, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p64-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+64+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+64+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+64+Pic+3"] }]
-    },
-    { 
-        id: 65, name: "Item Placeholder 2", price: 450, oldPrice: 599, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p65-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+65+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+65+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+65+Pic+3"] }]
-    },
-    { 
-        id: 66, name: "Item Placeholder 3", price: 299, oldPrice: 399, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p66-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+66+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+66+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+66+Pic+3"] }]
-    },
-    { 
-        id: 67, name: "Item Placeholder 4", price: 550, oldPrice: 750, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p67-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+67+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+67+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+67+Pic+3"] }]
-    },
-    { 
-        id: 68, name: "Item Placeholder 5", price: 199, oldPrice: 299, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p68-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+68+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+68+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+68+Pic+3"] }]
-    },
-    { 
-        id: 69, name: "Item Placeholder 6", price: 899, oldPrice: 1099, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p69-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+69+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+69+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+69+Pic+3"] }]
-    },
-    { 
-        id: 70, name: "Item Placeholder 7", price: 399, oldPrice: 499, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p70-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+70+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+70+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+70+Pic+3"] }]
-    },
-    { 
-        id: 71, name: "Item Placeholder 8", price: 499, oldPrice: 649, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p71-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+71+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+71+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+71+Pic+3"] }]
-    },
-    { 
-        id: 72, name: "Item Placeholder 9", price: 650, oldPrice: 799, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p72-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+72+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+72+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+72+Pic+3"] }]
-    },
-    { 
-        id: 73, name: "Item Placeholder 10", price: 250, oldPrice: 349, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p73-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+73+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+73+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+73+Pic+3"] }]
-    },
-    { 
-        id: 74, name: "Item Placeholder 11", price: 799, oldPrice: 999, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p74-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+74+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+74+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+74+Pic+3"] }]
-    },
-    { 
-        id: 75, name: "Item Placeholder 12", price: 320, oldPrice: 420, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p75-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+75+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+75+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+75+Pic+3"] }]
-    },
-    { 
-        id: 76, name: "Item Placeholder 13", price: 599, oldPrice: 749, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p76-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+76+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+76+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+76+Pic+3"] }]
-    },
-    { 
-        id: 77, name: "Item Placeholder 14", price: 420, oldPrice: 550, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p77-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+77+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+77+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+77+Pic+3"] }]
-    },
-    { 
-        id: 78, name: "Item Placeholder 15", price: 950, oldPrice: 1199, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p78-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+78+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+78+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+78+Pic+3"] }]
-    }
-];
-   
-        
         // =========================================================================
         // LOGIC & STATE
         // =========================================================================
@@ -939,6 +553,20 @@
             if(activeModals.length > 0) { history.go(-activeModals.length); } 
         }
 
+        // --- OS BRAND PILL FILTER ---
+        function filterByBrand(brandQuery) {
+            document.querySelectorAll('.brand-pill').forEach(btn => {
+                btn.classList.remove('active');
+                if (
+                    (brandQuery === '' && btn.innerText.toLowerCase().includes('all')) ||
+                    (brandQuery !== '' && btn.innerText.toLowerCase().includes(brandQuery))
+                ) {
+                    btn.classList.add('active');
+                }
+            });
+            updateSearch(brandQuery);
+        }
+
         // --- WISHLIST FUNCTIONALITY ---
         function toggleWishlist(event, productId) {
             event.stopPropagation();
@@ -955,9 +583,9 @@
             if (currentOpenProductId === productId) {
                 const btn = document.getElementById('pdWishlistBtn');
                 if (wishlist.includes(productId)) {
-                    btn.innerHTML = `<i class="fas fa-heart text-xl text-brand-600"></i>`;
+                    btn.innerHTML = `<i class="fas fa-heart text-lg text-brand-600"></i>`;
                 } else {
-                    btn.innerHTML = `<i class="far fa-heart text-xl text-gray-400"></i>`;
+                    btn.innerHTML = `<i class="far fa-heart text-lg text-gray-400"></i>`;
                 }
             }
         }
@@ -994,7 +622,7 @@
             container.innerHTML = '';
             
             if(wishlist.length === 0) {
-                container.innerHTML = `<div class="text-center py-20 flex flex-col items-center"><div class="h-20 w-20 bg-white rounded-full flex items-center justify-center shadow-sm border border-brand-100 mb-4"><i class="far fa-heart text-4xl text-brand-200"></i></div><p class="text-gray-800 font-bold text-lg">Wishlist is empty</p><p class="text-gray-400 text-sm mt-1">Save your favorite items here.</p></div>`;
+                container.innerHTML = `<div class="text-center py-20 flex flex-col items-center"><div class="h-20 w-20 bg-white rounded-full flex items-center justify-center shadow-sm border border-brand-100 mb-4"><i class="far fa-heart text-4xl text-brand-200"></i></div><p class="text-gray-800 font-bold text-lg">Wishlist is empty</p><p class="text-gray-400 text-sm mt-1">Tap the heart icon on any product to save it.</p></div>`;
                 return;
             }
 
@@ -1003,17 +631,15 @@
                 if(!p) return;
                 
                 container.innerHTML += `
-                    <div class="bg-white p-3 rounded-xl shadow-sm border border-brand-100 flex items-center justify-between cursor-pointer hover:shadow-md transition-all" onclick="closeWishlist(); openProductPage(${p.id})">
+                    <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-brand-100 flex items-center justify-between cursor-pointer hover:shadow-md transition-all" onclick="closeWishlist(); openProductPage(${p.id})">
                         <div class="flex items-center space-x-3 w-3/4">
-                            <img src="${p.shades[0].images[0]}" class="h-14 w-14 object-cover rounded-lg border border-brand-50 bg-brand-50 p-1">
-                            <div>
+                            <img src="${p.shades[0].images[0]}" class="h-14 w-14 object-contain rounded-xl border border-brand-50 bg-brand-50 p-1 shrink-0">
+                            <div class="min-w-0">
                                 <h4 class="text-sm font-bold text-gray-800 leading-tight line-clamp-1">${p.name}</h4>
                                 <span class="font-black text-brand-900 text-sm mt-1 block">₹${p.price} <span class="text-[10px] text-gray-400 line-through ml-1 font-normal">₹${p.oldPrice}</span></span>
                             </div>
                         </div>
-                        <div class="flex flex-col space-y-2">
-                            <button onclick="toggleWishlist(event, ${p.id}); renderWishlistUI();" class="h-8 w-8 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center hover:bg-brand-100"><i class="fas fa-trash-alt text-xs"></i></button>
-                        </div>
+                        <button onclick="toggleWishlist(event, ${p.id}); renderWishlistUI();" class="h-9 w-9 bg-brand-50 text-brand-600 rounded-xl flex items-center justify-center hover:bg-brand-100 shrink-0"><i class="fas fa-trash-alt text-xs"></i></button>
                     </div>
                 `;
             });
@@ -1024,14 +650,14 @@
             currentSearchQuery = query.toLowerCase();
             const mainSearch = document.getElementById('mainSearchInput');
             const sideSearch = document.getElementById('sideSearchInput');
-            if(mainSearch && mainSearch.value !== query) mainSearch.value = query;
-            if(sideSearch && sideSearch.value !== query) sideSearch.value = query;
+            if(mainSearch && mainSearch.value.toLowerCase() !== currentSearchQuery) mainSearch.value = query;
+            if(sideSearch && sideSearch.value.toLowerCase() !== currentSearchQuery) sideSearch.value = query;
             
             const titleEl = document.getElementById('collectionTitle');
             if(query.trim() !== "") { 
-                titleEl.innerHTML = `<i class="fas fa-search text-brand-500 mr-2"></i> Search Results`; 
+                titleEl.innerHTML = `<i class="fas fa-sparkles text-brand-500 mr-2 text-base"></i> Showing "${query.toUpperCase()}"`; 
             } else { 
-                titleEl.innerHTML = `<i class="fas fa-fire text-gold-500 mr-2"></i> All Collections`; 
+                titleEl.innerHTML = `<i class="fas fa-fire text-gold-500 mr-2 text-base"></i> All Collections`; 
             }
             renderGrid(); 
             renderRateList();
@@ -1050,57 +676,59 @@
         // --- GRID RENDERING ---
         function renderGrid() {
             const container = document.getElementById('productContainer');
+            const countBadge = document.getElementById('productCountBadge');
             container.innerHTML = '';
             
             const productsToRender = getFilteredProducts();
+            if(countBadge) countBadge.innerText = `${productsToRender.length} Items`;
 
             if(productsToRender.length === 0) { 
-                container.innerHTML = `<div class="col-span-full text-center py-12 text-brand-300 font-bold w-full"><i class="fas fa-search text-4xl mb-3 block text-brand-200"></i>No products found.</div>`; 
+                container.innerHTML = `<div class="col-span-full text-center py-14 text-brand-400 font-bold w-full bg-white rounded-3xl border border-brand-100"><i class="fas fa-search text-4xl mb-3 block text-brand-200"></i>No matching products found.</div>`; 
                 return; 
             }
 
             productsToRender.forEach(p => {
                 let btnHTML = "";
                 if (p.shades.length > 1) {
-                    btnHTML = `<button onclick="openProductPage(${p.id}); event.stopPropagation();" class="border border-brand-900 text-brand-900 bg-white hover:bg-brand-50 rounded-md w-full h-8 font-bold text-[10px] uppercase shadow-sm transition-colors flex items-center justify-center">Select Shade</button>`;
+                    btnHTML = `<button onclick="openProductPage(${p.id}); event.stopPropagation();" class="border border-brand-900 text-brand-900 bg-brand-50/60 hover:bg-brand-900 hover:text-white rounded-xl w-full h-8 font-extrabold text-[10px] uppercase shadow-sm transition-colors flex items-center justify-center">Shades</button>`;
                 } else {
                     const singleShadeId = p.shades[0].id;
                     const singleQty = cart[singleShadeId] ? cart[singleShadeId].quantity : 0;
                     if(singleQty > 0) {
-                        btnHTML = `<div class="bg-brand-900 text-white rounded-md flex justify-between items-center w-full h-8 px-1 font-bold shadow-sm" onclick="event.stopPropagation()">
-                                      <button onclick="updateCart(event, ${p.id}, '${singleShadeId}', -1)" class="px-2 w-1/3 hover:bg-brand-800 rounded text-lg">-</button>
-                                      <span class="w-1/3 text-center text-sm">${singleQty}</span>
-                                      <button onclick="updateCart(event, ${p.id}, '${singleShadeId}', 1)" class="px-2 w-1/3 hover:bg-brand-800 rounded text-lg">+</button>
+                        btnHTML = `<div class="bg-brand-900 text-white rounded-xl flex justify-between items-center w-full h-8 px-1 font-bold shadow-sm" onclick="event.stopPropagation()">
+                                       <button onclick="updateCart(event, ${p.id}, '${singleShadeId}', -1)" class="px-2 w-1/3 hover:bg-brand-800 rounded-lg text-base">-</button>
+                                       <span class="w-1/3 text-center text-xs font-extrabold">${singleQty}</span>
+                                       <button onclick="updateCart(event, ${p.id}, '${singleShadeId}', 1)" class="px-2 w-1/3 hover:bg-brand-800 rounded-lg text-base">+</button>
                                    </div>`;
                     } else {
-                        btnHTML = `<button onclick="updateCart(event, ${p.id}, '${singleShadeId}', 1)" class="border border-brand-900 text-brand-900 bg-white hover:bg-brand-50 rounded-md w-full h-8 font-bold text-[10px] uppercase shadow-sm transition-colors flex items-center justify-center"><i class="fas fa-plus mr-1 text-[10px]"></i> Add</button>`;
+                        btnHTML = `<button onclick="updateCart(event, ${p.id}, '${singleShadeId}', 1)" class="bg-brand-900 text-gold-400 hover:bg-brand-800 rounded-xl w-full h-8 font-extrabold text-[10px] uppercase shadow-sm transition-colors flex items-center justify-center"><i class="fas fa-plus mr-1 text-[9px]"></i> Add</button>`;
                     }
                 }
 
                 const discount = Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100);
                 const displayImage = p.shades[0].images[0];
-                const shadeText = p.shades.length > 1 ? `${p.shades.length} Shades Available` : `Standard Size`;
+                const shadeText = p.shades.length > 1 ? `${p.shades.length} Shades` : `Full Size`;
                 const isWishlisted = wishlist.includes(p.id);
 
                 container.innerHTML += `
-                    <div class="bg-white p-3 rounded-2xl shadow-sm hover:shadow-md transition-all border border-brand-100 flex flex-col relative overflow-hidden group cursor-pointer" onclick="openProductPage(${p.id})">
-                        <div class="absolute top-2 left-2 bg-green-500 text-white text-[9px] font-bold px-2 py-0.5 rounded z-10 uppercase tracking-wider">${discount}% OFF</div>
+                    <div class="os-card bg-white p-3 rounded-2xl shadow-sm hover:shadow-md border border-brand-100/80 flex flex-col relative overflow-hidden group cursor-pointer" onclick="openProductPage(${p.id})">
+                        <div class="absolute top-2.5 left-2.5 bg-emerald-600 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-md z-10 uppercase tracking-wider shadow-sm">${discount}% OFF</div>
                         
-                        <div class="absolute top-2 right-2 z-10 bg-white/80 backdrop-blur-sm h-7 w-7 rounded-full flex items-center justify-center shadow-sm cursor-pointer" onclick="toggleWishlist(event, ${p.id})">
-                            <i class="${isWishlisted ? 'fas text-brand-600' : 'far text-gray-400 hover:text-brand-400'} fa-heart text-lg transition-colors"></i>
+                        <div class="absolute top-2.5 right-2.5 z-10 bg-white/90 backdrop-blur-sm h-7 w-7 rounded-full flex items-center justify-center shadow-sm cursor-pointer border border-brand-50" onclick="toggleWishlist(event, ${p.id})">
+                            <i class="${isWishlisted ? 'fas text-brand-600' : 'far text-gray-400'} fa-heart text-sm transition-colors"></i>
                         </div>
 
-                        <div class="h-32 w-full bg-brand-50 rounded-xl mb-3 overflow-hidden flex items-center justify-center p-2 relative">
-                            <img src="${displayImage}" class="h-full w-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500">
+                        <div class="h-36 w-full bg-brand-50/60 rounded-xl mb-2.5 overflow-hidden flex items-center justify-center p-2.5 relative">
+                            <img src="${displayImage}" loading="lazy" class="h-full w-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500">
                         </div>
-                        <h4 class="font-bold text-sm text-brand-900 leading-tight mb-1 line-clamp-2 min-h-[2.5rem]">${p.name}</h4>
-                        <p class="text-[10px] text-gray-500 mb-3 font-medium">${shadeText}</p>
-                        <div class="mt-auto flex justify-between items-center">
+                        <span class="text-[9px] font-extrabold uppercase tracking-wider text-brand-500 mb-0.5">${shadeText}</span>
+                        <h4 class="font-bold text-xs sm:text-sm text-brand-900 leading-snug mb-2 line-clamp-2 min-h-[2.25rem]">${p.name}</h4>
+                        <div class="mt-auto pt-1 flex justify-between items-center gap-2 border-t border-brand-50/80">
                             <div class="flex flex-col">
-                                <span class="font-black text-base text-gray-900">₹${p.price}</span>
-                                <span class="text-[10px] text-gray-400 line-through">₹${p.oldPrice}</span>
+                                <span class="font-black text-sm sm:text-base text-gray-900 leading-none">₹${p.price}</span>
+                                <span class="text-[10px] text-gray-400 line-through mt-0.5">₹${p.oldPrice}</span>
                             </div>
-                            <div class="w-16">${btnHTML}</div>
+                            <div class="w-20 shrink-0">${btnHTML}</div>
                         </div>
                     </div>`;
             });
@@ -1113,7 +741,7 @@
             const productsToRender = getFilteredProducts();
 
             if(productsToRender.length === 0) {
-                container.innerHTML = `<div class="text-center py-8 text-brand-200 text-xs font-bold w-full">No matching items.</div>`;
+                container.innerHTML = `<div class="text-center py-8 text-brand-300 text-xs font-bold w-full">No matching items.</div>`;
             } else {
                 productsToRender.forEach(p => {
                     p.shades.forEach(s => {
@@ -1121,27 +749,26 @@
                         
                         const qty = cart[s.id] ? cart[s.id].quantity : 0;
                         let btnHTML = qty > 0 
-                            ? `<div class="bg-brand-900 text-white rounded flex justify-between items-center w-14 h-7 px-1 font-bold shadow-sm">
-                                  <button onclick="updateCart(event, ${p.id}, '${s.id}', -1)" class="px-1.5 hover:bg-brand-800 text-sm">-</button>
-                                  <span class="text-xs">${qty}</span>
-                                  <button onclick="updateCart(event, ${p.id}, '${s.id}', 1)" class="px-1.5 hover:bg-brand-800 text-sm">+</button>
+                            ? `<div class="bg-brand-900 text-white rounded-lg flex justify-between items-center w-16 h-7 px-1 font-bold shadow-sm">
+                                   <button onclick="updateCart(event, ${p.id}, '${s.id}', -1)" class="px-1.5 hover:bg-brand-800 text-sm">-</button>
+                                   <span class="text-xs">${qty}</span>
+                                   <button onclick="updateCart(event, ${p.id}, '${s.id}', 1)" class="px-1.5 hover:bg-brand-800 text-sm">+</button>
                                </div>`
-                            : `<button onclick="updateCart(event, ${p.id}, '${s.id}', 1)" class="border border-brand-200 text-brand-900 bg-white hover:bg-brand-50 rounded w-14 h-7 font-bold text-[10px] uppercase transition-colors">Add</button>`;
+                            : `<button onclick="updateCart(event, ${p.id}, '${s.id}', 1)" class="border border-brand-200 text-brand-900 bg-brand-50/50 hover:bg-brand-900 hover:text-white rounded-lg w-16 h-7 font-extrabold text-[10px] uppercase transition-colors">Add</button>`;
 
                         container.innerHTML += `
-                            <div class="flex items-center justify-between p-2 hover:bg-brand-50 rounded-lg border-b border-brand-50 last:border-0 transition-colors cursor-pointer bg-white mb-1" onclick="openProductPage(${p.id}, '${s.id}')">
-                                <div class="flex items-center space-x-3 w-3/4">
-                                    <div class="h-10 w-10 bg-brand-50 rounded border border-brand-100 p-0.5 shrink-0">
-                                        <img src="${s.images[0]}" class="h-full w-full object-contain mix-blend-multiply">
+                            <div class="flex items-center justify-between p-2 hover:bg-brand-50 rounded-xl border border-brand-50 transition-colors cursor-pointer bg-white" onclick="openProductPage(${p.id}, '${s.id}')">
+                                <div class="flex items-center space-x-2.5 min-w-0 flex-1 pr-2">
+                                    <div class="h-10 w-10 bg-brand-50 rounded-lg border border-brand-100 p-0.5 shrink-0">
+                                        <img src="${s.images[0]}" loading="lazy" class="h-full w-full object-contain mix-blend-multiply">
                                     </div>
                                     <div class="truncate">
-                                        <h4 class="text-xs font-bold text-gray-800 truncate">${p.name}</h4>${p.shades.length > 1 ? `<div class="text-[9px] text-brand-600 font-bold truncate mt-0.5 flex items-center"><div class="w-2 h-2 rounded-full mr-1 inline-block border border-gray-300" style="background-color: ${s.color}"></div>${s.name}</div>` : ''}
-                                        <div class="flex items-center space-x-1.5 mt-0.5">
-                                            <span class="text-[11px] font-black text-brand-900">₹${p.price}</span>
-                                        </div>
+                                        <h4 class="text-xs font-bold text-gray-800 truncate">${p.name}</h4>
+                                        ${p.shades.length > 1 ? `<div class="text-[9px] text-brand-600 font-bold truncate mt-0.5 flex items-center"><span class="w-2 h-2 rounded-full mr-1 inline-block border border-gray-300" style="background-color: ${s.color}"></span>${s.name}</div>` : ''}
+                                        <span class="text-[11px] font-black text-brand-900 block mt-0.5">₹${p.price}</span>
                                     </div>
                                 </div>
-                                <div class="w-14 shrink-0" onclick="event.stopPropagation()">${btnHTML}</div>
+                                <div class="shrink-0" onclick="event.stopPropagation()">${btnHTML}</div>
                             </div>`;
                     });
                 });
@@ -1154,11 +781,11 @@
         function toggleRateList() {
             const list = document.getElementById('sideRateList');
             if(list.classList.contains('hidden') || list.classList.contains('lg:flex')) {
-                list.classList.remove('hidden', 'lg:flex', 'sticky', 'rounded-2xl');
+                list.classList.remove('hidden', 'lg:flex', 'sticky', 'rounded-3xl');
                 list.classList.add('flex', 'fixed', 'inset-0', 'z-[70]', 'w-full', 'h-full', 'rounded-none');
                 document.body.style.overflow = 'hidden';
             } else {
-                list.classList.add('hidden', 'lg:flex', 'sticky', 'rounded-2xl');
+                list.classList.add('hidden', 'lg:flex', 'sticky', 'rounded-3xl');
                 list.classList.remove('flex', 'fixed', 'inset-0', 'z-[70]', 'w-full', 'h-full', 'rounded-none');
                 document.body.style.overflow = '';
             }
@@ -1180,9 +807,9 @@
             const pdWishlistBtn = document.getElementById('pdWishlistBtn');
             pdWishlistBtn.onclick = (e) => toggleWishlist(e, p.id);
             if (wishlist.includes(p.id)) {
-                pdWishlistBtn.innerHTML = `<i class="fas fa-heart text-xl text-brand-600"></i>`;
+                pdWishlistBtn.innerHTML = `<i class="fas fa-heart text-lg text-brand-600"></i>`;
             } else {
-                pdWishlistBtn.innerHTML = `<i class="far fa-heart text-xl text-gray-400"></i>`;
+                pdWishlistBtn.innerHTML = `<i class="far fa-heart text-lg text-gray-400"></i>`;
             }
 
             const swatchesContainer = document.getElementById('pdShadeSwatches');
@@ -1191,7 +818,7 @@
             if(p.shades.length > 1) {
                 document.getElementById('shadeSelectorSection').classList.remove('hidden');
                 p.shades.forEach(s => { 
-                    swatchesContainer.innerHTML += `<div id="swatch-${s.id}" onclick="selectShade('${s.id}')" class="w-8 h-8 rounded-full cursor-pointer transition-all border border-gray-300 hover:scale-110" style="background-color: ${s.color};" title="${s.name}"></div>`; 
+                    swatchesContainer.innerHTML += `<div id="swatch-${s.id}" onclick="selectShade('${s.id}')" class="w-9 h-9 rounded-full cursor-pointer transition-all border border-gray-300 shadow-sm" style="background-color: ${s.color};" title="${s.name}"></div>`; 
                 });
             } else {
                 document.getElementById('shadeSelectorSection').classList.add('hidden');
@@ -1245,21 +872,21 @@
             
             if(qty > 0) {
                 container.innerHTML = `
-                    <div class="flex justify-between items-center bg-brand-50 p-2 rounded-xl border border-brand-200 shadow-inner">
-                        <div class="font-bold text-brand-900 ml-2 text-sm">Added to Bag</div>
-                        <div class="bg-brand-900 text-white rounded-lg flex justify-between items-center w-32 h-11 px-2 font-bold shadow-md">
+                    <div class="flex justify-between items-center bg-brand-50 p-2 rounded-2xl border border-brand-200">
+                        <div class="font-extrabold text-brand-900 ml-3 text-sm flex items-center"><i class="fas fa-check-circle text-emerald-600 mr-1.5"></i> Added to Bag</div>
+                        <div class="bg-brand-900 text-white rounded-xl flex justify-between items-center w-32 h-11 px-2 font-bold shadow-md">
                             <button onclick="updateCart(event, ${currentOpenProductId}, '${currentSelectedShadeId}', -1)" class="px-3 hover:bg-brand-800 rounded text-xl">-</button>
-                            <span class="text-lg">${qty}</span>
+                            <span class="text-base font-black">${qty}</span>
                             <button onclick="updateCart(event, ${currentOpenProductId}, '${currentSelectedShadeId}', 1)" class="px-3 hover:bg-brand-800 rounded text-xl">+</button>
                         </div>
                     </div>`;
             } else {
                 container.innerHTML = `
                     <div class="flex space-x-3 w-full">
-                        <button onclick="updateCart(event, ${currentOpenProductId}, '${currentSelectedShadeId}', 1)" class="w-1/2 bg-white hover:bg-brand-50 text-brand-900 border-2 border-brand-900 font-bold py-3.5 rounded-xl shadow-sm flex items-center justify-center space-x-2 transition-transform active:scale-95">
+                        <button onclick="updateCart(event, ${currentOpenProductId}, '${currentSelectedShadeId}', 1)" class="w-1/2 bg-white hover:bg-brand-50 text-brand-900 border-2 border-brand-900 font-extrabold py-3.5 rounded-2xl shadow-sm flex items-center justify-center space-x-2 transition-transform active:scale-95">
                             <i class="fas fa-shopping-bag"></i> <span class="text-sm">Add to Bag</span>
                         </button>
-                        <button onclick="updateCart(event, ${currentOpenProductId}, '${currentSelectedShadeId}', 1); closeProductPage(); openCart();" class="w-1/2 bg-brand-900 hover:bg-brand-800 text-white font-bold py-3.5 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition-transform active:scale-95">
+                        <button onclick="updateCart(event, ${currentOpenProductId}, '${currentSelectedShadeId}', 1); closeProductPage(); openCart();" class="w-1/2 bg-gradient-to-r from-brand-900 to-brand-800 text-gold-400 font-extrabold py-3.5 rounded-2xl shadow-lg flex items-center justify-center space-x-2 transition-transform active:scale-95">
                             <i class="fas fa-bolt"></i> <span class="text-sm">Buy Now</span>
                         </button>
                     </div>`;
@@ -1274,10 +901,12 @@
             popAppModal('product'); 
         }
 
-        // --- IMAGE ZOOM + ADMOB ---
+        // --- IMAGE ZOOM + ADMOB INTERSTITIAL (100% INTACT) ---
         let openImagePreview = function() {
             pushAppModal('image'); 
-            if (typeof AndroidBridge !== "undefined") { AndroidBridge.showInterstitialAd(); }
+            if (typeof AndroidBridge !== "undefined" && typeof AndroidBridge.showInterstitialAd === "function") {
+                AndroidBridge.showInterstitialAd();
+            }
             const currentImgSrc = document.getElementById('pdMainImg').src;
             document.getElementById('previewMainImg').src = currentImgSrc;
             const modal = document.getElementById('imagePreviewModal');
@@ -1310,6 +939,7 @@
             cart[shadeId].quantity += change;
             if (cart[shadeId].quantity <= 0) { delete cart[shadeId]; }
             renderGrid(); 
+            renderRateList();
             updateCartUI();
             if(currentOpenProductId === productId && currentSelectedShadeId === shadeId) { updatePdActionBtn(); }
         }
@@ -1326,18 +956,18 @@
                 let shadeTextHtml = item.isSingle ? `` : `<div class="text-[10px] text-brand-600 font-bold mt-0.5 flex items-center"><div class="w-2.5 h-2.5 rounded-full mr-1.5 border border-gray-300" style="background-color: ${item.color}"></div>${item.shadeName}</div>`;
 
                 listContainer.innerHTML += `
-                    <div class="p-4 flex justify-between items-center">
-                        <div class="flex items-center space-x-3 w-3/5">
-                            <img src="${item.image}" class="h-14 w-14 object-cover rounded-lg border border-brand-100 bg-brand-50 p-1">
-                            <div>
-                                <h4 class="text-sm font-bold text-gray-800 leading-tight line-clamp-1">${item.productName}</h4>
+                    <div class="p-3.5 flex justify-between items-center gap-2">
+                        <div class="flex items-center space-x-3 min-w-0 flex-1">
+                            <img src="${item.image}" class="h-14 w-14 object-contain rounded-xl border border-brand-100 bg-brand-50 p-1 shrink-0">
+                            <div class="min-w-0">
+                                <h4 class="text-xs sm:text-sm font-bold text-gray-800 leading-tight line-clamp-1">${item.productName}</h4>
                                 ${shadeTextHtml}
                                 <p class="text-xs text-brand-900 mt-1 font-black">₹${item.price}</p>
                             </div>
                         </div>
-                        <div class="border border-brand-200 bg-brand-50 text-brand-900 rounded-md flex justify-between items-center w-20 h-8 px-1 font-bold">
+                        <div class="border border-brand-200 bg-brand-50 text-brand-900 rounded-xl flex justify-between items-center w-20 h-8 px-1 font-bold shrink-0">
                             <button onclick="updateCart(event, ${item.productId}, '${item.shadeId}', -1)" class="px-2 w-1/3 hover:bg-brand-100 rounded">-</button>
-                            <span class="w-1/3 text-center text-sm">${item.quantity}</span>
+                            <span class="w-1/3 text-center text-xs font-extrabold">${item.quantity}</span>
                             <button onclick="updateCart(event, ${item.productId}, '${item.shadeId}', 1)" class="px-2 w-1/3 hover:bg-brand-100 rounded">+</button>
                         </div>
                     </div>`;
@@ -1357,7 +987,7 @@
             }
 
             document.getElementById('billItemTotal').innerText = itemTotal;
-            document.getElementById('billDeliveryFee').innerHTML = deliveryFee === 0 ? `<span class="text-green-600 bg-green-50 px-2 py-0.5 rounded font-bold text-[10px] uppercase">Free</span>` : `₹${deliveryFee}`;
+            document.getElementById('billDeliveryFee').innerHTML = deliveryFee === 0 ? `<span class="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md font-extrabold text-[10px] uppercase">Free</span>` : `₹${deliveryFee}`;
             document.getElementById('billGrandTotal').innerText = grandTotal;
             document.getElementById('checkoutBtnTotal').innerText = grandTotal;
             document.getElementById('payModalTotal').innerText = grandTotal;
@@ -1384,7 +1014,7 @@
         function showCustomToast(htmlContent) {
             const container = document.getElementById('otpToastContainer');
             const toast = document.createElement('div');
-            toast.className = 'bg-white rounded-2xl shadow-2xl p-4 m-4 max-w-sm w-full flex items-start space-x-3 border-l-4 border-brand-500 otp-toast';
+            toast.className = 'bg-white rounded-2xl shadow-2xl p-4 my-2 max-w-sm w-full flex items-start space-x-3 border-l-4 border-brand-600 otp-toast';
             toast.innerHTML = htmlContent;
             container.appendChild(toast);
             setTimeout(() => { if(toast.parentElement) toast.remove(); }, 6000);
@@ -1394,21 +1024,21 @@
             document.getElementById('loginModal').classList.remove('hidden');
             document.getElementById('phoneInput').value = ''; 
             document.getElementById('sendOtpBtn').disabled = true;
-            document.getElementById('sendOtpBtn').className = "w-full bg-brand-100 text-brand-300 py-3.5 rounded-xl font-bold transition-colors";
+            document.getElementById('sendOtpBtn').className = "w-full bg-brand-100 text-brand-300 py-3.5 rounded-2xl font-extrabold transition-colors";
             document.getElementById('loginStep1').classList.remove('hidden'); 
             document.getElementById('loginStep2').classList.add('hidden');
         }
         function closeLoginModal() { document.getElementById('loginModal').classList.add('hidden'); }
 
-        document.getElementById('phoneInput').addEventListener('input', function(e) {
+        document.getElementById('phoneInput').addEventListener('input', function() {
             this.value = this.value.replace(/[^0-9]/g, '');
             const btn = document.getElementById('sendOtpBtn');
             if (this.value.length === 10) { 
                 btn.disabled = false; 
-                btn.className = "w-full bg-brand-900 text-white py-3.5 rounded-xl font-bold shadow-md hover:bg-brand-800 transition-colors"; 
+                btn.className = "w-full bg-brand-900 text-gold-400 py-3.5 rounded-2xl font-extrabold shadow-md hover:bg-brand-800 transition-colors"; 
             } else { 
                 btn.disabled = true; 
-                btn.className = "w-full bg-brand-100 text-brand-300 py-3.5 rounded-xl font-bold transition-colors"; 
+                btn.className = "w-full bg-brand-100 text-brand-300 py-3.5 rounded-2xl font-extrabold transition-colors"; 
             }
         });
 
@@ -1447,14 +1077,12 @@
             }
         }
 
-        // --- VERIFY OTP & AUTO LOGIN ---
         function verifyOTP() {
             let entered = ""; 
             document.querySelectorAll('.otp-input').forEach(i => entered += i.value);
             
             if (entered === generatedOTP) {
                 userLoggedIn = true; 
-                
                 localStorage.setItem('alKaynat_isLoggedIn', 'true');
                 localStorage.setItem('alKaynat_userPhone', customerPhone);
                 
@@ -1463,19 +1091,19 @@
                 if(document.getElementById('userProfileIcon')) document.getElementById('userProfileIcon').classList.remove('hidden');
                 
                 showCustomToast(`
-                    <div class="bg-green-100 rounded-full h-10 w-10 flex items-center justify-center shrink-0"><i class="fas fa-check text-green-600"></i></div>
+                    <div class="bg-emerald-100 rounded-full h-10 w-10 flex items-center justify-center shrink-0"><i class="fas fa-check text-emerald-600"></i></div>
                     <div class="flex-1 mt-2"><p class="text-sm font-bold text-gray-800 leading-tight">Logged in successfully!</p></div>
                 `);
                 
                 if(activeModals.includes('myorders')) { closeMyOrders(); openMyOrders(); }
             } else { 
-                alert("Invalid OTP. Check SMS."); 
+                alert("Invalid OTP. Check SMS notification."); 
                 document.querySelectorAll('.otp-input').forEach(i => i.value = ''); 
                 document.querySelectorAll('.otp-input')[0].focus(); 
             }
         }
 
-        // --- MY ORDERS SYSTEM (WITH LIVE TRACKING) ---
+        // --- MY ORDERS SYSTEM (WITH SAVED NAME & LIVE TRACKING) ---
         function openMyOrders() {
             if (!userLoggedIn) { openLoginModal(); return; }
             pushAppModal('myorders');
@@ -1500,20 +1128,24 @@
             const container = document.getElementById('myOrdersList');
             const myOrders = JSON.parse(localStorage.getItem('alKaynat_Orders_' + customerPhone) || '[]');
             
+            let savedName = localStorage.getItem('alKaynat_userName') || customerName;
+            let displayName = savedName ? savedName : "My Account";
+            let displayInitial = savedName ? savedName.charAt(0).toUpperCase() : '<i class="fas fa-user"></i>';
+            
             let profileHtml = `
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-brand-100 mb-6 flex items-center space-x-4">
-                <div class="h-14 w-14 bg-brand-900 rounded-full text-gold-400 font-bold text-xl flex items-center justify-center border-2 border-brand-200">
-                    <i class="fas fa-user"></i>
+                <div class="h-14 w-14 bg-brand-900 rounded-2xl text-gold-400 font-bold text-xl flex items-center justify-center border-2 border-brand-200 shrink-0">
+                    ${displayInitial}
                 </div>
-                <div>
-                    <h3 class="font-bold text-gray-800 text-lg">My Account</h3>
+                <div class="min-w-0">
+                    <h3 class="font-bold text-gray-800 text-lg truncate">${displayName}</h3>
                     <p class="text-gray-500 text-sm font-medium">+91 ${customerPhone}</p>
                 </div>
             </div>
             <h3 class="font-bold text-brand-900 mb-3 brand-font text-lg">Track Your Orders</h3>`;
 
             if (myOrders.length === 0) {
-                container.innerHTML = profileHtml + `<div class="text-center py-10 flex flex-col items-center bg-white rounded-2xl border border-brand-50"><div class="h-16 w-16 bg-brand-50 rounded-full flex items-center justify-center mb-3"><i class="fas fa-shopping-bag text-3xl text-brand-200"></i></div><p class="text-gray-800 font-bold">No orders yet</p></div>`;
+                container.innerHTML = profileHtml + `<div class="text-center py-12 flex flex-col items-center bg-white rounded-3xl border border-brand-100"><div class="h-16 w-16 bg-brand-50 rounded-full flex items-center justify-center mb-3"><i class="fas fa-shopping-bag text-3xl text-brand-200"></i></div><p class="text-gray-800 font-bold">No orders placed yet</p></div>`;
                 return;
             }
 
@@ -1533,10 +1165,10 @@
                 let itemsHtml = '';
                 order.items.forEach(item => {
                    itemsHtml += `<div class="flex items-center space-x-3 mt-3 border-t border-gray-100 pt-3">
-                        <img src="${item.image}" class="w-12 h-12 object-cover rounded-lg border border-gray-200 bg-white">
-                        <div class="flex-1">
+                        <img src="${item.image}" class="w-12 h-12 object-contain rounded-lg border border-gray-200 bg-white p-0.5 shrink-0">
+                        <div class="flex-1 min-w-0">
                             <p class="text-sm font-bold text-gray-800 line-clamp-1">${item.name}</p>
-                            <p class="text-[10px] text-gray-500">${item.shade ? 'Shade: '+item.shade : ''} | Qty: ${item.qty}</p>
+                            <p class="text-[10px] text-gray-500">${item.shade ? 'Shade: '+item.shade+' | ' : ''}Qty: ${item.qty}</p>
                         </div>
                         <div class="font-black text-brand-900 text-sm">₹${item.price}</div>
                    </div>`;
@@ -1546,35 +1178,35 @@
                 <div class="mt-5 mb-2 px-1">
                     <div class="flex justify-between items-center relative">
                         <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-200 z-0 rounded"></div>
-                        <div class="absolute left-0 top-1/2 transform -translate-y-1/2 h-1 bg-green-500 z-0 transition-all rounded" style="width: ${progressWidth}%"></div>
+                        <div class="absolute left-0 top-1/2 transform -translate-y-1/2 h-1 bg-emerald-500 z-0 transition-all rounded" style="width: ${progressWidth}%"></div>
                         
                         <div class="relative z-10 flex flex-col items-center">
-                            <div class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] ${step >= 1 ? 'bg-green-500 text-white shadow-md' : 'bg-gray-200 text-gray-400'}"><i class="fas fa-check"></i></div>
+                            <div class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] ${step >= 1 ? 'bg-emerald-500 text-white shadow-md' : 'bg-gray-200 text-gray-400'}"><i class="fas fa-check"></i></div>
                         </div>
                         <div class="relative z-10 flex flex-col items-center">
-                            <div class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] ${step >= 2 ? 'bg-green-500 text-white shadow-md' : 'bg-gray-200 text-gray-400'}"><i class="fas fa-box"></i></div>
+                            <div class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] ${step >= 2 ? 'bg-emerald-500 text-white shadow-md' : 'bg-gray-200 text-gray-400'}"><i class="fas fa-box"></i></div>
                         </div>
                         <div class="relative z-10 flex flex-col items-center">
-                            <div class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] ${step >= 3 ? 'bg-green-500 text-white shadow-md' : 'bg-gray-200 text-gray-400'}"><i class="fas fa-truck"></i></div>
+                            <div class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] ${step >= 3 ? 'bg-emerald-500 text-white shadow-md' : 'bg-gray-200 text-gray-400'}"><i class="fas fa-truck"></i></div>
                         </div>
                         <div class="relative z-10 flex flex-col items-center">
-                            <div class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] ${step >= 4 ? 'bg-green-500 text-white shadow-md' : 'bg-gray-200 text-gray-400'}"><i class="fas fa-home"></i></div>
+                            <div class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] ${step >= 4 ? 'bg-emerald-500 text-white shadow-md' : 'bg-gray-200 text-gray-400'}"><i class="fas fa-home"></i></div>
                         </div>
                     </div>
                     <div class="flex justify-between items-center mt-1.5 px-1">
-                        <span class="text-[9px] font-bold ${step >= 1 ? 'text-green-600' : 'text-gray-400'}">Placed</span>
-                        <span class="text-[9px] font-bold ${step >= 2 ? 'text-green-600' : 'text-gray-400'}">Shipped</span>
-                        <span class="text-[9px] font-bold ${step >= 3 ? 'text-green-600' : 'text-gray-400'} pl-2">Out for Delivery</span>
-                        <span class="text-[9px] font-bold ${step >= 4 ? 'text-green-600' : 'text-gray-400'}">Delivered</span>
+                        <span class="text-[9px] font-bold ${step >= 1 ? 'text-emerald-600' : 'text-gray-400'}">Placed</span>
+                        <span class="text-[9px] font-bold ${step >= 2 ? 'text-emerald-600' : 'text-gray-400'}">Shipped</span>
+                        <span class="text-[9px] font-bold ${step >= 3 ? 'text-emerald-600' : 'text-gray-400'}">Out for Delivery</span>
+                        <span class="text-[9px] font-bold ${step >= 4 ? 'text-emerald-600' : 'text-gray-400'}">Delivered</span>
                     </div>
-                    ${step < 4 ? `<p class="text-[10px] text-gray-500 mt-3 text-center bg-gray-50 py-1 rounded-md border border-gray-100"><i class="fas fa-clock text-brand-400 mr-1"></i> Expected Delivery in 7 Days</p>` : `<p class="text-[10px] text-green-600 mt-3 text-center bg-green-50 py-1 rounded-md border border-green-100 font-bold"><i class="fas fa-check-circle mr-1"></i> Order Delivered Successfully</p>`}
+                    ${step < 4 ? `<p class="text-[10px] text-gray-500 mt-3 text-center bg-gray-50 py-1.5 rounded-lg border border-gray-100"><i class="fas fa-clock text-brand-400 mr-1"></i> Expected Delivery in 7 Days</p>` : `<p class="text-[10px] text-emerald-600 mt-3 text-center bg-emerald-50 py-1.5 rounded-lg border border-emerald-100 font-bold"><i class="fas fa-check-circle mr-1"></i> Order Delivered Successfully</p>`}
                 </div>`;
 
                 html += `
-                <div class="bg-white rounded-2xl p-4 shadow-sm border border-brand-100 mb-4 transition-all hover:shadow-md">
+                <div class="bg-white rounded-2xl p-4 shadow-sm border border-brand-100 mb-4">
                     <div class="flex justify-between items-center mb-1 pb-1">
                         <div><span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Order ID: ${order.orderId}</span><div class="text-xs font-bold text-gray-800 mt-0.5">${order.date}</div></div>
-                        <div class="bg-${step === 4 ? 'green' : 'blue'}-50 text-${step === 4 ? 'green' : 'blue'}-700 px-2.5 py-1 rounded-md font-bold text-[10px] uppercase tracking-wider flex items-center border border-${step === 4 ? 'green' : 'blue'}-100">${statusText}</div>
+                        <div class="bg-brand-50 text-brand-800 px-2.5 py-1 rounded-lg font-extrabold text-[10px] uppercase tracking-wider border border-brand-100">${statusText}</div>
                     </div>
                     ${trackingHtml}
                     ${itemsHtml}
@@ -1587,7 +1219,7 @@
             container.innerHTML = html;
         }
 
-       // --- ADDRESS & PAYMENT ---
+        // --- ADDRESS & PAYMENT ---
         let openAddressModal = function() { pushAppModal('address'); document.getElementById('addressModal').classList.remove('hidden'); }
         let closeAddressModal = function() { document.getElementById('addressModal').classList.add('hidden'); popAppModal('address'); }
 
@@ -1608,8 +1240,9 @@
             customerPhone = phone; 
             currentAddress = `${house}, ${area}, ${city}, Pincode: ${pin}`;
             
-            // 👇 YAHAN USER KA NAAM HAMESHA KE LIYE SAVE HOGA 👇
             localStorage.setItem('alKaynat_userName', customerName);
+            localStorage.setItem('alKaynat_savedAddress', currentAddress);
+            localStorage.setItem('alKaynat_savedShortAddress', city + " - " + pin);
             
             document.getElementById('topAddressText').innerText = city + " - " + pin; 
             closeAddressModal();
@@ -1628,7 +1261,7 @@
             popAppModal('payment');
         }
 
-function processOnlinePayment(appName) {
+        function processOnlinePayment(appName) {
             selectedUPIApp = appName; 
             closePaymentModal(); 
             
@@ -1636,11 +1269,8 @@ function processOnlinePayment(appName) {
             let storeName = "Al Kaynat Cosmetic";
             let amountToPay = document.getElementById('billGrandTotal').innerText;
             let orderNote = "Order by " + customerName;
-
-            // Naya: Har order ke liye ek unique Transaction ID (tr) generate hogi
             let transactionId = "TXN" + Date.now();
             
-            // Naya: Link mein &tr=${transactionId} aur &mc=5499 add kiya gaya hai
             let upiUrl = `upi://pay?pa=${merchantUpiId}&pn=${encodeURIComponent(storeName)}&am=${amountToPay}&tn=${encodeURIComponent(orderNote)}&tr=${transactionId}&mc=5499&cu=INR`;
             
             window.location.href = upiUrl;
@@ -1650,102 +1280,6 @@ function processOnlinePayment(appName) {
             }, 3000);
         }
 
-        // --- MY ORDERS SYSTEM MEIN BHI UPDATE KAREIN 👇 ---
-        function renderMyOrders() {
-            const container = document.getElementById('myOrdersList');
-            const myOrders = JSON.parse(localStorage.getItem('alKaynat_Orders_' + customerPhone) || '[]');
-            
-            // 👇 YAHAN SAVE KIYA HUA NAAM NIKAL KAR PROFILE MEIN DIKHEGA 👇
-            let savedName = localStorage.getItem('alKaynat_userName') || customerName;
-            let displayName = savedName ? savedName : "My Account";
-            let displayInitial = savedName ? savedName.charAt(0).toUpperCase() : '<i class="fas fa-user"></i>';
-            
-            let profileHtml = `
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-brand-100 mb-6 flex items-center space-x-4">
-                <div class="h-14 w-14 bg-brand-900 rounded-full text-gold-400 font-bold text-xl flex items-center justify-center border-2 border-brand-200">
-                    ${displayInitial}
-                </div>
-                <div>
-                    <h3 class="font-bold text-gray-800 text-lg line-clamp-1">${displayName}</h3>
-                    <p class="text-gray-500 text-sm font-medium">+91 ${customerPhone}</p>
-                </div>
-            </div>
-            <h3 class="font-bold text-brand-900 mb-3 brand-font text-lg">Track Your Orders</h3>`;
-
-            if (myOrders.length === 0) {
-                container.innerHTML = profileHtml + `<div class="text-center py-10 flex flex-col items-center bg-white rounded-2xl border border-brand-50"><div class="h-16 w-16 bg-brand-50 rounded-full flex items-center justify-center mb-3"><i class="fas fa-shopping-bag text-3xl text-brand-200"></i></div><p class="text-gray-800 font-bold">No orders yet</p></div>`;
-                return;
-            }
-
-            let html = profileHtml;
-            myOrders.forEach(order => {
-                let step = 1; 
-                let statusText = "Order Placed";
-                let progressWidth = 10;
-                
-                if(order.timestamp) {
-                    let daysPassed = Math.floor((new Date().getTime() - order.timestamp) / (1000 * 3600 * 24));
-                    if(daysPassed >= 7) { step = 4; statusText = "Delivered"; progressWidth = 100; }
-                    else if(daysPassed >= 4) { step = 3; statusText = "Out for Delivery"; progressWidth = 66; }
-                    else if(daysPassed >= 2) { step = 2; statusText = "Shipped"; progressWidth = 33; }
-                }
-
-                let itemsHtml = '';
-                order.items.forEach(item => {
-                   itemsHtml += `<div class="flex items-center space-x-3 mt-3 border-t border-gray-100 pt-3">
-                        <img src="${item.image}" class="w-12 h-12 object-cover rounded-lg border border-gray-200 bg-white">
-                        <div class="flex-1">
-                            <p class="text-sm font-bold text-gray-800 line-clamp-1">${item.name}</p>
-                            <p class="text-[10px] text-gray-500">${item.shade ? 'Shade: '+item.shade : ''} | Qty: ${item.qty}</p>
-                        </div>
-                        <div class="font-black text-brand-900 text-sm">₹${item.price}</div>
-                   </div>`;
-                });
-
-                let trackingHtml = `
-                <div class="mt-5 mb-2 px-1">
-                    <div class="flex justify-between items-center relative">
-                        <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-200 z-0 rounded"></div>
-                        <div class="absolute left-0 top-1/2 transform -translate-y-1/2 h-1 bg-green-500 z-0 transition-all rounded" style="width: ${progressWidth}%"></div>
-                        
-                        <div class="relative z-10 flex flex-col items-center">
-                            <div class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] ${step >= 1 ? 'bg-green-500 text-white shadow-md' : 'bg-gray-200 text-gray-400'}"><i class="fas fa-check"></i></div>
-                        </div>
-                        <div class="relative z-10 flex flex-col items-center">
-                            <div class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] ${step >= 2 ? 'bg-green-500 text-white shadow-md' : 'bg-gray-200 text-gray-400'}"><i class="fas fa-box"></i></div>
-                        </div>
-                        <div class="relative z-10 flex flex-col items-center">
-                            <div class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] ${step >= 3 ? 'bg-green-500 text-white shadow-md' : 'bg-gray-200 text-gray-400'}"><i class="fas fa-truck"></i></div>
-                        </div>
-                        <div class="relative z-10 flex flex-col items-center">
-                            <div class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] ${step >= 4 ? 'bg-green-500 text-white shadow-md' : 'bg-gray-200 text-gray-400'}"><i class="fas fa-home"></i></div>
-                        </div>
-                    </div>
-                    <div class="flex justify-between items-center mt-1.5 px-1">
-                        <span class="text-[9px] font-bold ${step >= 1 ? 'text-green-600' : 'text-gray-400'}">Placed</span>
-                        <span class="text-[9px] font-bold ${step >= 2 ? 'text-green-600' : 'text-gray-400'}">Shipped</span>
-                        <span class="text-[9px] font-bold ${step >= 3 ? 'text-green-600' : 'text-gray-400'} pl-2">Out for Delivery</span>
-                        <span class="text-[9px] font-bold ${step >= 4 ? 'text-green-600' : 'text-gray-400'}">Delivered</span>
-                    </div>
-                    ${step < 4 ? `<p class="text-[10px] text-gray-500 mt-3 text-center bg-gray-50 py-1 rounded-md border border-gray-100"><i class="fas fa-clock text-brand-400 mr-1"></i> Expected Delivery in 7 Days</p>` : `<p class="text-[10px] text-green-600 mt-3 text-center bg-green-50 py-1 rounded-md border border-green-100 font-bold"><i class="fas fa-check-circle mr-1"></i> Order Delivered Successfully</p>`}
-                </div>`;
-
-                html += `
-                <div class="bg-white rounded-2xl p-4 shadow-sm border border-brand-100 mb-4 transition-all hover:shadow-md">
-                    <div class="flex justify-between items-center mb-1 pb-1">
-                        <div><span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Order ID: ${order.orderId}</span><div class="text-xs font-bold text-gray-800 mt-0.5">${order.date}</div></div>
-                        <div class="bg-${step === 4 ? 'green' : 'blue'}-50 text-${step === 4 ? 'green' : 'blue'}-700 px-2.5 py-1 rounded-md font-bold text-[10px] uppercase tracking-wider flex items-center border border-${step === 4 ? 'green' : 'blue'}-100">${statusText}</div>
-                    </div>
-                    ${trackingHtml}
-                    ${itemsHtml}
-                    <div class="flex justify-between items-center mt-4 pt-3 border-t border-brand-50">
-                        <span class="text-xs font-bold text-gray-500 uppercase">Grand Total</span>
-                        <span class="text-lg font-black text-brand-900">₹${order.total}</span>
-                    </div>
-                </div>`;
-            });
-            container.innerHTML = html;
-        }
         // --- WHATSAPP ORDER PROCESSING ---
         function processWhatsAppOrder() {
             let orderId = 'ORD' + Math.floor(100000 + Math.random() * 900000);
@@ -1798,10 +1332,11 @@ function processOnlinePayment(appName) {
             window.open(`https://api.whatsapp.com/send?phone=${ownerWhatsAppNumber}&text=${encodeURIComponent(waMsg)}`, '_blank');
             cart = {}; 
             renderGrid(); 
+            renderRateList();
             updateCartUI();
         }
 
-        // --- ADMIN PANEL ---
+        // --- SECRET ADMIN PANEL (5 TAPS ON AK LOGO -> PIN 9999) ---
         let adminTapCount = 0; 
         let adminTapTimer;
         
@@ -1863,11 +1398,11 @@ function processOnlinePayment(appName) {
                 let order = history[i]; 
                 totalCollection += order.total; 
                 historyHTML += `
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-brand-100 mb-3 transition-all hover:shadow-md">
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-brand-100 mb-3">
                         <div class="flex justify-between items-center mb-1">
                             <div class="flex items-center space-x-3">
                                 <div class="bg-brand-50 text-brand-600 h-10 w-10 rounded-full flex items-center justify-center font-bold text-sm border border-brand-100"><i class="fas fa-box"></i></div>
-                                <div><span class="font-bold text-gray-900 block text-sm tracking-tight">${order.id}</span><span class="text-gray-400 text-xs font-medium">${order.time}</span></div>
+                                <div><span class="font-bold text-gray-900 block text-sm">${order.id}</span><span class="text-gray-400 text-xs font-medium">${order.time}</span></div>
                             </div>
                             <div class="text-right"><span class="font-black text-brand-900 block text-lg">₹${order.total}</span></div>
                         </div>
@@ -1875,7 +1410,7 @@ function processOnlinePayment(appName) {
             } 
             
             container.innerHTML = `
-                <div class="bg-brand-900 text-white p-6 rounded-3xl shadow-xl mb-6 relative overflow-hidden">
+                <div class="bg-gradient-to-br from-brand-900 to-brand-800 text-white p-6 rounded-3xl shadow-xl mb-6 relative overflow-hidden">
                     <i class="fas fa-chart-line absolute -right-4 -bottom-4 text-[100px] text-brand-800 opacity-50"></i>
                     <p class="text-gold-400 text-xs font-bold uppercase tracking-widest mb-1 relative z-10">Total Collection (Dhanda)</p>
                     <div class="flex items-baseline space-x-1 relative z-10">
@@ -1889,20 +1424,20 @@ function processOnlinePayment(appName) {
             const btn = document.getElementById('clearHisaabBtn'); 
             if(!isConfirmingClear) { 
                 isConfirmingClear = true; 
-                btn.innerText = "Are you sure? Click again to delete"; 
-                btn.className = "w-full bg-red-600 text-white border border-red-600 font-bold py-3.5 rounded-xl transition-all shadow-sm"; 
+                btn.innerText = "Are you sure? Tap again to delete"; 
+                btn.className = "w-full bg-red-600 text-white border border-red-600 font-bold py-3.5 rounded-2xl transition-all shadow-sm"; 
                 setTimeout(() => { 
                     if(isConfirmingClear) { 
                         isConfirmingClear = false; 
                         btn.innerText = "Clear Today's Hisaab"; 
-                        btn.className = "w-full bg-brand-50 text-brand-800 border border-brand-200 font-bold py-3.5 rounded-xl hover:bg-brand-600 hover:text-white transition-all shadow-sm"; 
+                        btn.className = "w-full bg-brand-50 text-brand-800 border border-brand-200 font-bold py-3.5 rounded-2xl hover:bg-brand-600 hover:text-white transition-all shadow-sm"; 
                     } 
                 }, 3000); 
             } else { 
                 localStorage.removeItem('alKaynatHistory'); 
                 isConfirmingClear = false; 
                 btn.innerText = "Clear Today's Hisaab"; 
-                btn.className = "w-full bg-brand-50 text-brand-800 border border-brand-200 font-bold py-3.5 rounded-xl hover:bg-brand-600 hover:text-white transition-all shadow-sm"; 
+                btn.className = "w-full bg-brand-50 text-brand-800 border border-brand-200 font-bold py-3.5 rounded-2xl hover:bg-brand-600 hover:text-white transition-all shadow-sm"; 
                 renderHisaab(); 
             } 
         }
@@ -1970,11 +1505,19 @@ function processOnlinePayment(appName) {
 
             if(localStorage.getItem('alKaynat_isLoggedIn') === 'true') {
                 userLoggedIn = true;
-                customerPhone = localStorage.getItem('alKaynat_userPhone');
+                customerPhone = localStorage.getItem('alKaynat_userPhone') || "";
+                customerName = localStorage.getItem('alKaynat_userName') || "";
                 if(document.getElementById('loginNavBtn')) document.getElementById('loginNavBtn').classList.add('hidden');
                 if(document.getElementById('userProfileIcon')) document.getElementById('userProfileIcon').classList.remove('hidden');
             }
-            renderGrid(); renderRateList(); 
+
+            if(localStorage.getItem('alKaynat_savedAddress')) {
+                currentAddress = localStorage.getItem('alKaynat_savedAddress');
+                document.getElementById('topAddressText').innerText = localStorage.getItem('alKaynat_savedShortAddress') || "Saved Address";
+            }
+
+            renderGrid(); 
+            renderRateList(); 
         };
     </script>
 </body>
