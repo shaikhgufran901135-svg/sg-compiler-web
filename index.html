@@ -29,9 +29,9 @@
             -webkit-tap-highlight-color: transparent;
             box-sizing: border-box;
         }
-        html, body {
+        body {
             max-width: 100vw;
-            overflow-x: hidden !important;
+            overflow-x: clip;
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #FAF6F6;
             scroll-behavior: smooth;
@@ -86,10 +86,10 @@
 </head>
 <body class="bg-brand-50 text-gray-800 pb-32 lg:pb-10">
 
-    <!-- OS LUXURY STICKY HEADER -->
-    <header class="bg-brand-900 sticky top-0 z-40 shadow-sm" style="padding-top: max(env(safe-area-inset-top), 24px);">
+    <!-- 🔒 100% LOCKED FIXED HEADER + SEARCH BAR (Scroll karne par kabhi gayab nahi hoga) -->
+    <header id="mainFixedHeader" class="bg-brand-900 fixed top-0 left-0 right-0 w-full z-40 shadow-md" style="padding-top: max(env(safe-area-inset-top), 24px);">
         <div class="bg-white/95 backdrop-blur-xl border-b border-brand-100">
-            <div class="px-3 py-2.5 sm:px-4 sm:py-3 flex justify-between items-center max-w-6xl mx-auto gap-2">
+            <div class="px-3 py-2 sm:px-4 sm:py-2.5 flex justify-between items-center max-w-6xl mx-auto gap-2">
                 
                 <!-- Left Side: AK Logo + Address -->
                 <div class="flex items-center space-x-2.5 sm:space-x-3 flex-1 min-w-0">
@@ -108,7 +108,7 @@
                 <!-- Right Side Controls -->
                 <div class="flex items-center space-x-2.5 sm:space-x-4 shrink-0">
                     <button onclick="toggleRateList()" class="text-brand-900 font-extrabold text-[11px] uppercase tracking-wider flex items-center lg:hidden bg-brand-100/80 border border-brand-200 px-3 py-2 rounded-xl active:scale-95 transition-transform whitespace-nowrap shadow-sm">
-                        <i class="fas fa-bolt text-gold-500 mr-1.5"></i> Quick List
+                        <i class="fas fa-bolt text-gold-500 mr-1.5"></i> List
                     </button>
                     
                     <div class="hidden sm:flex items-center text-brand-800 text-xs font-bold uppercase tracking-wider cursor-pointer hover:text-brand-500" onclick="openMyOrders()">
@@ -127,28 +127,31 @@
                 </div>
             </div>
             
-            <!-- STICKY OS SEARCH BAR (Mobile) -->
-            <div class="px-3 pb-2.5 lg:hidden w-full max-w-6xl mx-auto">
+            <!-- LOCKED SEARCH BAR -->
+            <div class="px-3 pb-2.5 w-full max-w-6xl mx-auto">
                 <div class="bg-brand-50/90 border border-brand-200/80 rounded-2xl px-4 py-2.5 flex items-center shadow-inner focus-within:border-brand-500 focus-within:bg-white focus-within:shadow-md transition-all w-full">
-                    <i class="fas fa-search text-brand-400 mr-3 text-sm"></i>
-                    <input type="text" id="mainSearchInput" oninput="updateSearch(this.value)" placeholder="Search foundations, lipsticks, MARS, Forever 52..." class="w-full outline-none text-sm bg-transparent placeholder-gray-400 text-brand-900 font-semibold">
+                    <i class="fas fa-search text-brand-500 mr-3 text-sm"></i>
+                    <input type="text" id="mainSearchInput" oninput="updateSearch(this.value)" placeholder="Search products, brands (MARS, Forever 52)..." class="w-full outline-none text-sm bg-transparent placeholder-gray-400 text-brand-900 font-semibold">
                 </div>
             </div>
         </div>
         
         <!-- LUXURY GOLD MARQUEE -->
-        <div class="bg-gradient-to-r from-brand-900 via-brand-800 to-brand-900 text-gold-400 overflow-hidden py-1.5 border-y border-gold-500/20">
+        <div class="bg-gradient-to-r from-brand-900 via-brand-800 to-brand-900 text-gold-400 overflow-hidden py-1 border-y border-gold-500/20">
             <div class="animate-marquee text-[10px] font-extrabold uppercase tracking-[0.22em]">
                 ✨ FOREVER 52 &nbsp; • &nbsp; MARS COSMETICS &nbsp; • &nbsp; RECODE STUDIOS &nbsp; • &nbsp; SWISS BEAUTY &nbsp; • &nbsp; L'OREAL PARIS &nbsp; • &nbsp; KRYOLAN PROFESSIONAL &nbsp; • &nbsp; 100% AUTHENTIC PRODUCTS ✨
             </div>
         </div>
     </header>
 
+    <!-- AUTO SPACER FOR FIXED HEADER -->
+    <div id="headerSpacer" style="height: 165px;"></div>
+
     <!-- MAIN WORKSPACE -->
-    <div class="max-w-6xl mx-auto flex flex-col lg:flex-row mt-3 px-3 lg:px-4 gap-5">
+    <div class="max-w-6xl mx-auto flex flex-col lg:flex-row mt-2 px-3 lg:px-4 gap-5">
         
         <!-- SIDE QUICK RATE LIST -->
-        <aside id="sideRateList" class="hidden lg:flex flex-col w-full lg:w-80 bg-white rounded-3xl border border-brand-100 h-[calc(100vh-140px)] sticky top-[120px] overflow-hidden shadow-sm z-30 order-2 lg:order-1 transition-all">
+        <aside id="sideRateList" class="hidden lg:flex flex-col w-full lg:w-80 bg-white rounded-3xl border border-brand-100 h-[calc(100vh-185px)] sticky top-[175px] overflow-hidden shadow-sm z-30 order-2 lg:order-1 transition-all">
             <div class="p-4 bg-gradient-to-r from-brand-900 to-brand-800 text-white flex justify-between items-center relative overflow-hidden" style="padding-top: max(env(safe-area-inset-top), 16px);">
                 <div class="relative z-10">
                     <h3 class="font-bold text-gold-400 brand-font text-lg flex items-center"><i class="fas fa-bolt mr-2 text-sm"></i> Quick Rate List</h3>
@@ -179,10 +182,10 @@
             
             <!-- HERO BANNER CARD -->
             <div class="mb-4">
-                <div class="bg-gradient-to-br from-brand-900 via-brand-800 to-brand-600 rounded-3xl p-5 md:p-8 text-white shadow-lg relative overflow-hidden flex flex-col justify-center min-h-[155px] border border-gold-500/20">
+                <div class="bg-gradient-to-br from-brand-900 via-brand-800 to-brand-600 rounded-3xl p-5 md:p-8 text-white shadow-lg relative overflow-hidden flex flex-col justify-center min-h-[150px] border border-gold-500/20">
                     <div class="relative z-10">
                         <span class="bg-gold-500/20 border border-gold-400/50 text-gold-300 px-2.5 py-1 rounded-full text-[9px] uppercase tracking-widest font-extrabold mb-2.5 inline-flex items-center gap-1.5">
-                            <i class="fas fa-sparkles text-[8px]"></i> Official Beauty Store
+                            <i class="fas fa-crown text-[8px]"></i> Official Beauty Store
                         </span>
                         <h2 class="font-bold text-2xl md:text-3xl mb-1.5 brand-font text-white tracking-tight">Al Kaynat Cosmetic</h2>
                         <p class="text-brand-100 text-xs md:text-sm max-w-md opacity-90 leading-relaxed">Luxury bridal makeup, HD foundations & authentic skincare delivered to your doorstep.</p>
@@ -505,468 +508,467 @@
 
     <script>
         // =========================================================================
-        // 🛍️ DATA: PRODUCTS (SIRF  PRODUCTS RAKHE HAIN, BAAKI NICHE PASTE KAR LO)
+        // 🛍️ DATA: PRODUCTS (SIRF 2 PRODUCTS RAKHE HAIN, BAAKI NICHE PASTE KAR LO)
         // =========================================================================
- const products = [
-            { 
-                id: 1, name: "Forever 52 Pro Artist Foundation", price: 12, oldPrice: 1499, 
-                desc: "Professional artist foundation for flawless, long-lasting coverage.",
-                shades: [
-                    { id: "p1-s1", name: "BUF001 Cheese cake", color: "#F4D5B6", images: ["https://cdn.tirabeauty.com/v2/billowing-snowflake-434234/tira-p/wrkr/products/pictures/item/free/original/1120200/Oxyvklxy82-1120200_1.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Cheese+cake+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Cheese+cake+3"] },
-                    { id: "p1-s2", name: "FUF002 Custard", color: "#E8C396", images: ["https://cdn.tirabeauty.com/v2/billowing-snowflake-434234/tira-p/wrkr/products/pictures/item/free/original/daily-life-forever52/964451/0/4BKBNW6l5g-lZ4vSEKzF_-1.png", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Custard+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Custard+3"] },
-                    { id: "p1-s3", name: "FUF004 French Toast", color: "#D29B72", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=French+Toast+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=French+Toast+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=French+Toast+3"] },
-                    { id: "p1-s4", name: "FUF012 Brownie", color: "#6A4028", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Brownie+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Brownie+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Brownie+3"] }
-                ]
-            },
-            { 
-                id: 2, name: "Forever 52 Coverup Foundation", price: 1199, oldPrice: 1399, 
-                desc: "High coverage foundation to conceal imperfections.",
-                shades: [
-                    { id: "p2-s1", name: "FCU20.1 Desert", color: "#E1BB93", images: ["https://m.media-amazon.com/images/I/51P96GvKcDL._SL1000_.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Desert+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Desert+3"] },
-                    { id: "p2-s2", name: "FCU20.6 Toast", color: "#D49E71", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Toast+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Toast+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Toast+3"] },
-                    { id: "p2-s3", name: "FCU30.1 Olive", color: "#C6986A", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Olive+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Olive+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Olive+3"] },
-                    { id: "p2-s4", name: "FCU30.4", color: "#B37D53", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=FCU30.4+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=FCU30.4+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=FCU30.4+3"] }
-                ]
-            },
-            { 
-                id: 3, name: "Forever 52 Ultra Def Liquid Foundation", price: 1099, oldPrice: 1299, 
-                desc: "Ultra definition liquid formula for a natural finish.",
-                shades: [
-                    { id: "p3-s1", name: "FLF011 Cheese cake", color: "#F4D5B6", images: ["https://tse1.mm.bing.net/th/id/OIP.bj9sIe42yqh3buUl39pjvAHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Cheese+cake+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Cheese+cake+3"] }
-                ]
-            },
-            { 
-                id: 4, name: "Forever 52 Complete Coverage Concealer", price: 699, oldPrice: 899, 
-                desc: "Complete coverage concealer for dark circles and spots.",
-                shades: [
-                    { id: "p4-s1", name: "COV001 Vanilla", color: "#FAE1CD", images: ["https://www.mypurefind.com/cdn/shop/files/COV001.png?v=1769708470&width=533", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Vanilla+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Vanilla+3"] },
-                    { id: "p4-s2", name: "COV003 Iced coffee", color: "#E6B892", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Iced+coffee+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Iced+coffee+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Iced+coffee+3"] },
-                    { id: "p4-s3", name: "COV005 Caramel", color: "#CA8C56", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Caramel+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Caramel+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Caramel+3"] }
-                ]
-            },
-            { 
-                id: 5, name: "Forever 52 Coverup Concealer", price: 749, oldPrice: 949, 
-                desc: "Smooth coverup concealer offering a flawless matte finish.",
-                shades: [
-                    { id: "p5-s1", name: "CCU10.5 Mandel", color: "#E1B690", images: ["https://static-01.daraz.com.np/p/9e2d777104b012f94c2162efdaf5fddc.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Mandel+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Mandel+3"] },
-                    { id: "p5-s2", name: "CCU30.2 Sienna", color: "#AD6D44", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Sienna+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Sienna+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Sienna+3"] }
-                ]
-            },
-            { 
-                id: 6, name: "Forever 52 Translucent Setting Powder", price: 899, oldPrice: 1199, 
-                desc: "Finely milled loose powder to set makeup.",
-                shades: [
-                    { id: "p6-s1", name: "TLM006 Classic Beige", color: "#EBD0B3", images: ["https://images-static.nykaa.com/media/catalog/product/6/a/6ac2ec5DAIAA00000112_6.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Classic+Beige+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Classic+Beige+3"] },
-                    { id: "p6-s2", name: "TLM001 White", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=White+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=White+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=White+3"] }
-                ]
-            },
-            { 
-        id: 7, name: "MARS SPF50 PA++++ High Coverage Foundation Tested by IN-VIVO (40ml)", price: 349, oldPrice: 499, 
-        desc: "High coverage foundation with SPF50 PA++++ sun protection.",
-        shades: [
-            { id: "p7-s1", name: "Shade 01", color: "#F5D6B8", images: ["https://m.media-amazon.com/images/I/51mbmgyI3AL._SL1500_.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S01+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S01+3"] },
-            { id: "p7-s2", name: "Shade 02", color: "#E8C19D", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S02+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S02+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S02+3"] },
-            { id: "p7-s3", name: "Shade 05", color: "#C88F65", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S05+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S05+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S05+3"] },
-            { id: "p7-s4", name: "Shade 06", color: "#B3774E", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S06+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S06+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S06+3"] }
-        ]
-    },
-    { 
-        id: 8, name: "MARS Infinity Matte Lip Color Palette", price: 299, oldPrice: 399, 
-        desc: "Multi-shade matte lip color palette for versatile lip looks.",
-        shades: [
-            { id: "p8-s1", name: "Variant 01", color: "#C94A50", images: ["https://marscosmetics.in/cdn/shop/files/Artboard16.jpg?v=1721212844&width=1500", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Lip+Palette+01+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Lip+Palette+01+3"] },
-            { id: "p8-s2", name: "Variant 03", color: "#A8384B", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Lip+Palette+03+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Lip+Palette+03+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Lip+Palette+03+3"] }
-        ]
-    },
-    { 
-        id: 9, name: "MARS Women Fantasy Highlighter Blusher & Contour Intense Pigmented Face Palette", price: 399, oldPrice: 499, 
-        desc: "All-in-one intense pigmented face palette with highlighter, blusher, and contour.",
-        shades: [{ id: "p9-s1", name: "Standard", color: "#FFFFFF", images: ["https://tse1.mm.bing.net/th/id/OIP.j2TGPIYS1V9nu-z9xK056gHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+9+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+9+Pic+3"] }]
-    },
-    { 
-        id: 10, name: "MARS Jashn-e-Shringaar 36 Color Eyeshadow Palette", price: 599, oldPrice: 799, 
-        desc: "Vibrant 36-color eyeshadow palette with matte and shimmer shades.",
-        shades: [{ id: "p10-s1", name: "Standard", color: "#FFFFFF", images: ["https://m.media-amazon.com/images/S/aplus-media-library-service-media/cac566de-4d17-4a73-ab2e-2202aac1bd50.__CR0,0,970,600_PT0_SX970_V1___.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+10+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+10+Pic+3"] }]
-    },
-    { 
-        id: 11, name: "MARS Its Glow Clock Primer Griping Glow", price: 329, oldPrice: 399, 
-        desc: "Hydrating gripping primer that gives a dewy, long-lasting makeup base.",
-        shades: [{ id: "p11-s1", name: "Standard", color: "#FFFFFF", images: ["https://www.indiangoods.shop/cdn/shop/files/e9c1d7aMARSX00000218x_1_1280x.jpg?v=1772686474", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+11+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+11+Pic+3"] }]
-    },
-    { 
-        id: 12, name: "MARS Color Changing Waterproof Satin Finish Foundation", price: 349, oldPrice: 449, 
-        desc: "Smart color-adapting waterproof foundation with a smooth satin finish.",
-        shades: [{ id: "p12-s1", name: "Standard", color: "#FFFFFF", images: ["https://image.cdn.shpy.in/365412/mars-color-changing-foundation-20ml-waterproof-li-1764688228605_SKU-12725_0.jpg?format=webp", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+12+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+12+Pic+3"] }]
-    },
-    { 
-        id: 13, name: "MARS TRIO Treat 3-IN-1 Eye Makeup Kit with Eyeliner", price: 399, oldPrice: 499, 
-        desc: "Complete 3-in-1 eye makeup combo kit with eyeliner, mascara, and kajal.",
-        shades: [{ id: "p13-s1", name: "Standard", color: "#FFFFFF", images: ["https://m.media-amazon.com/images/I/61D+O0rtErL._SL1500_.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+13+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+13+Pic+3"] }]
-    },
-    { 
-        id: 14, name: "MARS Trend Setting Loose Powder", price: 249, oldPrice: 299, 
-        desc: "Ultra-fine loose setting powder for a shine-free, smooth finish.",
-        shades: [{ id: "p14-s1", name: "Standard", color: "#FFFFFF", images: ["https://drive.brodox.com/uploads/1625/26/01/696f5c85efa3d2001261768905861.webp", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+14+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+14+Pic+3"] }]
-    },
-    { 
-        id: 15, name: "MARS Born To Bake Setting Powder With Matte Finish", price: 279, oldPrice: 349, 
-        desc: "Matte finish baking and setting powder to lock makeup in place.",
-        shades: [{ id: "p15-s1", name: "Standard", color: "#FFFFFF", images: ["https://marscosmetics.in/cdn/shop/files/Artboard_1_2048f431-c146-4464-a318-e230f0987180.jpg?v=1753272112&width=1500", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+15+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+15+Pic+3"] }]
-    },
-    { 
-        id: 16, name: "MARS Melody Compact Powder | Full Natural Coverage", price: 229, oldPrice: 299, 
-        desc: "Pressed compact powder offering full natural coverage.",
-        shades: [
-            { id: "p16-s1", name: "No.01", color: "#F7DEC8", images: ["https://tse2.mm.bing.net/th/id/OIP.zhlDH46O-DYnin5u8hydaQHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.01+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.01+3"] },
-            { id: "p16-s2", name: "No.02", color: "#EBC5A4", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.02+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.02+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.02+3"] },
-            { id: "p16-s3", name: "No.04", color: "#CFA07A", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.04+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.04+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.04+3"] }
-        ]
-    },
-    { 
-        id: 17, name: "MARS 3in1 Air Brush Compact Powder", price: 299, oldPrice: 399, 
-        desc: "3-in-1 airbrush finish compact powder for poreless skin.",
-        shades: [
-            { id: "p17-s1", name: "Shade 03", color: "#DFB38C", images: ["https://m.media-amazon.com/images/S/aplus-media-library-service-media/d89caeda-9adf-4d14-a36e-2a97907ed097.__CR0,0,970,600_PT0_SX970_V1___.png", "https://placehold.co/400x400/FDF6F6/9B2D45?text=AirBrush+S03+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=AirBrush+S03+3"] }
-        ]
-    },
-    { 
-        id: 18, name: "MARS 4 in 1 Eyebrow Powder Palette (8 gm)", price: 249, oldPrice: 329, 
-        desc: "4-in-1 eyebrow shaping and filling powder palette.",
-        shades: [{ id: "p18-s1", name: "Standard", color: "#FFFFFF", images: ["https://www.bigbasket.com/media/uploads/flatpages/mailer-images-aug/40340948_170625_1.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+18+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+18+Pic+3"] }]
-    },
-    { 
-        id: 19, name: "MARS Seal the Deal Long-Lasting Makeup Fixer Spray", price: 249, oldPrice: 299, 
-        desc: "Long-lasting makeup setting spray to keep makeup fresh all day.",
-        shades: [{ id: "p19-s1", name: "Standard", color: "#FFFFFF", images: ["https://images-static.nykaa.com/media/catalog/product/0/c/0cffee80MARSX00000290_1.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+19+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+19+Pic+3"] }]
-    },
-    { 
-        id: 20, name: "MARS Zero Pore Perfection Non-Sticky Silicone-Based Primer (25ml)", price: 299, oldPrice: 399, 
-        desc: "Non-sticky silicone-based primer that blurs pores instantly.",
-        shades: [{ id: "p20-s1", name: "Standard", color: "#FFFFFF", images: ["https://5.imimg.com/data5/SELLER/Default/2026/1/577377708/GH/GD/MN/93202015/mars-zero-pore-perfection-primer-1000x1000.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+20+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+20+Pic+3"] }]
-    },
-    { 
-        id: 21, name: "MARS SPF50 PA++++ Cancel Concealer with Radiant Finish (6 ml)", price: 229, oldPrice: 299, 
-        desc: "Radiant finish concealer with SPF50 PA++++ protection.",
-        shades: [
-            { id: "p21-s1", name: "Ivory Veil 01", color: "#F9E4CF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Ivory+Veil+01+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Ivory+Veil+01+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Ivory+Veil+01+3"] },
-            { id: "p21-s2", name: "Neutral Charm 04", color: "#E0B58E", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Neutral+Charm+04+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Neutral+Charm+04+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Neutral+Charm+04+3"] },
-            { id: "p21-s3", name: "Honey Glow 06", color: "#C69065", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Honey+Glow+06+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Honey+Glow+06+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Honey+Glow+06+3"] }
-        ]
-    },
-    { 
-        id: 22, name: "L'Oreal Paris Infallible 3-Second Setting Spray Mist (75 ml)", price: 799, oldPrice: 999, 
-        desc: "Micro-fine setting mist that locks makeup in just 3 seconds without transfer.",
-        shades: [{ id: "p22-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+22+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+22+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+22+Pic+3"] }]
-    },
-    { 
-        id: 23, name: "KRYOLAN Fixing Spray (75 ml)", price: 1150, oldPrice: 1350, 
-        desc: "Professional makeup fixing spray for smudge-proof, waterproof wear (75 ml).",
-        shades: [{ id: "p23-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+23+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+23+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+23+Pic+3"] }]
-    },
-    { 
-        id: 24, name: "KRYOLAN Fixing Spray (300 ml)", price: 2450, oldPrice: 2800, 
-        desc: "Full-size professional fixing spray for long-lasting bridal and stage makeup (300 ml).",
-        shades: [{ id: "p24-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+24+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+24+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+24+Pic+3"] }]
-    },
-    { 
-        id: 25, name: "The UCANBE Pretty All Set 2 Eyeshadow Palette", price: 1299, oldPrice: 1599, 
-        desc: "Complete multi-color professional eyeshadow palette with high pigmentation.",
-        shades: [{ id: "p25-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+25+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+25+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+25+Pic+3"] }]
-    },
-    { 
-        id: 26, name: "DE'LANCI Matte Lipstick Palette", price: 999, oldPrice: 1299, 
-        desc: "Professional lip color palette with rich, blendable matte shades.",
-        shades: [{ id: "p26-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+26+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+26+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+26+Pic+3"] }]
-    },
-    { 
-        id: 27, name: "IMAGIC Professional Cosmetic Touch Blush Palette 6 Color (80g)", price: 699, oldPrice: 899, 
-        desc: "6-color professional blush palette for a natural, flushed glow.",
-        shades: [{ id: "p27-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+27+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+27+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+27+Pic+3"] }]
-    },
-    { 
-        id: 28, name: "FLiCKA Silk Touch 3-in-1 Primer + Moisturizer", price: 399, oldPrice: 499, 
-        desc: "3-in-1 primer and moisturizer that blurs 100% of pores for a silky finish.",
-        shades: [{ id: "p28-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+28+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+28+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+28+Pic+3"] }]
-    },
-    { 
-        id: 29, name: "Recode Ace of Base Concealer", price: 499, oldPrice: 650, 
-        desc: "Full coverage color-correcting and base concealer.",
-        shades: [
-            { id: "p29-s1", name: "08 Orange", color: "#E86F38", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Ace+08+Orange+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Ace+08+Orange+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Ace+08+Orange+3"] }
-        ]
-    },
-    { 
-        id: 30, name: "Recode Silky Moisturizer Cum Primer (60 G)", price: 599, oldPrice: 750, 
-        desc: "Nourishing silky moisturizer cum primer for a smooth makeup canvas.",
-        shades: [{ id: "p30-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+30+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+30+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+30+Pic+3"] }]
-    },
-    { 
-        id: 31, name: "Recode Hyaluronic Acid Glow Mist (100 ML)", price: 450, oldPrice: 595, 
-        desc: "Hydrating hyaluronic acid face mist for an instant dewy glow.",
-        shades: [{ id: "p31-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+31+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+31+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+31+Pic+3"] }]
-    },
-    { 
-        id: 32, name: "Recode Perfect Grip Spray - Makeup Fixer (100 ML)", price: 550, oldPrice: 699, 
-        desc: "High-hold makeup fixer spray that locks your look in place.",
-        shades: [{ id: "p32-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+32+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+32+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+32+Pic+3"] }]
-    },
-    { 
-        id: 33, name: "Recode Perfect Grip Primer (12 ML)", price: 350, oldPrice: 450, 
-        desc: "Travel-friendly gripping primer for long-lasting makeup adherence.",
-        shades: [{ id: "p33-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+33+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+33+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+33+Pic+3"] }]
-    },
-    { 
-        id: 34, name: "Recode We Stole Da Show Concealer (6 ML)", price: 499, oldPrice: 650, 
-        desc: "High-definition liquid concealer to brighten and correct dark spots.",
-        shades: [
-            { id: "p34-s1", name: "01 Light", color: "#F5D8BE", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Recode+01+Light+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Recode+01+Light+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Recode+01+Light+3"] },
-            { id: "p34-s2", name: "06 Orange", color: "#E86F38", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Recode+06+Orange+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Recode+06+Orange+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Recode+06+Orange+3"] }
-        ]
-    },
-    { 
-        id: 35, name: "Recode Clay Matte Liquid Lipsticks (2 ML x 10)", price: 1199, oldPrice: 1499, 
-        desc: "Set of 10 smudge-proof clay matte liquid lipsticks.",
-        shades: [{ id: "p35-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+35+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+35+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+35+Pic+3"] }]
-    },
-    { 
-        id: 36, name: "Recode Concealer Refill (3.50 G)", price: 299, oldPrice: 399, 
-        desc: "Creamy concealer pan refill for custom makeup palettes.",
-        shades: [
-            { id: "p36-s1", name: "Shade - 1", color: "#F6DEC6", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+1+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+1+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+1+3"] },
-            { id: "p36-s2", name: "Shade - 2", color: "#E6C29F", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+2+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+2+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+2+3"] },
-            { id: "p36-s3", name: "Shade - 17", color: "#B87B50", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+17+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+17+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+17+3"] }
-        ]
-    },
-    { 
-        id: 37, name: "Recode 10 Silky Matte Mini Liquid Lipsticks - 12.50 ML (1.25ML x 10)", price: 999, oldPrice: 1299, 
-        desc: "Pack of 10 mini silky matte liquid lipsticks for everyday wear.",
-        shades: [{ id: "p37-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+37+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+37+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+37+Pic+3"] }]
-    },
+const products = [
+            { 
+                id: 1, name: "Forever 52 Pro Artist Foundation", price: 12, oldPrice: 1499, 
+                desc: "Professional artist foundation for flawless, long-lasting coverage.",
+                shades: [
+                    { id: "p1-s1", name: "BUF001 Cheese cake", color: "#F4D5B6", images: ["https://cdn.tirabeauty.com/v2/billowing-snowflake-434234/tira-p/wrkr/products/pictures/item/free/original/1120200/Oxyvklxy82-1120200_1.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Cheese+cake+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Cheese+cake+3"] },
+                    { id: "p1-s2", name: "FUF002 Custard", color: "#E8C396", images: ["https://cdn.tirabeauty.com/v2/billowing-snowflake-434234/tira-p/wrkr/products/pictures/item/free/original/daily-life-forever52/964451/0/4BKBNW6l5g-lZ4vSEKzF_-1.png", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Custard+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Custard+3"] },
+                    { id: "p1-s3", name: "FUF004 French Toast", color: "#D29B72", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=French+Toast+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=French+Toast+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=French+Toast+3"] },
+                    { id: "p1-s4", name: "FUF012 Brownie", color: "#6A4028", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Brownie+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Brownie+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Brownie+3"] }
+                ]
+            },
+            { 
+                id: 2, name: "Forever 52 Coverup Foundation", price: 1199, oldPrice: 1399, 
+                desc: "High coverage foundation to conceal imperfections.",
+                shades: [
+                    { id: "p2-s1", name: "FCU20.1 Desert", color: "#E1BB93", images: ["https://m.media-amazon.com/images/I/51P96GvKcDL._SL1000_.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Desert+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Desert+3"] },
+                    { id: "p2-s2", name: "FCU20.6 Toast", color: "#D49E71", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Toast+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Toast+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Toast+3"] },
+                    { id: "p2-s3", name: "FCU30.1 Olive", color: "#C6986A", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Olive+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Olive+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Olive+3"] },
+                    { id: "p2-s4", name: "FCU30.4", color: "#B37D53", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=FCU30.4+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=FCU30.4+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=FCU30.4+3"] }
+                ]
+            },
+            { 
+                id: 3, name: "Forever 52 Ultra Def Liquid Foundation", price: 1099, oldPrice: 1299, 
+                desc: "Ultra definition liquid formula for a natural finish.",
+                shades: [
+                    { id: "p3-s1", name: "FLF011 Cheese cake", color: "#F4D5B6", images: ["https://tse1.mm.bing.net/th/id/OIP.bj9sIe42yqh3buUl39pjvAHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Cheese+cake+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Cheese+cake+3"] }
+                ]
+            },
+            { 
+                id: 4, name: "Forever 52 Complete Coverage Concealer", price: 699, oldPrice: 899, 
+                desc: "Complete coverage concealer for dark circles and spots.",
+                shades: [
+                    { id: "p4-s1", name: "COV001 Vanilla", color: "#FAE1CD", images: ["https://www.mypurefind.com/cdn/shop/files/COV001.png?v=1769708470&width=533", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Vanilla+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Vanilla+3"] },
+                    { id: "p4-s2", name: "COV003 Iced coffee", color: "#E6B892", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Iced+coffee+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Iced+coffee+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Iced+coffee+3"] },
+                    { id: "p4-s3", name: "COV005 Caramel", color: "#CA8C56", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Caramel+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Caramel+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Caramel+3"] }
+                ]
+            },
+            { 
+                id: 5, name: "Forever 52 Coverup Concealer", price: 749, oldPrice: 949, 
+                desc: "Smooth coverup concealer offering a flawless matte finish.",
+                shades: [
+                    { id: "p5-s1", name: "CCU10.5 Mandel", color: "#E1B690", images: ["https://static-01.daraz.com.np/p/9e2d777104b012f94c2162efdaf5fddc.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Mandel+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Mandel+3"] },
+                    { id: "p5-s2", name: "CCU30.2 Sienna", color: "#AD6D44", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Sienna+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Sienna+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Sienna+3"] }
+                ]
+            },
+            { 
+                id: 6, name: "Forever 52 Translucent Setting Powder", price: 899, oldPrice: 1199, 
+                desc: "Finely milled loose powder to set makeup.",
+                shades: [
+                    { id: "p6-s1", name: "TLM006 Classic Beige", color: "#EBD0B3", images: ["https://images-static.nykaa.com/media/catalog/product/6/a/6ac2ec5DAIAA00000112_6.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Classic+Beige+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Classic+Beige+3"] },
+                    { id: "p6-s2", name: "TLM001 White", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=White+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=White+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=White+3"] }
+                ]
+            },
+            { 
+        id: 7, name: "MARS SPF50 PA++++ High Coverage Foundation Tested by IN-VIVO (40ml)", price: 349, oldPrice: 499, 
+        desc: "High coverage foundation with SPF50 PA++++ sun protection.",
+        shades: [
+            { id: "p7-s1", name: "Shade 01", color: "#F5D6B8", images: ["https://m.media-amazon.com/images/I/51mbmgyI3AL._SL1500_.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S01+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S01+3"] },
+            { id: "p7-s2", name: "Shade 02", color: "#E8C19D", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S02+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S02+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S02+3"] },
+            { id: "p7-s3", name: "Shade 05", color: "#C88F65", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S05+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S05+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S05+3"] },
+            { id: "p7-s4", name: "Shade 06", color: "#B3774E", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S06+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S06+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=MARS+Found+S06+3"] }
+        ]
+    },
+    { 
+        id: 8, name: "MARS Infinity Matte Lip Color Palette", price: 299, oldPrice: 399, 
+        desc: "Multi-shade matte lip color palette for versatile lip looks.",
+        shades: [
+            { id: "p8-s1", name: "Variant 01", color: "#C94A50", images: ["https://marscosmetics.in/cdn/shop/files/Artboard16.jpg?v=1721212844&width=1500", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Lip+Palette+01+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Lip+Palette+01+3"] },
+            { id: "p8-s2", name: "Variant 03", color: "#A8384B", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Lip+Palette+03+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Lip+Palette+03+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Lip+Palette+03+3"] }
+        ]
+    },
+    { 
+        id: 9, name: "MARS Women Fantasy Highlighter Blusher & Contour Intense Pigmented Face Palette", price: 399, oldPrice: 499, 
+        desc: "All-in-one intense pigmented face palette with highlighter, blusher, and contour.",
+        shades: [{ id: "p9-s1", name: "Standard", color: "#FFFFFF", images: ["https://tse1.mm.bing.net/th/id/OIP.j2TGPIYS1V9nu-z9xK056gHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+9+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+9+Pic+3"] }]
+    },
+    { 
+        id: 10, name: "MARS Jashn-e-Shringaar 36 Color Eyeshadow Palette", price: 599, oldPrice: 799, 
+        desc: "Vibrant 36-color eyeshadow palette with matte and shimmer shades.",
+        shades: [{ id: "p10-s1", name: "Standard", color: "#FFFFFF", images: ["https://m.media-amazon.com/images/S/aplus-media-library-service-media/cac566de-4d17-4a73-ab2e-2202aac1bd50.__CR0,0,970,600_PT0_SX970_V1___.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+10+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+10+Pic+3"] }]
+    },
+    { 
+        id: 11, name: "MARS Its Glow Clock Primer Griping Glow", price: 329, oldPrice: 399, 
+        desc: "Hydrating gripping primer that gives a dewy, long-lasting makeup base.",
+        shades: [{ id: "p11-s1", name: "Standard", color: "#FFFFFF", images: ["https://www.indiangoods.shop/cdn/shop/files/e9c1d7aMARSX00000218x_1_1280x.jpg?v=1772686474", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+11+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+11+Pic+3"] }]
+    },
+    { 
+        id: 12, name: "MARS Color Changing Waterproof Satin Finish Foundation", price: 349, oldPrice: 449, 
+        desc: "Smart color-adapting waterproof foundation with a smooth satin finish.",
+        shades: [{ id: "p12-s1", name: "Standard", color: "#FFFFFF", images: ["https://image.cdn.shpy.in/365412/mars-color-changing-foundation-20ml-waterproof-li-1764688228605_SKU-12725_0.jpg?format=webp", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+12+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+12+Pic+3"] }]
+    },
+    { 
+        id: 13, name: "MARS TRIO Treat 3-IN-1 Eye Makeup Kit with Eyeliner", price: 399, oldPrice: 499, 
+        desc: "Complete 3-in-1 eye makeup combo kit with eyeliner, mascara, and kajal.",
+        shades: [{ id: "p13-s1", name: "Standard", color: "#FFFFFF", images: ["https://m.media-amazon.com/images/I/61D+O0rtErL._SL1500_.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+13+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+13+Pic+3"] }]
+    },
+    { 
+        id: 14, name: "MARS Trend Setting Loose Powder", price: 249, oldPrice: 299, 
+        desc: "Ultra-fine loose setting powder for a shine-free, smooth finish.",
+        shades: [{ id: "p14-s1", name: "Standard", color: "#FFFFFF", images: ["https://drive.brodox.com/uploads/1625/26/01/696f5c85efa3d2001261768905861.webp", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+14+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+14+Pic+3"] }]
+    },
+    { 
+        id: 15, name: "MARS Born To Bake Setting Powder With Matte Finish", price: 279, oldPrice: 349, 
+        desc: "Matte finish baking and setting powder to lock makeup in place.",
+        shades: [{ id: "p15-s1", name: "Standard", color: "#FFFFFF", images: ["https://marscosmetics.in/cdn/shop/files/Artboard_1_2048f431-c146-4464-a318-e230f0987180.jpg?v=1753272112&width=1500", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+15+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+15+Pic+3"] }]
+    },
+    { 
+        id: 16, name: "MARS Melody Compact Powder | Full Natural Coverage", price: 229, oldPrice: 299, 
+        desc: "Pressed compact powder offering full natural coverage.",
+        shades: [
+            { id: "p16-s1", name: "No.01", color: "#F7DEC8", images: ["https://tse2.mm.bing.net/th/id/OIP.zhlDH46O-DYnin5u8hydaQHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.01+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.01+3"] },
+            { id: "p16-s2", name: "No.02", color: "#EBC5A4", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.02+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.02+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.02+3"] },
+            { id: "p16-s3", name: "No.04", color: "#CFA07A", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.04+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.04+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Melody+No.04+3"] }
+        ]
+    },
+    { 
+        id: 17, name: "MARS 3in1 Air Brush Compact Powder", price: 299, oldPrice: 399, 
+        desc: "3-in-1 airbrush finish compact powder for poreless skin.",
+        shades: [
+            { id: "p17-s1", name: "Shade 03", color: "#DFB38C", images: ["https://m.media-amazon.com/images/S/aplus-media-library-service-media/d89caeda-9adf-4d14-a36e-2a97907ed097.__CR0,0,970,600_PT0_SX970_V1___.png", "https://placehold.co/400x400/FDF6F6/9B2D45?text=AirBrush+S03+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=AirBrush+S03+3"] }
+        ]
+    },
+    { 
+        id: 18, name: "MARS 4 in 1 Eyebrow Powder Palette (8 gm)", price: 249, oldPrice: 329, 
+        desc: "4-in-1 eyebrow shaping and filling powder palette.",
+        shades: [{ id: "p18-s1", name: "Standard", color: "#FFFFFF", images: ["https://www.bigbasket.com/media/uploads/flatpages/mailer-images-aug/40340948_170625_1.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+18+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+18+Pic+3"] }]
+    },
+    { 
+        id: 19, name: "MARS Seal the Deal Long-Lasting Makeup Fixer Spray", price: 249, oldPrice: 299, 
+        desc: "Long-lasting makeup setting spray to keep makeup fresh all day.",
+        shades: [{ id: "p19-s1", name: "Standard", color: "#FFFFFF", images: ["https://images-static.nykaa.com/media/catalog/product/0/c/0cffee80MARSX00000290_1.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+19+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+19+Pic+3"] }]
+    },
+    { 
+        id: 20, name: "MARS Zero Pore Perfection Non-Sticky Silicone-Based Primer (25ml)", price: 299, oldPrice: 399, 
+        desc: "Non-sticky silicone-based primer that blurs pores instantly.",
+        shades: [{ id: "p20-s1", name: "Standard", color: "#FFFFFF", images: ["https://5.imimg.com/data5/SELLER/Default/2026/1/577377708/GH/GD/MN/93202015/mars-zero-pore-perfection-primer-1000x1000.jpg", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+20+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+20+Pic+3"] }]
+    },
+    { 
+        id: 21, name: "MARS SPF50 PA++++ Cancel Concealer with Radiant Finish (6 ml)", price: 229, oldPrice: 299, 
+        desc: "Radiant finish concealer with SPF50 PA++++ protection.",
+        shades: [
+            { id: "p21-s1", name: "Ivory Veil 01", color: "#F9E4CF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Ivory+Veil+01+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Ivory+Veil+01+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Ivory+Veil+01+3"] },
+            { id: "p21-s2", name: "Neutral Charm 04", color: "#E0B58E", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Neutral+Charm+04+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Neutral+Charm+04+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Neutral+Charm+04+3"] },
+            { id: "p21-s3", name: "Honey Glow 06", color: "#C69065", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Honey+Glow+06+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Honey+Glow+06+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Honey+Glow+06+3"] }
+        ]
+    },
+    { 
+        id: 22, name: "L'Oreal Paris Infallible 3-Second Setting Spray Mist (75 ml)", price: 799, oldPrice: 999, 
+        desc: "Micro-fine setting mist that locks makeup in just 3 seconds without transfer.",
+        shades: [{ id: "p22-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+22+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+22+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+22+Pic+3"] }]
+    },
+    { 
+        id: 23, name: "KRYOLAN Fixing Spray (75 ml)", price: 1150, oldPrice: 1350, 
+        desc: "Professional makeup fixing spray for smudge-proof, waterproof wear (75 ml).",
+        shades: [{ id: "p23-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+23+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+23+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+23+Pic+3"] }]
+    },
+    { 
+        id: 24, name: "KRYOLAN Fixing Spray (300 ml)", price: 2450, oldPrice: 2800, 
+        desc: "Full-size professional fixing spray for long-lasting bridal and stage makeup (300 ml).",
+        shades: [{ id: "p24-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+24+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+24+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+24+Pic+3"] }]
+    },
+    { 
+        id: 25, name: "The UCANBE Pretty All Set 2 Eyeshadow Palette", price: 1299, oldPrice: 1599, 
+        desc: "Complete multi-color professional eyeshadow palette with high pigmentation.",
+        shades: [{ id: "p25-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+25+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+25+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+25+Pic+3"] }]
+    },
+    { 
+        id: 26, name: "DE'LANCI Matte Lipstick Palette", price: 999, oldPrice: 1299, 
+        desc: "Professional lip color palette with rich, blendable matte shades.",
+        shades: [{ id: "p26-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+26+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+26+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+26+Pic+3"] }]
+    },
+    { 
+        id: 27, name: "IMAGIC Professional Cosmetic Touch Blush Palette 6 Color (80g)", price: 699, oldPrice: 899, 
+        desc: "6-color professional blush palette for a natural, flushed glow.",
+        shades: [{ id: "p27-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+27+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+27+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+27+Pic+3"] }]
+    },
+    { 
+        id: 28, name: "FLiCKA Silk Touch 3-in-1 Primer + Moisturizer", price: 399, oldPrice: 499, 
+        desc: "3-in-1 primer and moisturizer that blurs 100% of pores for a silky finish.",
+        shades: [{ id: "p28-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+28+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+28+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+28+Pic+3"] }]
+    },
+    { 
+        id: 29, name: "Recode Ace of Base Concealer", price: 499, oldPrice: 650, 
+        desc: "Full coverage color-correcting and base concealer.",
+        shades: [
+            { id: "p29-s1", name: "08 Orange", color: "#E86F38", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Ace+08+Orange+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Ace+08+Orange+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Ace+08+Orange+3"] }
+        ]
+    },
+    { 
+        id: 30, name: "Recode Silky Moisturizer Cum Primer (60 G)", price: 599, oldPrice: 750, 
+        desc: "Nourishing silky moisturizer cum primer for a smooth makeup canvas.",
+        shades: [{ id: "p30-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+30+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+30+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+30+Pic+3"] }]
+    },
+    { 
+        id: 31, name: "Recode Hyaluronic Acid Glow Mist (100 ML)", price: 450, oldPrice: 595, 
+        desc: "Hydrating hyaluronic acid face mist for an instant dewy glow.",
+        shades: [{ id: "p31-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+31+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+31+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+31+Pic+3"] }]
+    },
+    { 
+        id: 32, name: "Recode Perfect Grip Spray - Makeup Fixer (100 ML)", price: 550, oldPrice: 699, 
+        desc: "High-hold makeup fixer spray that locks your look in place.",
+        shades: [{ id: "p32-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+32+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+32+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+32+Pic+3"] }]
+    },
+    { 
+        id: 33, name: "Recode Perfect Grip Primer (12 ML)", price: 350, oldPrice: 450, 
+        desc: "Travel-friendly gripping primer for long-lasting makeup adherence.",
+        shades: [{ id: "p33-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+33+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+33+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+33+Pic+3"] }]
+    },
+    { 
+        id: 34, name: "Recode We Stole Da Show Concealer (6 ML)", price: 499, oldPrice: 650, 
+        desc: "High-definition liquid concealer to brighten and correct dark spots.",
+        shades: [
+            { id: "p34-s1", name: "01 Light", color: "#F5D8BE", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Recode+01+Light+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Recode+01+Light+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Recode+01+Light+3"] },
+            { id: "p34-s2", name: "06 Orange", color: "#E86F38", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Recode+06+Orange+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Recode+06+Orange+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Recode+06+Orange+3"] }
+        ]
+    },
+    { 
+        id: 35, name: "Recode Clay Matte Liquid Lipsticks (2 ML x 10)", price: 1199, oldPrice: 1499, 
+        desc: "Set of 10 smudge-proof clay matte liquid lipsticks.",
+        shades: [{ id: "p35-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+35+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+35+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+35+Pic+3"] }]
+    },
+    { 
+        id: 36, name: "Recode Concealer Refill (3.50 G)", price: 299, oldPrice: 399, 
+        desc: "Creamy concealer pan refill for custom makeup palettes.",
+        shades: [
+            { id: "p36-s1", name: "Shade - 1", color: "#F6DEC6", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+1+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+1+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+1+3"] },
+            { id: "p36-s2", name: "Shade - 2", color: "#E6C29F", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+2+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+2+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+2+3"] },
+            { id: "p36-s3", name: "Shade - 17", color: "#B87B50", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+17+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+17+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Refill+Shade+17+3"] }
+        ]
+    },
+    { 
+        id: 37, name: "Recode 10 Silky Matte Mini Liquid Lipsticks - 12.50 ML (1.25ML x 10)", price: 999, oldPrice: 1299, 
+        desc: "Pack of 10 mini silky matte liquid lipsticks for everyday wear.",
+        shades: [{ id: "p37-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+37+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+37+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+37+Pic+3"] }]
+    },
 
 // --- NEW RECODE PRODUCTS (ID 38 TO 45) ---
-    { 
-        id: 38, name: "RECODE HD Luminous Matte Foundation (30 ML)", price: 799, oldPrice: 999, 
-        desc: "HD luminous matte finish foundation for a flawless, long-wearing base.",
-        shades: [
-            { id: "p38-s1", name: "1.01 Alhind", color: "#F4D5B6", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=1.01+Alhind+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=1.01+Alhind+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=1.01+Alhind+3"] }
-        ]
-    },
-    { 
-        id: 39, name: "Recode Makeup Primer for Oily & Dry Skin - Ace Of Base Primer (30 ML)", price: 699, oldPrice: 899, 
-        desc: "Smooth makeup primer suitable for both oily and dry skin types.",
-        shades: [{ id: "p39-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+39+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+39+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+39+Pic+3"] }]
-    },
-    { 
-        id: 40, name: "Recode Blush it Blush Stick (6 G)", price: 549, oldPrice: 699, 
-        desc: "Creamy, blendable blush stick for a natural flush of color.",
-        shades: [
-            { id: "p40-s1", name: "02 Peach Pop", color: "#F4978E", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Peach+Pop+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Peach+Pop+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Peach+Pop+3"] }
-        ]
-    },
-    { 
-        id: 41, name: "Recode 5 Silky Matte Mini Liquid Lipsticks - 6.25 ML (1.25ML x 5)", price: 599, oldPrice: 799, 
-        desc: "Set of 5 mini silky matte liquid lipsticks with rich pigmentation.",
-        shades: [{ id: "p41-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+41+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+41+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+41+Pic+3"] }]
-    },
-    { 
-        id: 42, name: "Recode Rose Gold Strobe Cream (19 ML)", price: 449, oldPrice: 599, 
-        desc: "Illuminating rose gold strobe cream for a radiant, dewy glow.",
-        shades: [{ id: "p42-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+42+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+42+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+42+Pic+3"] }]
-    },
-    { 
-        id: 43, name: "Recode Let Me Gloss U Lipstick Glosses (3 ML)", price: 399, oldPrice: 499, 
-        desc: "High-shine, non-sticky lip gloss for plump and hydrated lips.",
-        shades: [
-            { id: "p43-s1", name: "B.F.F 02", color: "#E28B97", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=B.F.F+02+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=B.F.F+02+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=B.F.F+02+3"] },
-            { id: "p43-s2", name: "L.O.L 04", color: "#C96A75", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=L.O.L+04+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=L.O.L+04+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=L.O.L+04+3"] },
-            { id: "p43-s3", name: "R.O.F.L 05", color: "#9E4752", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=R.O.F.L+05+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=R.O.F.L+05+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=R.O.F.L+05+3"] }
-        ]
-    },
-    { 
-        id: 44, name: "Recode Pookie Kajal - Everyday Makeup (0.3 G)", price: 249, oldPrice: 349, 
-        desc: "Smudge-proof, waterproof everyday kajal with a smooth glide.",
-        shades: [
-            { id: "p44-s1", name: "Black", color: "#1C1C1C", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+Black+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+Black+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+Black+3"] },
-            { id: "p44-s2", name: "White", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+White+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+White+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+White+3"] },
-            { id: "p44-s3", name: "Nude", color: "#E6C29F", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+Nude+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+Nude+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+Nude+3"] }
-        ]
-    },
-    { 
-        id: 45, name: "Recode Beauty Concealer, Colour Corrector & Contour Palette (52 G)", price: 1199, oldPrice: 1499, 
-        desc: "All-in-one professional concealer, colour corrector, and contour palette.",
-        shades: [{ id: "p45-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+45+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+45+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+45+Pic+3"] }]
-    },
+    { 
+        id: 38, name: "RECODE HD Luminous Matte Foundation (30 ML)", price: 799, oldPrice: 999, 
+        desc: "HD luminous matte finish foundation for a flawless, long-wearing base.",
+        shades: [
+            { id: "p38-s1", name: "1.01 Alhind", color: "#F4D5B6", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=1.01+Alhind+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=1.01+Alhind+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=1.01+Alhind+3"] }
+        ]
+    },
+    { 
+        id: 39, name: "Recode Makeup Primer for Oily & Dry Skin - Ace Of Base Primer (30 ML)", price: 699, oldPrice: 899, 
+        desc: "Smooth makeup primer suitable for both oily and dry skin types.",
+        shades: [{ id: "p39-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+39+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+39+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+39+Pic+3"] }]
+    },
+    { 
+        id: 40, name: "Recode Blush it Blush Stick (6 G)", price: 549, oldPrice: 699, 
+        desc: "Creamy, blendable blush stick for a natural flush of color.",
+        shades: [
+            { id: "p40-s1", name: "02 Peach Pop", color: "#F4978E", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Peach+Pop+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Peach+Pop+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Peach+Pop+3"] }
+        ]
+    },
+    { 
+        id: 41, name: "Recode 5 Silky Matte Mini Liquid Lipsticks - 6.25 ML (1.25ML x 5)", price: 599, oldPrice: 799, 
+        desc: "Set of 5 mini silky matte liquid lipsticks with rich pigmentation.",
+        shades: [{ id: "p41-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+41+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+41+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+41+Pic+3"] }]
+    },
+    { 
+        id: 42, name: "Recode Rose Gold Strobe Cream (19 ML)", price: 449, oldPrice: 599, 
+        desc: "Illuminating rose gold strobe cream for a radiant, dewy glow.",
+        shades: [{ id: "p42-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+42+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+42+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+42+Pic+3"] }]
+    },
+    { 
+        id: 43, name: "Recode Let Me Gloss U Lipstick Glosses (3 ML)", price: 399, oldPrice: 499, 
+        desc: "High-shine, non-sticky lip gloss for plump and hydrated lips.",
+        shades: [
+            { id: "p43-s1", name: "B.F.F 02", color: "#E28B97", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=B.F.F+02+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=B.F.F+02+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=B.F.F+02+3"] },
+            { id: "p43-s2", name: "L.O.L 04", color: "#C96A75", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=L.O.L+04+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=L.O.L+04+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=L.O.L+04+3"] },
+            { id: "p43-s3", name: "R.O.F.L 05", color: "#9E4752", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=R.O.F.L+05+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=R.O.F.L+05+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=R.O.F.L+05+3"] }
+        ]
+    },
+    { 
+        id: 44, name: "Recode Pookie Kajal - Everyday Makeup (0.3 G)", price: 249, oldPrice: 349, 
+        desc: "Smudge-proof, waterproof everyday kajal with a smooth glide.",
+        shades: [
+            { id: "p44-s1", name: "Black", color: "#1C1C1C", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+Black+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+Black+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+Black+3"] },
+            { id: "p44-s2", name: "White", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+White+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+White+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+White+3"] },
+            { id: "p44-s3", name: "Nude", color: "#E6C29F", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+Nude+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+Nude+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Kajal+Nude+3"] }
+        ]
+    },
+    { 
+        id: 45, name: "Recode Beauty Concealer, Colour Corrector & Contour Palette (52 G)", price: 1199, oldPrice: 1499, 
+        desc: "All-in-one professional concealer, colour corrector, and contour palette.",
+        shades: [{ id: "p45-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+45+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+45+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+45+Pic+3"] }]
+    },
 
-   // --- NEW SWISS BEAUTY PRODUCTS (ID 46 TO 63) ---
-    { 
-        id: 46, name: "Swiss Beauty Glow Up Makeup Fixer", price: 249, oldPrice: 349, 
-        desc: "Hydrating makeup fixer spray that locks makeup with a radiant, dewy glow.",
-        shades: [{ id: "p46-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+46+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+46+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+46+Pic+3"] }]
-    },
-    { 
-        id: 47, name: "Swiss Beauty Real Make-Up Base Highlighting Primer", price: 329, oldPrice: 399, 
-        desc: "Illuminating makeup base primer that minimizes pores and gives a natural glow.",
-        shades: [{ id: "p47-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+47+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+47+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+47+Pic+3"] }]
-    },
-    { 
-        id: 48, name: "Swiss Beauty High Performance Foundation", price: 399, oldPrice: 499, 
-        desc: "Long-wearing, water-resistant liquid foundation for a smooth, flawless finish.",
-        shades: [{ id: "p48-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+48+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+48+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+48+Pic+3"] }]
-    },
-    { 
-        id: 49, name: "Swiss Beauty Perfect Liquid Concealer", price: 229, oldPrice: 299, 
-        desc: "Full coverage, crease-resistant liquid concealer for dark circles and blemishes.",
-        shades: [{ id: "p49-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+49+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+49+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+49+Pic+3"] }]
-    },
-    { 
-        id: 50, name: "Swiss Beauty Long Lasting Makeup Fixer", price: 219, oldPrice: 279, 
-        desc: "Natural Aloe Vera and Vitamin-E enriched setting spray for all-day makeup hold.",
-        shades: [{ id: "p50-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+50+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+50+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+50+Pic+3"] }]
-    },
-    { 
-        id: 51, name: "Swiss Beauty Oil Free Long Lasting Make-Up Primer", price: 299, oldPrice: 399, 
-        desc: "Lightweight, oil-free primer that blurs imperfections and extends makeup wear.",
-        shades: [{ id: "p51-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+51+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+51+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+51+Pic+3"] }]
-    },
-    { 
-        id: 52, name: "Swiss Beauty Bake It Away Loose Powder", price: 279, oldPrice: 349, 
-        desc: "Ultra-fine translucent loose powder for baking and setting makeup with a matte finish.",
-        shades: [{ id: "p52-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+52+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+52+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+52+Pic+3"] }]
-    },
-    { 
-        id: 53, name: "Swiss Beauty Glow Up Strobe Cream", price: 349, oldPrice: 449, 
-        desc: "Moisturizing strobe cream for an instant luminous, dewy skin finish.",
-        shades: [{ id: "p53-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+53+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+53+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+53+Pic+3"] }]
-    },
-    { 
-        id: 54, name: "Swiss Beauty Awaken Mascara", price: 249, oldPrice: 329, 
-        desc: "Volumizing and lengthening mascara for wide-awake, dramatic lashes.",
-        shades: [{ id: "p54-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+54+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+54+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+54+Pic+3"] }]
-    },
-    { 
-        id: 55, name: "Swiss Beauty Awaken Pen Eyeliner", price: 199, oldPrice: 249, 
-        desc: "Precision felt-tip pen eyeliner for jet-black, smudge-proof winged lines.",
-        shades: [{ id: "p55-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+55+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+55+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+55+Pic+3"] }]
-    },
-    { 
-        id: 56, name: "Swiss Beauty Bold Eyes Super Lash Waterproof Mascara", price: 279, oldPrice: 349, 
-        desc: "Waterproof, clump-free mascara that delivers bold volume and curl.",
-        shades: [{ id: "p56-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+56+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+56+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+56+Pic+3"] }]
-    },
-    { 
-        id: 57, name: "Swiss Beauty Precision Mascara", price: 229, oldPrice: 299, 
-        desc: "High-definition precision brush mascara that coats every single lash evenly.",
-        shades: [{ id: "p57-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+57+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+57+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+57+Pic+3"] }]
-    },
-    { 
-        id: 58, name: "Swiss Beauty Care Korean Glow Facial Set", price: 599, oldPrice: 799, 
-        desc: "Complete Korean glow skincare facial set for glass-like, radiant skin.",
-        shades: [{ id: "p58-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+58+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+58+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+58+Pic+3"] }]
-    },
-    { 
-        id: 59, name: "Swiss Beauty Facial Kit", price: 499, oldPrice: 649, 
-        desc: "Multi-step nourishing facial kit for instant salon-like brightness and glow.",
-        shades: [{ id: "p59-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+59+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+59+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+59+Pic+3"] }]
-    },
-    { 
-        id: 60, name: "Swiss Beauty Bold Matte Lipliner (Pack Of 12 Pcs)", price: 449, oldPrice: 599, 
-        desc: "Set of 12 richly pigmented, smooth-gliding matte lip liner pencils.",
-        shades: [{ id: "p60-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+60+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+60+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+60+Pic+3"] }]
-    },
-    { 
-        id: 61, name: "Swiss Beauty Oil Control Compact Powder", price: 219, oldPrice: 279, 
-        desc: "Mattifying compact powder that controls excess oil and gives an even skin tone.",
-        shades: [{ id: "p61-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+61+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+61+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+61+Pic+3"] }]
-    },
-    { 
-        id: 62, name: "Swiss Beauty Cream It Up Blush", price: 299, oldPrice: 399, 
-        desc: "Velvety, easily blendable liquid-cream blush for a natural flushed look.",
-        shades: [{ id: "p62-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+62+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+62+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+62+Pic+3"] }]
-    },
-    { 
-        id: 63, name: "Swiss Beauty Power Stage Eyeshadow Palette", price: 499, oldPrice: 649, 
-        desc: "High-pigment eyeshadow palette featuring a mix of matte and shimmer shades.",
-        shades: [{ id: "p63-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+63+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+63+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+63+Pic+3"] }]
-    },
+   // --- NEW SWISS BEAUTY PRODUCTS (ID 46 TO 63) ---
+    { 
+        id: 46, name: "Swiss Beauty Glow Up Makeup Fixer", price: 249, oldPrice: 349, 
+        desc: "Hydrating makeup fixer spray that locks makeup with a radiant, dewy glow.",
+        shades: [{ id: "p46-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+46+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+46+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+46+Pic+3"] }]
+    },
+    { 
+        id: 47, name: "Swiss Beauty Real Make-Up Base Highlighting Primer", price: 329, oldPrice: 399, 
+        desc: "Illuminating makeup base primer that minimizes pores and gives a natural glow.",
+        shades: [{ id: "p47-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+47+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+47+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+47+Pic+3"] }]
+    },
+    { 
+        id: 48, name: "Swiss Beauty High Performance Foundation", price: 399, oldPrice: 499, 
+        desc: "Long-wearing, water-resistant liquid foundation for a smooth, flawless finish.",
+        shades: [{ id: "p48-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+48+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+48+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+48+Pic+3"] }]
+    },
+    { 
+        id: 49, name: "Swiss Beauty Perfect Liquid Concealer", price: 229, oldPrice: 299, 
+        desc: "Full coverage, crease-resistant liquid concealer for dark circles and blemishes.",
+        shades: [{ id: "p49-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+49+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+49+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+49+Pic+3"] }]
+    },
+    { 
+        id: 50, name: "Swiss Beauty Long Lasting Makeup Fixer", price: 219, oldPrice: 279, 
+        desc: "Natural Aloe Vera and Vitamin-E enriched setting spray for all-day makeup hold.",
+        shades: [{ id: "p50-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+50+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+50+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+50+Pic+3"] }]
+    },
+    { 
+        id: 51, name: "Swiss Beauty Oil Free Long Lasting Make-Up Primer", price: 299, oldPrice: 399, 
+        desc: "Lightweight, oil-free primer that blurs imperfections and extends makeup wear.",
+        shades: [{ id: "p51-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+51+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+51+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+51+Pic+3"] }]
+    },
+    { 
+        id: 52, name: "Swiss Beauty Bake It Away Loose Powder", price: 279, oldPrice: 349, 
+        desc: "Ultra-fine translucent loose powder for baking and setting makeup with a matte finish.",
+        shades: [{ id: "p52-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+52+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+52+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+52+Pic+3"] }]
+    },
+    { 
+        id: 53, name: "Swiss Beauty Glow Up Strobe Cream", price: 349, oldPrice: 449, 
+        desc: "Moisturizing strobe cream for an instant luminous, dewy skin finish.",
+        shades: [{ id: "p53-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+53+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+53+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+53+Pic+3"] }]
+    },
+    { 
+        id: 54, name: "Swiss Beauty Awaken Mascara", price: 249, oldPrice: 329, 
+        desc: "Volumizing and lengthening mascara for wide-awake, dramatic lashes.",
+        shades: [{ id: "p54-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+54+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+54+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+54+Pic+3"] }]
+    },
+    { 
+        id: 55, name: "Swiss Beauty Awaken Pen Eyeliner", price: 199, oldPrice: 249, 
+        desc: "Precision felt-tip pen eyeliner for jet-black, smudge-proof winged lines.",
+        shades: [{ id: "p55-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+55+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+55+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+55+Pic+3"] }]
+    },
+    { 
+        id: 56, name: "Swiss Beauty Bold Eyes Super Lash Waterproof Mascara", price: 279, oldPrice: 349, 
+        desc: "Waterproof, clump-free mascara that delivers bold volume and curl.",
+        shades: [{ id: "p56-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+56+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+56+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+56+Pic+3"] }]
+    },
+    { 
+        id: 57, name: "Swiss Beauty Precision Mascara", price: 229, oldPrice: 299, 
+        desc: "High-definition precision brush mascara that coats every single lash evenly.",
+        shades: [{ id: "p57-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+57+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+57+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+57+Pic+3"] }]
+    },
+    { 
+        id: 58, name: "Swiss Beauty Care Korean Glow Facial Set", price: 599, oldPrice: 799, 
+        desc: "Complete Korean glow skincare facial set for glass-like, radiant skin.",
+        shades: [{ id: "p58-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+58+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+58+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+58+Pic+3"] }]
+    },
+    { 
+        id: 59, name: "Swiss Beauty Facial Kit", price: 499, oldPrice: 649, 
+        desc: "Multi-step nourishing facial kit for instant salon-like brightness and glow.",
+        shades: [{ id: "p59-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+59+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+59+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+59+Pic+3"] }]
+    },
+    { 
+        id: 60, name: "Swiss Beauty Bold Matte Lipliner (Pack Of 12 Pcs)", price: 449, oldPrice: 599, 
+        desc: "Set of 12 richly pigmented, smooth-gliding matte lip liner pencils.",
+        shades: [{ id: "p60-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+60+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+60+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+60+Pic+3"] }]
+    },
+    { 
+        id: 61, name: "Swiss Beauty Oil Control Compact Powder", price: 219, oldPrice: 279, 
+        desc: "Mattifying compact powder that controls excess oil and gives an even skin tone.",
+        shades: [{ id: "p61-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+61+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+61+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+61+Pic+3"] }]
+    },
+    { 
+        id: 62, name: "Swiss Beauty Cream It Up Blush", price: 299, oldPrice: 399, 
+        desc: "Velvety, easily blendable liquid-cream blush for a natural flushed look.",
+        shades: [{ id: "p62-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+62+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+62+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+62+Pic+3"] }]
+    },
+    { 
+        id: 63, name: "Swiss Beauty Power Stage Eyeshadow Palette", price: 499, oldPrice: 649, 
+        desc: "High-pigment eyeshadow palette featuring a mix of matte and shimmer shades.",
+        shades: [{ id: "p63-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+63+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+63+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+63+Pic+3"] }]
+    },
 
-    // --- 15 EXTRA PLACEHOLDER ITEMS (ID 64 TO 78) ---
-    { 
-        id: 64, name: "Item Placeholder 1", price: 350, oldPrice: 499, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p64-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+64+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+64+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+64+Pic+3"] }]
-    },
-    { 
-        id: 65, name: "Item Placeholder 2", price: 450, oldPrice: 599, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p65-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+65+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+65+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+65+Pic+3"] }]
-    },
-    { 
-        id: 66, name: "Item Placeholder 3", price: 299, oldPrice: 399, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p66-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+66+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+66+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+66+Pic+3"] }]
-    },
-    { 
-        id: 67, name: "Item Placeholder 4", price: 550, oldPrice: 750, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p67-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+67+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+67+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+67+Pic+3"] }]
-    },
-    { 
-        id: 68, name: "Item Placeholder 5", price: 199, oldPrice: 299, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p68-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+68+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+68+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+68+Pic+3"] }]
-    },
-    { 
-        id: 69, name: "Item Placeholder 6", price: 899, oldPrice: 1099, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p69-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+69+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+69+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+69+Pic+3"] }]
-    },
-    { 
-        id: 70, name: "Item Placeholder 7", price: 399, oldPrice: 499, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p70-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+70+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+70+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+70+Pic+3"] }]
-    },
-    { 
-        id: 71, name: "Item Placeholder 8", price: 499, oldPrice: 649, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p71-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+71+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+71+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+71+Pic+3"] }]
-    },
-    { 
-        id: 72, name: "Item Placeholder 9", price: 650, oldPrice: 799, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p72-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+72+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+72+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+72+Pic+3"] }]
-    },
-    { 
-        id: 73, name: "Item Placeholder 10", price: 250, oldPrice: 349, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p73-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+73+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+73+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+73+Pic+3"] }]
-    },
-    { 
-        id: 74, name: "Item Placeholder 11", price: 799, oldPrice: 999, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p74-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+74+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+74+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+74+Pic+3"] }]
-    },
-    { 
-        id: 75, name: "Item Placeholder 12", price: 320, oldPrice: 420, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p75-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+75+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+75+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+75+Pic+3"] }]
-    },
-    { 
-        id: 76, name: "Item Placeholder 13", price: 599, oldPrice: 749, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p76-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+76+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+76+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+76+Pic+3"] }]
-    },
-    { 
-        id: 77, name: "Item Placeholder 14", price: 420, oldPrice: 550, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p77-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+77+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+77+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+77+Pic+3"] }]
-    },
-    { 
-        id: 78, name: "Item Placeholder 15", price: 950, oldPrice: 1199, 
-        desc: "Item details will go here.",
-        shades: [{ id: "p78-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+78+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+78+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+78+Pic+3"] }]
-    }
+    // --- 15 EXTRA PLACEHOLDER ITEMS (ID 64 TO 78) ---
+    { 
+        id: 64, name: "Item Placeholder 1", price: 350, oldPrice: 499, 
+        desc: "Item details will go here.",
+        shades: [{ id: "p64-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+64+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+64+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+64+Pic+3"] }]
+    },
+    { 
+        id: 65, name: "Item Placeholder 2", price: 450, oldPrice: 599, 
+        desc: "Item details will go here.",
+        shades: [{ id: "p65-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+65+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+65+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+65+Pic+3"] }]
+    },
+    { 
+        id: 66, name: "Item Placeholder 3", price: 299, oldPrice: 399, 
+        desc: "Item details will go here.",
+        shades: [{ id: "p66-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+66+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+66+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+66+Pic+3"] }]
+    },
+    { 
+        id: 67, name: "Item Placeholder 4", price: 550, oldPrice: 750, 
+        desc: "Item details will go here.",
+        shades: [{ id: "p67-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+67+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+67+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+67+Pic+3"] }]
+    },
+    { 
+        id: 68, name: "Item Placeholder 5", price: 199, oldPrice: 299, 
+        desc: "Item details will go here.",
+        shades: [{ id: "p68-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+68+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+68+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+68+Pic+3"] }]
+    },
+    { 
+        id: 69, name: "Item Placeholder 6", price: 899, oldPrice: 1099, 
+        desc: "Item details will go here.",
+        shades: [{ id: "p69-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+69+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+69+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+69+Pic+3"] }]
+    },
+    { 
+        id: 70, name: "Item Placeholder 7", price: 399, oldPrice: 499, 
+        desc: "Item details will go here.",
+        shades: [{ id: "p70-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+70+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+70+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+70+Pic+3"] }]
+    },
+    { 
+        id: 71, name: "Item Placeholder 8", price: 499, oldPrice: 649, 
+        desc: "Item details will go here.",
+        shades: [{ id: "p71-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+71+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+71+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+71+Pic+3"] }]
+    },
+    { 
+        id: 72, name: "Item Placeholder 9", price: 650, oldPrice: 799, 
+        desc: "Item details will go here.",
+        shades: [{ id: "p72-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+72+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+72+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+72+Pic+3"] }]
+    },
+    { 
+        id: 73, name: "Item Placeholder 10", price: 250, oldPrice: 349, 
+        desc: "Item details will go here.",
+        shades: [{ id: "p73-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+73+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+73+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+73+Pic+3"] }]
+    },
+    { 
+        id: 74, name: "Item Placeholder 11", price: 799, oldPrice: 999, 
+        desc: "Item details will go here.",
+        shades: [{ id: "p74-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+74+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+74+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+74+Pic+3"] }]
+    },
+    { 
+        id: 75, name: "Item Placeholder 12", price: 320, oldPrice: 420, 
+        desc: "Item details will go here.",
+        shades: [{ id: "p75-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+75+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+75+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+75+Pic+3"] }]
+    },
+    { 
+        id: 76, name: "Item Placeholder 13", price: 599, oldPrice: 749, 
+        desc: "Item details will go here.",
+        shades: [{ id: "p76-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+76+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+76+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+76+Pic+3"] }]
+    },
+    { 
+        id: 77, name: "Item Placeholder 14", price: 420, oldPrice: 550, 
+        desc: "Item details will go here.",
+        shades: [{ id: "p77-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+77+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+77+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+77+Pic+3"] }]
+    },
+    { 
+        id: 78, name: "Item Placeholder 15", price: 950, oldPrice: 1199, 
+        desc: "Item details will go here.",
+        shades: [{ id: "p78-s1", name: "Standard", color: "#FFFFFF", images: ["https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+78+Pic+1", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+78+Pic+2", "https://placehold.co/400x400/FDF6F6/9B2D45?text=Item+78+Pic+3"] }]
+    }
 ];
-
 
         // =========================================================================
         // LOGIC & STATE
@@ -983,6 +985,16 @@
         let currentSearchQuery = "";
         let currentOpenProductId = null; 
         let currentSelectedShadeId = null;
+
+        // Auto-sync fixed header spacer height
+        function syncHeaderSpacer() {
+            const header = document.getElementById('mainFixedHeader');
+            const spacer = document.getElementById('headerSpacer');
+            if (header && spacer) {
+                spacer.style.height = (header.offsetHeight + 6) + 'px';
+            }
+        }
+        window.addEventListener('resize', syncHeaderSpacer);
 
         // --- BOTTOM NAV ROUTING ---
         function navToHome() {
@@ -1092,7 +1104,7 @@
             
             const titleEl = document.getElementById('collectionTitle');
             if(query.trim() !== "") { 
-                titleEl.innerHTML = `<i class="fas fa-sparkles text-brand-500 mr-2 text-base"></i> Showing "${query.toUpperCase()}"`; 
+                titleEl.innerHTML = `<i class="fas fa-search text-brand-500 mr-2 text-base"></i> Results for "${query.toUpperCase()}"`; 
             } else { 
                 titleEl.innerHTML = `<i class="fas fa-fire text-gold-500 mr-2 text-base"></i> All Collections`; 
             }
@@ -1937,6 +1949,7 @@
         }
 
         window.onload = () => { 
+            syncHeaderSpacer();
             wishlist = JSON.parse(localStorage.getItem('alKaynat_Wishlist') || '[]');
             updateWishlistBadge();
 
