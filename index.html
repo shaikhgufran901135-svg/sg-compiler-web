@@ -1814,7 +1814,7 @@ const products = [
             popAppModal('payment');
         }
 
-        function processOnlinePayment(appName) {
+function processOnlinePayment(appName) {
             selectedUPIApp = appName; 
             closePaymentModal(); 
             
@@ -1826,11 +1826,25 @@ const products = [
             
             let upiUrl = `upi://pay?pa=${merchantUpiId}&pn=${encodeURIComponent(storeName)}&am=${amountToPay}&tn=${encodeURIComponent(orderNote)}&tr=${transactionId}&mc=5499&cu=INR`;
             
-            window.location.href = upiUrl;
-            
-            setTimeout(() => { 
+            // NAYA: Ab hum Android Studio ko link bhejenge, direct open nahi karenge
+            if (window.Android && window.Android.startUPIPayment) {
+                window.Android.startUPIPayment(upiUrl);
+            } else {
+                alert("Please use the official App to make a payment.");
+            }
+        }
+
+        // NAYA: Yeh function Android Studio khud run karega jab payment ka exact result pata chal jayega
+        function handlePaymentResult(status) {
+            if (status === "SUCCESS") {
+                // Payment 100% SUCCESS hone par hi receipt ka popup khulega
                 document.getElementById('whatsappPromptOverlay').classList.remove('hidden');
-            }, 3000);
+            } else if (status === "PENDING") {
+                alert("Payment is pending at the bank. Please check your account.");
+            } else {
+                // Payment FAIL ya CANCEL hone par yahan aayega (receipt popup NAHI khulega)
+                alert("Payment failed or cancelled. Please try again.");
+            }
         }
 
         // --- WHATSAPP ORDER PROCESSING ---
