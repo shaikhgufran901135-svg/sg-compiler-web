@@ -364,17 +364,19 @@
     </div>
 
     <!-- WISHLIST SLIDE PANEL -->
-<div id="wishlistOverlay" class="fixed inset-0 bg-black/60 z-50 hidden modal-fade backdrop-blur-sm" onclick="closeWishlist()"></div>
+<!-- Wishlist Overlay -->
+    <div id="wishlistOverlay" class="fixed inset-0 bg-black/60 z-50 hidden modal-fade backdrop-blur-sm" onclick="closeWishlist()"></div>
     
+    <!-- Wishlist Panel -->
     <div id="wishlistPanel" class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-brand-50 z-50 translate-x-full slide-up flex flex-col shadow-2xl">
         
-        <!-- Puraana Header -->
+        <!-- Header -->
         <div class="bg-white px-4 pb-3.5 flex justify-between items-center shadow-sm z-10 border-b border-brand-100" style="padding-top: max(env(safe-area-inset-top), 24px);">
             <h2 class="font-bold text-xl text-brand-900 brand-font flex items-center"><i class="fas fa-heart mr-2.5 text-brand-500"></i> My Wishlist</h2>
             <button onclick="closeWishlist()" class="h-8 w-8 bg-brand-50 hover:bg-brand-100 rounded-full text-brand-900"><i class="fas fa-times"></i></button>
         </div>
 
-        <!-- NAYA: Storage Limit Tracker aur Ad Button (Yeh naya add kiya hai) -->
+        <!-- Storage Limit Tracker aur Ad Button -->
         <div class="bg-white border-b border-brand-100 px-4 py-3 flex justify-between items-center z-10 shadow-sm">
             <div class="flex flex-col">
                 <span class="text-xs text-gray-500 font-medium">Storage Limit</span>
@@ -385,13 +387,29 @@
             </button>
         </div>
 
-        <!-- Puraana Items List -->
+        <!-- Items List -->
         <div class="flex-1 overflow-y-auto p-4 pb-20 custom-scrollbar">
             <div id="wishlistItemsList" class="space-y-3"></div>
         </div>
         
     </div>
 
+    <!-- NAYA: Watch Ad Confirmation Modal (Custom Popup) -->
+    <div id="adConfirmModal" class="fixed inset-0 bg-black/60 z-[60] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center transform transition-all">
+            <div class="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4 text-rose-500 text-3xl">
+                <i class="fas fa-video"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2 brand-font">Unlock More Slots!</h3>
+            <p class="text-sm text-gray-500 mb-6">Aapki wishlist full ho gayi hai. Kya aap 2 chhote video ads dekh kar 3 naye slots unlock karna chahte hain?</p>
+            <div class="flex space-x-3">
+                <button onclick="closeAdModal()" class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-xl text-sm transition-colors">Cancel</button>
+                <button onclick="confirmWatchAd()" class="flex-1 py-3 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-xl text-sm transition-colors flex justify-center items-center">
+                    <i class="fas fa-play mr-2"></i> Watch Ad
+                </button>
+            </div>
+        </div>
+    </div>
     <!-- 📍 ADDRESS ADD / EDIT MODAL (z-[95] so it opens cleanly over Cart & Profile) -->
     <div id="addressModal" class="fixed inset-0 bg-black/70 z-[95] hidden flex items-end sm:items-center justify-center modal-fade backdrop-blur-sm" onclick="if(event.target === this) closeAddressModal()">
         <div class="bg-white w-full sm:w-[450px] rounded-t-3xl sm:rounded-3xl p-6 transform transition-transform slide-up shadow-2xl border border-brand-100 max-h-[90vh] overflow-y-auto custom-scrollbar">
@@ -1057,150 +1075,153 @@ const products = [
             updateSearch(brandQuery);
         }
 
-        // --- WISHLIST FUNCTIONALITY ---
+// --- WISHLIST FUNCTIONALITY ---
 // NAYA: Limit ko LocalStorage se nikalenge, agar naya user hai toh default 5 rahegi
-        let wishlistLimit = parseInt(localStorage.getItem('alKaynat_WishlistLimit')) || 5;
-        let adsWatched = 0;
+let wishlistLimit = parseInt(localStorage.getItem('alKaynat_WishlistLimit')) || 5;
+let adsWatched = 0;
 
-        // --- WISHLIST FUNCTIONALITY ---
-        function toggleWishlist(event, productId) {
-            event.stopPropagation();
-            const index = wishlist.indexOf(productId);
-            
-            if (index > -1) {
-                // Agar item pehle se hai, toh usko remove kar do (Isme limit check ki zaroorat nahi)
-                wishlist.splice(index, 1);
-            } else {
-                // NAYA: Naya item add karne se pehle Limit check karo
-                if (wishlist.length >= wishlistLimit) {
-                    let userAgreed = confirm(`Aapki wishlist full ho chuki hai (${wishlistLimit} items).\nKya aap 2 chote ads dekh kar 3 naye slots unlock karna chahte hain?`);
-                    if (userAgreed) {
-                        watchRewardedAd(); // Ad chalane ke liye Android ko order do
-                    }
-                    return; // Yahan se wapas bhej do, item add NAHI hoga
-                }
-                
-                // Agar limit bachi hai, toh item add kar do
-                wishlist.push(productId);
-            }
-            
-            localStorage.setItem('alKaynat_Wishlist', JSON.stringify(wishlist));
-            renderGrid(); 
-            updateWishlistBadge();
-            
-            if (typeof currentOpenProductId !== 'undefined' && currentOpenProductId === productId) {
-                const btn = document.getElementById('pdWishlistBtn');
-                if(btn) {
-                    if (wishlist.includes(productId)) {
-                        btn.innerHTML = `<i class="fas fa-heart text-lg text-brand-600"></i>`;
-                    } else {
-                        btn.innerHTML = `<i class="far fa-heart text-lg text-gray-400"></i>`;
-                    }
-                }
-            }
-            
-            // NAYA: Wishlist panel mein limit update karo
-            updateLimitTrackerUI();
-        }
-
-        function updateWishlistBadge() {
-            const navBadge = document.getElementById('navWishlistBadge');
-            if(navBadge) {
-                if(wishlist.length > 0) {
-                    navBadge.innerText = wishlist.length;
-                    navBadge.classList.remove('hidden');
-                } else {
-                    navBadge.classList.add('hidden');
-                }
-            }
-        }
-
-        function openWishlist() {
-            pushAppModal('wishlist');
-            document.getElementById('wishlistOverlay').classList.remove('hidden');
-            setTimeout(() => { document.getElementById('wishlistPanel').classList.remove('translate-x-full'); }, 10);
-            document.body.style.overflow = 'hidden';
-            renderWishlistUI();
-            updateLimitTrackerUI(); // Panel khulte hi numbers update ho jayein
+// --- WISHLIST FUNCTIONALITY ---
+function toggleWishlist(event, productId) {
+    event.stopPropagation();
+    const index = wishlist.indexOf(productId);
+    
+    if (index > -1) {
+        // Agar item pehle se hai, toh usko remove kar do
+        wishlist.splice(index, 1);
+    } else {
+        // NAYA: Naya item add karne se pehle Limit check karo
+        if (wishlist.length >= wishlistLimit) {
+            requestLimitIncrease(); // Yahan custom HTML popup khulega
+            return; // Yahan se wapas bhej do, item add NAHI hoga
         }
         
-        function closeWishlist() {
-            document.getElementById('wishlistPanel').classList.add('translate-x-full');
-            setTimeout(() => { document.getElementById('wishlistOverlay').classList.add('hidden'); }, 300);
-            popAppModal('wishlist');
-        }
-
-        function renderWishlistUI() {
-            const container = document.getElementById('wishlistItemsList');
-            container.innerHTML = '';
-            
-            if(wishlist.length === 0) {
-                container.innerHTML = `<div class="text-center py-20 flex flex-col items-center"><div class="h-20 w-20 bg-white rounded-full flex items-center justify-center shadow-sm border border-brand-100 mb-4"><i class="far fa-heart text-4xl text-brand-200"></i></div><p class="text-gray-800 font-bold text-lg">Wishlist is empty</p><p class="text-gray-400 text-sm mt-1">Save your favorite items here.</p></div>`;
-                return;
+        // Agar limit bachi hai, toh item add kar do
+        wishlist.push(productId);
+    }
+    
+    localStorage.setItem('alKaynat_Wishlist', JSON.stringify(wishlist));
+    renderGrid(); 
+    updateWishlistBadge();
+    
+    if (typeof currentOpenProductId !== 'undefined' && currentOpenProductId === productId) {
+        const btn = document.getElementById('pdWishlistBtn');
+        if(btn) {
+            if (wishlist.includes(productId)) {
+                btn.innerHTML = `<i class="fas fa-heart text-lg text-brand-600"></i>`;
+            } else {
+                btn.innerHTML = `<i class="far fa-heart text-lg text-gray-400"></i>`;
             }
+        }
+    }
+    
+    updateLimitTrackerUI();
+}
 
-            wishlist.forEach(id => {
-                // Aapke products array ke hisaab se
-                const p = products.find(x => x.id === id); 
-                if(!p) return;
-                
-                container.innerHTML += `
-                    <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-brand-100 flex items-center justify-between cursor-pointer hover:shadow-md transition-all" onclick="closeWishlist(); setTimeout(() => openProductPage(${p.id}), 50);">
-                        <div class="flex items-center space-x-3 w-3/4">
-                            <img src="${p.shades && p.shades[0] ? p.shades[0].images[0] : p.image}" class="h-14 w-14 object-contain rounded-xl border border-brand-50 bg-brand-50 p-1 shrink-0">
-                            <div class="min-w-0">
-                                <h4 class="text-sm font-bold text-gray-800 leading-tight line-clamp-1">${p.name}</h4>
-                                <span class="font-black text-brand-900 text-sm mt-1 block">₹${p.price} <span class="text-[10px] text-gray-400 line-through ml-1 font-normal">₹${p.oldPrice}</span></span>
-                            </div>
-                        </div>
-                        <button onclick="toggleWishlist(event, ${p.id}); renderWishlistUI();" class="h-9 w-9 bg-brand-50 text-brand-600 rounded-xl flex items-center justify-center hover:bg-brand-100 shrink-0"><i class="fas fa-trash-alt text-xs"></i></button>
+function updateWishlistBadge() {
+    const navBadge = document.getElementById('navWishlistBadge');
+    if(navBadge) {
+        if(wishlist.length > 0) {
+            navBadge.innerText = wishlist.length;
+            navBadge.classList.remove('hidden');
+        } else {
+            navBadge.classList.add('hidden');
+        }
+    }
+}
+
+function openWishlist() {
+    pushAppModal('wishlist');
+    document.getElementById('wishlistOverlay').classList.remove('hidden');
+    setTimeout(() => { document.getElementById('wishlistPanel').classList.remove('translate-x-full'); }, 10);
+    document.body.style.overflow = 'hidden';
+    renderWishlistUI();
+    updateLimitTrackerUI();
+}
+
+function closeWishlist() {
+    document.getElementById('wishlistPanel').classList.add('translate-x-full');
+    setTimeout(() => { document.getElementById('wishlistOverlay').classList.add('hidden'); }, 300);
+    popAppModal('wishlist');
+}
+
+function renderWishlistUI() {
+    const container = document.getElementById('wishlistItemsList');
+    container.innerHTML = '';
+    
+    if(wishlist.length === 0) {
+        container.innerHTML = `<div class="text-center py-20 flex flex-col items-center"><div class="h-20 w-20 bg-white rounded-full flex items-center justify-center shadow-sm border border-brand-100 mb-4"><i class="far fa-heart text-4xl text-brand-200"></i></div><p class="text-gray-800 font-bold text-lg">Wishlist is empty</p><p class="text-gray-400 text-sm mt-1">Save your favorite items here.</p></div>`;
+        return;
+    }
+
+    wishlist.forEach(id => {
+        const p = products.find(x => x.id === id); 
+        if(!p) return;
+        
+        container.innerHTML += `
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-brand-100 flex items-center justify-between cursor-pointer hover:shadow-md transition-all" onclick="closeWishlist(); setTimeout(() => openProductPage(${p.id}), 50);">
+                <div class="flex items-center space-x-3 w-3/4">
+                    <img src="${p.shades && p.shades[0] ? p.shades[0].images[0] : p.image}" class="h-14 w-14 object-contain rounded-xl border border-brand-50 bg-brand-50 p-1 shrink-0">
+                    <div class="min-w-0">
+                        <h4 class="text-sm font-bold text-gray-800 leading-tight line-clamp-1">${p.name}</h4>
+                        <span class="font-black text-brand-900 text-sm mt-1 block">₹${p.price} <span class="text-[10px] text-gray-400 line-through ml-1 font-normal">₹${p.oldPrice}</span></span>
                     </div>
-                `;
-            });
-        }
+                </div>
+                <button onclick="toggleWishlist(event, ${p.id}); renderWishlistUI();" class="h-9 w-9 bg-brand-50 text-brand-600 rounded-xl flex items-center justify-center hover:bg-brand-100 shrink-0"><i class="fas fa-trash-alt text-xs"></i></button>
+            </div>
+        `;
+    });
+}
 
-        // --- NAYA: ADS AUR LIMIT TRACKER KE FUNCTIONS ---
+// --- NAYA: ADS AUR LIMIT TRACKER KE FUNCTIONS ---
 
-        function updateLimitTrackerUI() {
-            const countDisplay = document.getElementById('wishlistCountDisplay');
-            const limitDisplay = document.getElementById('wishlistLimitDisplay');
-            if(countDisplay && limitDisplay) {
-                countDisplay.innerText = wishlist.length;
-                limitDisplay.innerText = wishlistLimit;
-            }
-        }
+function updateLimitTrackerUI() {
+    const countDisplay = document.getElementById('wishlistCountDisplay');
+    const limitDisplay = document.getElementById('wishlistLimitDisplay');
+    if(countDisplay && limitDisplay) {
+        countDisplay.innerText = wishlist.length;
+        limitDisplay.innerText = wishlistLimit;
+    }
+}
 
-        function requestLimitIncrease() {
-            let userAgreed = confirm(`Kya aap 2 chote ads dekh kar 3 naye slots unlock karna chahte hain? \n(Aapki current limit ${wishlistLimit} items ki hai)`);
-            if (userAgreed) {
-                watchRewardedAd();
-            }
-        }
+// 1. Apna Custom Popup Kholne ka function
+function requestLimitIncrease() {
+    document.getElementById('adConfirmModal').classList.remove('hidden');
+}
 
-        function watchRewardedAd() {
-            if (window.Android && window.Android.showRewardedAd) {
-                window.Android.showRewardedAd();
-            } else {
-                alert("Please use the official App to watch ads and unlock slots.");
-            }
-        }
+// 2. Custom Popup Band Karne ka function
+function closeAdModal() {
+    document.getElementById('adConfirmModal').classList.add('hidden');
+}
 
-        function rewardedAdWatched() {
-            adsWatched++; 
-            
-            if (adsWatched >= 2) {
-                wishlistLimit += 3; // 3 slots badha do
-                adsWatched = 0; // Wapas 0 kar do
-                
-                // NAYA: Badhi hui limit ko device mein save kar lo taaki app band hone par reset na ho
-                localStorage.setItem('alKaynat_WishlistLimit', wishlistLimit);
-                
-                updateLimitTrackerUI();
-                alert(`Congratulations! 🎉 Aapne 2 ads dekh liye. Ab aapki wishlist limit ${wishlistLimit} ho gayi hai.`);
-            } else {
-                alert("Aapne 1 Ad dekh liya hai! 1 Ad aur dekhein 3 naye slots unlock karne ke liye.");
-            }
-        }
+// 3. User Popup mein 'Watch Ad' dabaye tab
+function confirmWatchAd() {
+    closeAdModal(); 
+    watchRewardedAd(); 
+}
+
+function watchRewardedAd() {
+    if (window.Android && window.Android.showRewardedAd) {
+        window.Android.showRewardedAd();
+    } else {
+        // Yeh default alert rakha hai in case koi web browser mein khol le, kyunki web par ad nahi chalta
+        alert("Please use the official App to watch ads and unlock slots.");
+    }
+}
+
+function rewardedAdWatched() {
+    adsWatched++; 
+    
+    if (adsWatched >= 2) {
+        wishlistLimit += 3; // 3 slots badha do
+        adsWatched = 0; // Wapas 0 kar do
+        
+        localStorage.setItem('alKaynat_WishlistLimit', wishlistLimit);
+        updateLimitTrackerUI();
+        alert(`Congratulations! 🎉 Aapne 2 ads dekh liye. Ab aapki wishlist limit ${wishlistLimit} ho gayi hai.`);
+    } else {
+        alert("Aapne 1 Ad dekh liya hai! 1 Ad aur dekhein 3 naye slots unlock karne ke liye.");
+    }
+}
 
         // --- SEARCH FUNCTIONALITY ---
         function updateSearch(query) {
