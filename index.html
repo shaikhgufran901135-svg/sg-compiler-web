@@ -394,17 +394,29 @@
         
     </div>
 
-    <!-- NAYA: Watch Ad Confirmation Modal (Custom Popup) -->
+    <!-- NAYA: Watch Ad Confirmation Modal (With Progress Counter) -->
     <div id="adConfirmModal" class="fixed inset-0 bg-black/60 z-[60] hidden flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center transform transition-all">
-            <div class="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4 text-rose-500 text-3xl">
+            <div class="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-3 text-rose-500 text-3xl">
                 <i class="fas fa-video"></i>
             </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-2 brand-font">Unlock More Slots!</h3>
-            <p class="text-sm text-gray-500 mb-6">Aapki wishlist full ho gayi hai. Kya aap 2 chhote video ads dekh kar 3 naye slots unlock karna chahte hain?</p>
+            <h3 class="text-xl font-bold text-gray-900 mb-1 brand-font">Unlock More Slots!</h3>
+            <p class="text-sm text-gray-500 mb-4">Aapki wishlist full ho gayi hai. 2 chhote video ads dekh kar 3 naye slots unlock karein.</p>
+            
+            <!-- NAYA: PROGRESS TRACKER BOX -->
+            <div class="bg-gray-50 rounded-xl p-3 mb-5 border border-gray-100">
+                <div class="flex justify-between items-center mb-1.5">
+                    <span class="text-xs font-bold text-gray-600 uppercase">Ads Watched</span>
+                    <span class="text-sm font-black text-rose-500"><span id="adProgressCount">0</span> / 2</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                    <div id="adProgressBar" class="bg-rose-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+
             <div class="flex space-x-3">
                 <button onclick="closeAdModal()" class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-xl text-sm transition-colors">Cancel</button>
-                <button onclick="confirmWatchAd()" class="flex-1 py-3 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-xl text-sm transition-colors flex justify-center items-center">
+                <button onclick="confirmWatchAd()" class="flex-1 py-3 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-xl text-sm transition-colors flex justify-center items-center shadow-md">
                     <i class="fas fa-play mr-2"></i> Watch Ad
                 </button>
             </div>
@@ -1076,33 +1088,29 @@ const products = [
         }
 
 // --- WISHLIST FUNCTIONALITY ---
-// NAYA: Limit ko LocalStorage se nikalenge, agar naya user hai toh default 5 rahegi
-let wishlistLimit = parseInt(localStorage.getItem('alKaynat_WishlistLimit')) || 5;
-let adsWatched = 0;
-
 // --- WISHLIST FUNCTIONALITY ---
+// Limit aur Ads Watched dono ko LocalStorage se nikalenge
+let wishlistLimit = parseInt(localStorage.getItem('alKaynat_WishlistLimit')) || 5;
+let adsWatched = parseInt(localStorage.getItem('alKaynat_AdsWatched')) || 0;
+
 function toggleWishlist(event, productId) {
     event.stopPropagation();
     const index = wishlist.indexOf(productId);
-    
+
     if (index > -1) {
-        // Agar item pehle se hai, toh usko remove kar do
         wishlist.splice(index, 1);
     } else {
-        // NAYA: Naya item add karne se pehle Limit check karo
         if (wishlist.length >= wishlistLimit) {
-            requestLimitIncrease(); // Yahan custom HTML popup khulega
-            return; // Yahan se wapas bhej do, item add NAHI hoga
+            requestLimitIncrease(); 
+            return; 
         }
-        
-        // Agar limit bachi hai, toh item add kar do
         wishlist.push(productId);
     }
-    
+
     localStorage.setItem('alKaynat_Wishlist', JSON.stringify(wishlist));
     renderGrid(); 
     updateWishlistBadge();
-    
+
     if (typeof currentOpenProductId !== 'undefined' && currentOpenProductId === productId) {
         const btn = document.getElementById('pdWishlistBtn');
         if(btn) {
@@ -1113,7 +1121,7 @@ function toggleWishlist(event, productId) {
             }
         }
     }
-    
+
     updateLimitTrackerUI();
 }
 
@@ -1147,7 +1155,7 @@ function closeWishlist() {
 function renderWishlistUI() {
     const container = document.getElementById('wishlistItemsList');
     container.innerHTML = '';
-    
+
     if(wishlist.length === 0) {
         container.innerHTML = `<div class="text-center py-20 flex flex-col items-center"><div class="h-20 w-20 bg-white rounded-full flex items-center justify-center shadow-sm border border-brand-100 mb-4"><i class="far fa-heart text-4xl text-brand-200"></i></div><p class="text-gray-800 font-bold text-lg">Wishlist is empty</p><p class="text-gray-400 text-sm mt-1">Save your favorite items here.</p></div>`;
         return;
@@ -1156,7 +1164,7 @@ function renderWishlistUI() {
     wishlist.forEach(id => {
         const p = products.find(x => x.id === id); 
         if(!p) return;
-        
+
         container.innerHTML += `
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-brand-100 flex items-center justify-between cursor-pointer hover:shadow-md transition-all" onclick="closeWishlist(); setTimeout(() => openProductPage(${p.id}), 50);">
                 <div class="flex items-center space-x-3 w-3/4">
@@ -1183,17 +1191,25 @@ function updateLimitTrackerUI() {
     }
 }
 
-// 1. Apna Custom Popup Kholne ka function
+// Progress UI ko update karne ka naya function
+function updateAdProgressUI() {
+    const countElem = document.getElementById('adProgressCount');
+    const barElem = document.getElementById('adProgressBar');
+    if(countElem && barElem) {
+        countElem.innerText = adsWatched;
+        barElem.style.width = (adsWatched * 50) + '%'; 
+    }
+}
+
 function requestLimitIncrease() {
+    updateAdProgressUI(); // Kholne se pehle counter fresh kar lo
     document.getElementById('adConfirmModal').classList.remove('hidden');
 }
 
-// 2. Custom Popup Band Karne ka function
 function closeAdModal() {
     document.getElementById('adConfirmModal').classList.add('hidden');
 }
 
-// 3. User Popup mein 'Watch Ad' dabaye tab
 function confirmWatchAd() {
     closeAdModal(); 
     watchRewardedAd(); 
@@ -1203,23 +1219,28 @@ function watchRewardedAd() {
     if (window.Android && window.Android.showRewardedAd) {
         window.Android.showRewardedAd();
     } else {
-        // Yeh default alert rakha hai in case koi web browser mein khol le, kyunki web par ad nahi chalta
         alert("Please use the official App to watch ads and unlock slots.");
     }
 }
 
 function rewardedAdWatched() {
     adsWatched++; 
-    
+    localStorage.setItem('alKaynat_AdsWatched', adsWatched); 
+    updateAdProgressUI(); 
+
     if (adsWatched >= 2) {
-        wishlistLimit += 3; // 3 slots badha do
-        adsWatched = 0; // Wapas 0 kar do
-        
+        wishlistLimit += 3; 
+        adsWatched = 0; 
+
         localStorage.setItem('alKaynat_WishlistLimit', wishlistLimit);
+        localStorage.setItem('alKaynat_AdsWatched', adsWatched);
+
         updateLimitTrackerUI();
+        updateAdProgressUI();
         alert(`Congratulations! 🎉 Aapne 2 ads dekh liye. Ab aapki wishlist limit ${wishlistLimit} ho gayi hai.`);
     } else {
-        alert("Aapne 1 Ad dekh liya hai! 1 Ad aur dekhein 3 naye slots unlock karne ke liye.");
+        // Agar 1 hi ad dekha hai, toh popup wapas khol do taaki user ko progress bar 50% dikhe
+        requestLimitIncrease();
     }
 }
 
