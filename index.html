@@ -2,43 +2,165 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SG Code Compiler - Practice & Demo Tool</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>SG Code Compiler</title>
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/material-darker.min.css"> 
   
   <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #e8f5e9; color: #0b3d0b; transition: background 0.3s, color 0.3s; }
-    
-    header { 
-      background: linear-gradient(135deg, #1b5e20, #2e7d32);
-      padding: 14px 20px; 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      color: white; font-size: 22px; font-weight: bold;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.2); 
+    :root {
+      --bg-primary: #F2F2F7;
+      --bg-card: #FFFFFF;
+      --bg-secondary: #E5E5EA;
+      --text-primary: #1C1C1E;
+      --text-secondary: #8E8E93;
+      --accent-blue: #007AFF;
+      --accent-green: #34C759;
+      --accent-orange: #FF9500;
+      --accent-red: #FF3B30;
+      --border-color: rgba(60, 60, 67, 0.12);
+      --header-bg: rgba(255, 255, 255, 0.82);
+      --card-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
     }
-    header span { font-size: 20px; font-weight: bold; letter-spacing: 0.3px; }
-    
-    .container { display: flex; flex-wrap: wrap; padding: 20px; gap: 20px; max-width: 1200px; margin: 0 auto; }
-    .editor, .output { flex: 1 1 450px; background: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.08); min-width: 300px; }
-    
-    /* --- NEW MODERN EDITOR HEADER & LANGUAGE SELECTOR --- */
+
+    .dark-mode {
+      --bg-primary: #000000;
+      --bg-card: #1C1C1E;
+      --bg-secondary: #2C2C2E;
+      --text-primary: #F2F2F7;
+      --text-secondary: #98989D;
+      --accent-blue: #0A84FF;
+      --accent-green: #30D158;
+      --accent-orange: #FF9F0A;
+      --accent-red: #FF453A;
+      --border-color: rgba(255, 255, 255, 0.12);
+      --header-bg: rgba(28, 28, 30, 0.82);
+      --card-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* PULL-TO-REFRESH FIX */
+    html, body {
+      margin: 0;
+      padding: 0;
+      overscroll-behavior-y: none;
+      overscroll-behavior: none;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, Helvetica, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    /* iOS Frosted Glass Navigation Bar */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--header-bg);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 0.5px solid var(--border-color);
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+      color: var(--text-primary);
+    }
+
+    .brand-badge {
+      background: var(--accent-blue);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      letter-spacing: 0.3px;
+    }
+
+    #darkModeToggle {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 0.5px solid var(--border-color);
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.2s;
+    }
+    #darkModeToggle:active { transform: scale(0.94); }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 14px;
+      gap: 16px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .editor, .output {
+      flex: 1 1 450px;
+      background: var(--bg-card);
+      padding: 16px;
+      border-radius: 18px;
+      border: 0.5px solid var(--border-color);
+      box-shadow: var(--card-shadow);
+      min-width: 300px;
+    }
+
+    /* Card Top Header */
     .editor-top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
       gap: 10px;
-      border-bottom: 2px solid #a5d6a7;
-      padding-bottom: 12px;
       margin-bottom: 12px;
     }
-    .editor-top-bar h3 { margin: 0; border: none; padding: 0; color: #1b5e20; font-size: 19px; }
-    
+
+    .card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .mac-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .mac-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #FF5F56; }
+    .dot-yellow { background: #FFBD2E; }
+    .dot-green { background: #27C93F; }
+
+    .editor-top-bar h3, .output-header h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: var(--text-primary);
+    }
+
+    /* iOS Dropdown Selector */
     .select-wrapper {
       position: relative;
       display: inline-flex;
@@ -47,154 +169,263 @@
     #languageSelector {
       appearance: none;
       -webkit-appearance: none;
-      padding: 8px 34px 8px 14px;
-      border-radius: 8px;
-      border: 1.5px solid #2e7d32;
-      background-color: #f1f8e9;
-      color: #1b5e20;
-      font-size: 14px;
-      font-weight: 700;
+      padding: 7px 30px 7px 12px;
+      border-radius: 10px;
+      border: 0.5px solid var(--border-color);
+      background-color: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 600;
       cursor: pointer;
       outline: none;
-      transition: all 0.2s ease;
     }
-    #languageSelector:hover { background-color: #e8f5e9; box-shadow: 0 2px 8px rgba(46,125,50,0.18); }
     .select-arrow {
       position: absolute;
-      right: 12px;
+      right: 10px;
       pointer-events: none;
-      font-size: 11px;
-      color: #1b5e20;
+      font-size: 10px;
+      color: var(--text-secondary);
     }
 
-    /* Language Pill Bar */
+    /* iOS Segmented Pill Bar */
     .lang-pill-bar {
       display: flex;
       gap: 8px;
       overflow-x: auto;
-      padding: 4px 2px 12px 2px;
-      margin-bottom: 6px;
-      scrollbar-width: thin;
+      padding: 2px 2px 12px 2px;
+      margin-bottom: 4px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
     }
-    .lang-pill-bar::-webkit-scrollbar { height: 5px; }
-    .lang-pill-bar::-webkit-scrollbar-thumb { background: #a5d6a7; border-radius: 10px; }
+    .lang-pill-bar::-webkit-scrollbar { display: none; }
 
     .lang-pill {
       display: inline-flex;
       align-items: center;
       gap: 6px;
       padding: 7px 13px;
-      border-radius: 20px;
-      border: 1.5px solid #c8e6c9;
-      background: #f9fbe7;
-      color: #2e7d32;
+      border-radius: 999px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
       white-space: nowrap;
-      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
       user-select: none;
     }
-    .lang-pill:hover {
-      transform: translateY(-1px);
-      border-color: #2e7d32;
-      background: #e8f5e9;
-    }
+    .lang-pill:active { transform: scale(0.95); }
+
     .lang-pill.active {
-      background: linear-gradient(135deg, #2e7d32, #43a047);
-      color: #ffffff;
-      border-color: #1b5e20;
-      box-shadow: 0 3px 8px rgba(46, 125, 50, 0.3);
+      background: var(--accent-blue);
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
     }
+
     .lang-pill.locked {
-      background: #f5f5f5;
-      color: #616161;
-      border-color: #e0e0e0;
+      opacity: 0.85;
     }
-    .lang-pill.locked:hover {
-      border-color: #ffb300;
-      background: #fff8e1;
-      color: #e65100;
-    }
+
     .ad-badge {
-      font-size: 11px;
+      font-size: 10px;
       padding: 2px 6px;
-      border-radius: 10px;
-      background: #fff3e0;
-      color: #e65100;
-      border: 1px solid #ffe0b2;
+      border-radius: 8px;
+      background: rgba(255, 149, 0, 0.16);
+      color: var(--accent-orange);
       font-weight: 700;
     }
     .lang-pill.active .ad-badge {
-      background: rgba(255,255,255,0.2);
-      color: #fff;
-      border-color: transparent;
+      background: rgba(255, 255, 255, 0.22);
+      color: #FFFFFF;
     }
 
-    h3 { margin-top: 0; color: #1b5e20; border-bottom: 2px solid #a5d6a7; padding-bottom: 10px; }
-    
-    .CodeMirror { height: 350px; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; box-sizing: border-box; }
-    .CodeMirror-scroll { max-height: 350px; overflow-y: auto; }
-    .CodeMirror-lines { padding: 4px 0; }
+    /* CODEMIRROR COMPACT LINE SPACING FIX */
+    .CodeMirror {
+      height: 330px;
+      border-radius: 12px;
+      border: 0.5px solid var(--border-color);
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace !important;
+      font-size: 13.5px !important;
+      line-height: 1.35 !important;
+      direction: ltr;
+    }
+    .CodeMirror-scroll {
+      max-height: 330px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+    .CodeMirror-lines {
+      padding: 8px 0 !important;
+    }
+    .CodeMirror pre.CodeMirror-line,
+    .CodeMirror pre.CodeMirror-line-like {
+      line-height: 1.35 !important;
+      padding: 0 8px !important;
+      margin: 0 !important;
+    }
+    .CodeMirror-linenumber {
+      line-height: 1.35 !important;
+      padding: 0 6px 0 4px !important;
+      font-size: 12px !important;
+    }
 
-    .controls { margin-top: 15px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; background: #f1f8e9; padding: 10px; border-radius: 8px; }
-    button { background-color: #2e7d32; color: white; padding: 10px 18px; border: none; border-radius: 7px; cursor: pointer; font-size: 14px; font-weight: bold; transition: 0.25s; }
-    button:hover { background-color: #1b5e20; transform: translateY(-1px); }
-    
-    #darkModeToggle { background-color: #fdd835; color: #000; padding: 8px 15px; font-size: 14px; font-weight: bold; border-radius: 20px; }
-    #darkModeToggle:hover { background-color: #fbc02d; }
-    #resetDefaultBtn { background-color: #fbc02d; color: #111; }
-    #resetDefaultBtn:hover { background-color: #f9a825; }
-    #clearEditorBtn { background-color: #d32f2f; }
-    #clearEditorBtn:hover { background-color: #b71c1c; }
-    #copyOutputBtn { background-color: #0288d1; }
-    #copyOutputBtn:hover { background-color: #01579b; }
-    
-    pre { background:#263238; color: #eceff1; padding:15px; border-radius:8px; height:350px; overflow:auto; white-space: pre-wrap; font-family: 'Consolas', monospace; font-size: 14px; }
+    /* iOS Action Controls */
+    .controls {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    @media (min-width: 520px) {
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+      }
+    }
 
-    /* --- UNLOCK MODAL POPUP --- */
+    button.ios-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 11px 16px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      transition: transform 0.12s ease, opacity 0.2s;
+      color: #FFFFFF;
+    }
+    button.ios-btn:active {
+      transform: scale(0.96);
+      opacity: 0.9;
+    }
+
+    .btn-run {
+      background: var(--accent-green);
+      box-shadow: 0 4px 12px rgba(52, 199, 89, 0.28);
+      flex: 1.2;
+    }
+    .btn-secondary {
+      background: var(--bg-secondary);
+      color: var(--text-primary) !important;
+      flex: 1;
+    }
+    .btn-reset {
+      background: rgba(255, 149, 0, 0.15);
+      color: var(--accent-orange) !important;
+      flex: 1;
+    }
+    .btn-danger {
+      background: rgba(255, 59, 48, 0.14);
+      color: var(--accent-red) !important;
+      flex: 1;
+    }
+    .btn-copy {
+      width: 100%;
+      margin-top: 12px;
+      background: var(--accent-blue);
+      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25);
+    }
+
+    .auto-save-note {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      margin: 10px 0 0 2px;
+    }
+
+    /* Output Console Box */
+    .output-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .terminal-tag {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--bg-secondary);
+      padding: 4px 9px;
+      border-radius: 8px;
+    }
+
+    pre#outputBox {
+      background: #141417;
+      color: #E5E5EA;
+      padding: 14px;
+      border-radius: 12px;
+      border: 0.5px solid var(--border-color);
+      height: 330px;
+      margin: 0;
+      overflow: auto;
+      overscroll-behavior: contain;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    /* iOS Modal Sheet for 3 Ads Unlock */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.65);
-      backdrop-filter: blur(4px);
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       display: none;
       justify-content: center;
       align-items: center;
       z-index: 9999;
-      padding: 16px;
+      padding: 18px;
     }
     .modal-overlay.show { display: flex; }
+
     .unlock-card {
-      background: #ffffff;
-      color: #1f2937;
+      background: var(--bg-card);
+      color: var(--text-primary);
       width: 100%;
-      max-width: 380px;
-      border-radius: 16px;
-      padding: 24px;
+      max-width: 360px;
+      border-radius: 24px;
+      padding: 24px 20px 20px 20px;
       text-align: center;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-      animation: popIn 0.25s ease-out;
+      border: 0.5px solid var(--border-color);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+      animation: iosSheetPop 0.22s cubic-bezier(0.32, 0.72, 0, 1);
     }
-    @keyframes popIn {
-      from { transform: scale(0.9); opacity: 0; }
+    @keyframes iosSheetPop {
+      from { transform: scale(0.92); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
     }
+
     .unlock-icon {
-      width: 60px;
-      height: 60px;
-      background: #fff8e1;
-      border: 2px solid #ffca28;
-      border-radius: 50%;
+      width: 56px;
+      height: 56px;
+      background: rgba(255, 149, 0, 0.14);
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 28px;
+      font-size: 26px;
       margin: 0 auto 12px auto;
     }
-    .unlock-card h4 { margin: 0 0 6px 0; font-size: 20px; color: #1b5e20; }
-    .unlock-card p { margin: 0 0 18px 0; font-size: 14px; color: #555; line-height: 1.4; }
-    
+    .unlock-card h4 {
+      margin: 0 0 6px 0;
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    .unlock-card p {
+      margin: 0 0 16px 0;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
     .progress-steps {
       display: flex;
       justify-content: space-between;
@@ -204,91 +435,82 @@
     .step-box {
       flex: 1;
       padding: 8px 4px;
-      border-radius: 8px;
-      background: #f1f5f9;
-      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      background: var(--bg-secondary);
       font-size: 12px;
-      font-weight: 700;
-      color: #64748b;
-      transition: 0.3s;
+      font-weight: 600;
+      color: var(--text-secondary);
+      transition: 0.25s;
     }
     .step-box.completed {
-      background: #e8f5e9;
-      border-color: #2e7d32;
-      color: #1b5e20;
+      background: rgba(52, 199, 89, 0.16);
+      color: var(--accent-green);
     }
+
     .progress-bar-bg {
       width: 100%;
-      height: 10px;
-      background: #e2e8f0;
-      border-radius: 10px;
+      height: 8px;
+      background: var(--bg-secondary);
+      border-radius: 99px;
       overflow: hidden;
       margin-bottom: 18px;
     }
     .progress-bar-fill {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, #ff9800, #2e7d32);
-      border-radius: 10px;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+      border-radius: 99px;
       transition: width 0.35s ease;
     }
+
     .modal-actions {
       display: flex;
       gap: 10px;
     }
     .btn-watch-ad {
-      flex: 1;
-      background: linear-gradient(135deg, #ff8f00, #f57c00);
+      flex: 1.5;
+      background: var(--accent-blue);
       color: #fff;
-      font-size: 15px;
+      font-size: 14px;
+      font-weight: 600;
       padding: 12px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(245, 124, 0, 0.3);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
     }
-    .btn-watch-ad:hover { background: linear-gradient(135deg, #f57c00, #e65100); }
     .btn-cancel {
-      background: #e2e8f0;
-      color: #334155;
-      padding: 12px 16px;
-      border-radius: 10px;
+      flex: 1;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
     }
-    .btn-cancel:hover { background: #cbd5e1; }
-
-    /* --- DARK MODE --- */
-    .dark-mode { background-color: #121212 !important; color: #e0e0e0 !important; }
-    .dark-mode header { background: linear-gradient(135deg, #00332c, #004d40); color: #fff; }
-    .dark-mode .editor, .dark-mode .output { background: #1e1e1e; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-    .dark-mode h3, .dark-mode .editor-top-bar h3 { color: #80cbc4; }
-    .dark-mode .editor-top-bar { border-bottom-color: #004d40; }
-    .dark-mode #languageSelector { background-color: #263238; color: #80cbc4; border-color: #00695c; }
-    .dark-mode .select-arrow { color: #80cbc4; }
-    .dark-mode .lang-pill { background: #263238; color: #b2dfdb; border-color: #37474f; }
-    .dark-mode .lang-pill.active { background: linear-gradient(135deg, #00695c, #00897b); color: #fff; border-color: #00bfa5; }
-    .dark-mode .lang-pill.locked { background: #1a1a1a; color: #757575; border-color: #2c2c2c; }
-    .dark-mode .ad-badge { background: #3e2723; color: #ffb74d; border-color: #5d4037; }
-    .dark-mode .controls { background: #212121; }
-    .dark-mode button { background-color: #00695c; }
-    .dark-mode button:hover { background-color: #00897b; }
-    .dark-mode #darkModeToggle { background-color: #64dd17; color: #000; }
-    .dark-mode .unlock-card { background: #1e1e1e; color: #e0e0e0; border: 1px solid #333; }
-    .dark-mode .unlock-card h4 { color: #80cbc4; }
-    .dark-mode .unlock-card p { color: #b0bec5; }
-    .dark-mode .step-box { background: #263238; border-color: #37474f; color: #90a4ae; }
-    .dark-mode .step-box.completed { background: #004d40; border-color: #00bfa5; color: #e0f2f1; }
-    .dark-mode .btn-cancel { background: #37474f; color: #eceff1; }
   </style>
 </head>
 <body onload="initializeEditor()">
   <header>
-    <span>💻 SG Code Compiler</span>
+    <div class="brand-title">
+      <span>SG Compiler</span>
+      <span class="brand-badge">PRO</span>
+    </div>
     <button id="darkModeToggle" onclick="toggleDarkMode()">☀️ Light</button> 
   </header>
 
   <div class="container">
     <div class="editor">
-      <!-- Improved Top Bar with Dropdown -->
       <div class="editor-top-bar">
-        <h3>Write Your Code</h3>
+        <div class="card-title-group">
+          <div class="mac-dots">
+            <span class="mac-dot dot-red"></span>
+            <span class="mac-dot dot-yellow"></span>
+            <span class="mac-dot dot-green"></span>
+          </div>
+          <h3>Code Editor</h3>
+        </div>
         <div class="select-wrapper">
           <select id="languageSelector" onchange="changeLanguage()">
             <option value="c">C</option>
@@ -304,32 +526,42 @@
         </div>
       </div>
 
-      <!-- New Modern Interactive Language Pill Bar -->
+      <!-- iOS Segmented Language Bar -->
       <div class="lang-pill-bar" id="langPillBar"></div>
       
       <textarea id="code"></textarea>
 
       <div class="controls">
-        <button onclick="runCode()">▶ Run Code</button>
-        <button onclick="clearOutput()">Clear Output</button>
-        <button id="resetDefaultBtn" onclick="resetDefaultCode()">🔄 Reset Default</button> 
-        <button id="clearEditorBtn" onclick="clearEditor()">Clear Editor</button>
+        <button class="ios-btn btn-run" onclick="runCode()">▶ Run Code</button>
+        <button class="ios-btn btn-secondary" onclick="clearOutput()">Clear Output</button>
+        <button class="ios-btn btn-reset" id="resetDefaultBtn" onclick="resetDefaultCode()">↺ Reset</button> 
+        <button class="ios-btn btn-danger" id="clearEditorBtn" onclick="clearEditor()">✕ Clear</button>
       </div>
-      <p style="font-size:12px; color: #1b5e20; margin-top: 8px;">*Code & unlocked languages are saved automatically.</p>
+      <p class="auto-save-note">✓ Auto-saved locally on your device</p>
     </div>
 
     <div class="output">
-      <h3>Output</h3>
+      <div class="output-header">
+        <div class="card-title-group">
+          <div class="mac-dots">
+            <span class="mac-dot dot-red"></span>
+            <span class="mac-dot dot-yellow"></span>
+            <span class="mac-dot dot-green"></span>
+          </div>
+          <h3>Console Output</h3>
+        </div>
+        <span class="terminal-tag" id="activeLangTag">C • Ready</span>
+      </div>
       <pre id="outputBox">(Output will appear here)</pre>
-      <button id="copyOutputBtn" onclick="copyOutput()">📋 Copy Output</button>
+      <button class="ios-btn btn-copy" id="copyOutputBtn" onclick="copyOutput()">📋 Copy Output</button>
     </div>
   </div>
 
-  <!-- 3-Rewarded Ads Unlock Modal -->
+  <!-- iOS 3-Rewarded Ads Unlock Modal -->
   <div class="modal-overlay" id="unlockModal">
     <div class="unlock-card">
       <div class="unlock-icon">🔒</div>
-      <h4 id="modalTitle">Unlock Premium Language</h4>
+      <h4 id="modalTitle">Unlock Language</h4>
       <p id="modalDesc">Watch 3 short video ads to permanently unlock this compiler language.</p>
       
       <div class="progress-steps">
@@ -342,7 +574,7 @@
       </div>
 
       <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeUnlockModal()">Later</button>
+        <button class="btn-cancel" onclick="closeUnlockModal()">Cancel</button>
         <button class="btn-watch-ad" id="watchAdBtn" onclick="triggerRewardedAd()">🎬 Watch Ad (0/3)</button>
       </div>
     </div>
@@ -360,6 +592,20 @@
     let pendingUnlockLang = null;
     let waitingForAdCallback = false;
 
+    // Prevent accidental WebView pull-to-refresh when dragging down at top of page
+    let touchStartY = 0;
+    document.addEventListener('touchstart', function(e) {
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', function(e) {
+      const touchY = e.touches[0].clientY;
+      const touchDiff = touchY - touchStartY;
+      if (window.scrollY === 0 && touchDiff > 0 && !e.target.closest('.CodeMirror-scroll') && !e.target.closest('#outputBox') && !e.target.closest('.lang-pill-bar')) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+
     const languageConfig = {
       c:          { name: 'C',          icon: '⚙️', free: true,  mode: 'text/x-csrc',       judgeId: 50 },
       python:     { name: 'Python',     icon: '🐍', free: true,  mode: 'text/x-python',     judgeId: 71 },
@@ -371,16 +617,15 @@
       go:         { name: 'Go',         icon: '🐹', free: false, mode: 'text/x-csrc',       judgeId: 60 }
     };
 
-    // Default Codes
     const defaultCodes = {
-      c: `#include <stdio.h>\n\nint main() {\n    int num = 10;\n    printf("Hello from C compiler! The number is %d.\\n", num);\n    return 0;\n}`,
-      python: `# Python Example\nprint("Hello from Python!")\nprint("The actual compiler is working now.")`,
-      java: `// Java Example\nclass Main {\n    public static void main(String[] args) {\n        System.out.println("Hello from Java!");\n    }\n}`,
-      cpp: `#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Hello from Premium C++ Compiler!" << endl;\n    return 0;\n}`,
-      javascript: `// JavaScript Example\nconsole.log("Hello from Premium JavaScript Compiler!");`,
-      php: `<?php\necho "Hello from Premium PHP Compiler!\\n";\n?>`,
-      ruby: `# Ruby Example\nputs "Hello from Premium Ruby Compiler!"`,
-      go: `package main\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello from Premium Go Compiler!")\n}`
+      c: "#include <stdio.h>\n\nint main() {\n    int num = 10;\n    printf(\"Hello from C compiler! Number: %d\\n\", num);\n    return 0;\n}",
+      python: "# Python Example\nprint(\"Hello from Python!\")\nfor i in range(1, 4):\n    print(f\"Step {i}: Ready to code\")",
+      java: "// Java Example\nclass Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello from Java!\");\n    }\n}",
+      cpp: "#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << \"Hello from C++ Compiler!\" << endl;\n    return 0;\n}",
+      javascript: "// JavaScript Example\nconsole.log(\"Hello from JavaScript Compiler!\");",
+      php: "<?php\necho \"Hello from PHP Compiler!\\n\";\n?>",
+      ruby: "# Ruby Example\nputs \"Hello from Ruby Compiler!\"",
+      go: "package main\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"Hello from Go Compiler!\")\n}"
     };
 
     function getAdsWatched(lang) {
@@ -409,10 +654,10 @@
       }
     }
 
-    // Refresh both Dropdown and Pill Bar UI
     function updateLanguageUI() {
       const selector = document.getElementById('languageSelector');
       const pillBar = document.getElementById('langPillBar');
+      const activeTag = document.getElementById('activeLangTag');
       pillBar.innerHTML = '';
 
       for (let i = 0; i < selector.options.length; i++) {
@@ -422,7 +667,6 @@
         const watched = getAdsWatched(langKey);
         const unlocked = isLanguageUnlocked(langKey);
 
-        // Update <select> option text & attributes
         if (cfg.free) {
           opt.text = `${cfg.icon} ${cfg.name}`;
           opt.removeAttribute('data-locked');
@@ -434,7 +678,6 @@
           opt.setAttribute('data-locked', 'true');
         }
 
-        // Create Interactive Pill
         const pill = document.createElement('div');
         pill.className = `lang-pill ${langKey === currentUnlockedLang ? 'active' : ''} ${!unlocked ? 'locked' : ''}`;
         
@@ -451,6 +694,9 @@
       }
 
       selector.value = currentUnlockedLang;
+      if (activeTag && languageConfig[currentUnlockedLang]) {
+        activeTag.innerText = `${languageConfig[currentUnlockedLang].name} • Ready`;
+      }
     }
 
     function selectLanguageFromPill(langKey) {
@@ -477,10 +723,11 @@
         lineNumbers: true,    
         indentUnit: 4,        
         tabSize: 4,
-        indentWithTabs: true,
+        indentWithTabs: false,
         electricChars: true,
         matchBrackets: true,
         autoCloseBrackets: true,
+        lineWrapping: false
       });
 
       editor.setValue(savedCode || defaultCodes[currentUnlockedLang]); 
@@ -488,7 +735,6 @@
 
       updateLanguageUI();
 
-      // App startup language check
       if (typeof AndroidApp !== "undefined" && AndroidApp.checkLanguageStatus) {
         AndroidApp.checkLanguageStatus(); 
       }
@@ -498,9 +744,8 @@
       const selector = document.getElementById('languageSelector');
       const lang = selector.value;
 
-      // Check if language is locked (needs 3 ads)
       if (!isLanguageUnlocked(lang)) {
-        selector.value = currentUnlockedLang; // Keep editor on previous unlocked language
+        selector.value = currentUnlockedLang;
         openUnlockModal(lang);
         return;
       }
@@ -517,7 +762,6 @@
       updateLanguageUI();
     }
 
-    // --- 3 ADS UNLOCK MODAL FUNCTIONS ---
     function openUnlockModal(langKey) {
       pendingUnlockLang = langKey;
       const cfg = languageConfig[langKey];
@@ -526,21 +770,19 @@
 
       document.getElementById('modalTitle').innerText = `Unlock ${cfg.icon} ${cfg.name}`;
       document.getElementById('modalDesc').innerText = 
-        `Watch ${remaining} more short video ad${remaining > 1 ? 's' : ''} to unlock ${cfg.name} compiler! (${watched}/${REQUIRED_ADS} completed)`;
+        `Watch ${remaining} more short video ad${remaining > 1 ? 's' : ''} to permanently unlock ${cfg.name}. (${watched}/${REQUIRED_ADS} completed)`;
 
-      // Update Step Boxes
       for (let i = 1; i <= 3; i++) {
         const stepEl = document.getElementById(`step${i}`);
         if (i <= watched) {
           stepEl.classList.add('completed');
-          stepEl.innerText = `Ad ${i} ✅`;
+          stepEl.innerText = `Ad ${i} ✓`;
         } else {
           stepEl.classList.remove('completed');
           stepEl.innerText = `Ad ${i} 🔒`;
         }
       }
 
-      // Update Progress Bar
       const pct = Math.min(100, Math.round((watched / REQUIRED_ADS) * 100));
       document.getElementById('modalProgressBar').style.width = `${pct}%`;
       document.getElementById('watchAdBtn').innerText = `🎬 Watch Ad (${watched}/${REQUIRED_ADS})`;
@@ -558,15 +800,13 @@
         waitingForAdCallback = true;
         AndroidApp.showRewardedAd(pendingUnlockLang);
       } else {
-        alert("This premium language can only be unlocked by watching 3 short video ads inside the SG Code Compiler Android App!");
+        alert("Watch 3 rewarded video ads inside the SG Code Compiler Android App to unlock this language!");
       }
     }
 
-    // Android App calls this function after an ad is completed
     function unlockLanguage(langId) {
       if (!languageConfig[langId]) return;
 
-      // Ignore startup check calls if 3 ads aren't completed yet
       if (!waitingForAdCallback && getAdsWatched(langId) < REQUIRED_ADS) {
         updateLanguageUI();
         return;
@@ -582,28 +822,25 @@
       if (watched >= REQUIRED_ADS) {
         closeUnlockModal();
         applyLanguageSwitch(langId);
-        alert(`🎉 Congratulations! ${languageConfig[langId].name} is now Unlocked! (${REQUIRED_ADS}/${REQUIRED_ADS} Ads Watched)`);
+        alert(`🎉 ${languageConfig[langId].name} is now Unlocked!`);
       } else {
         openUnlockModal(langId);
       }
     }
 
     function saveCode() {
-      const codeText = editor.getValue(); 
-      localStorage.setItem('sgCompilerCode', codeText);
+      localStorage.setItem('sgCompilerCode', editor.getValue());
     }
     
     function resetDefaultCode() {
       const lang = currentUnlockedLang;
-      const defaultCodeToLoad = defaultCodes[lang] || defaultCodes.c;
-
-      if (confirm(`Are you sure you want to reset the code to the default ${languageConfig[lang].name} example?`)) {
-        editor.setValue(defaultCodeToLoad);
+      if (confirm(`Reset to default ${languageConfig[lang].name} template?`)) {
+        editor.setValue(defaultCodes[lang] || defaultCodes.c);
       }
     }
 
     function clearEditor() {
-      if (confirm("Are you sure you want to clear all code in the editor?")) {
+      if (confirm("Clear all code in the editor?")) {
         editor.setValue(''); 
         localStorage.removeItem('sgCompilerCode'); 
       }
@@ -612,20 +849,23 @@
     function copyOutput() {
       const outputText = document.getElementById('outputBox').innerText;
       navigator.clipboard.writeText(outputText).then(() => {
-        alert('Output copied to clipboard!');
-      }).catch(err => {
-        console.error('Failed to copy text: ', err);
-        alert('Could not copy output. Please try manually.');
+        const btn = document.getElementById('copyOutputBtn');
+        btn.innerText = '✓ Copied to Clipboard';
+        setTimeout(() => { btn.innerText = '📋 Copy Output'; }, 1800);
+      }).catch(() => {
+        alert('Could not copy output.');
       });
     }
 
     async function runCode() {
       const code = editor.getValue(); 
       const outputBox = document.getElementById('outputBox');
+      const activeTag = document.getElementById('activeLangTag');
       const lang = currentUnlockedLang; 
       const cfg = languageConfig[lang];
       
-      outputBox.innerText = `Compiling & Running ${cfg.name} on Server... Please wait.`;
+      activeTag.innerText = `${cfg.name} • Running...`;
+      outputBox.innerText = `Compiling & Running ${cfg.name}...`;
       
       try {
         const response = await fetch('https://compiler-backend-4dbz.onrender.com/compile', {
@@ -635,6 +875,7 @@
         });
 
         const result = await response.json();
+        activeTag.innerText = `${cfg.name} • Done`;
 
         if (result.error) {
           outputBox.innerText = "Server Error:\n" + (result.message || "Something went wrong.");
@@ -646,17 +887,15 @@
         } else if (result.stderr) {
           outputBox.innerText = "Runtime Error:\n" + result.stderr;
         } else if (result.stdout !== null && result.stdout !== undefined) {
-          outputBox.innerText = result.stdout || "Program executed successfully but returned no output.";
+          outputBox.innerText = result.stdout || "Program executed successfully (no output).";
         } else if (result.status && result.status.description) {
           outputBox.innerText = "Status:\n" + result.status.description;
         } else {
-          outputBox.innerText = "Something went wrong. Please check console.";
-          console.log(result);
+          outputBox.innerText = "Unknown response from server.";
         }
-
       } catch (error) {
+        activeTag.innerText = `${cfg.name} • Offline`;
         outputBox.innerText = `Network Error: Server is not reachable.\nDetails: ${error.message}`;
-        console.error("Fetch Error:", error);
       }
     }
 
