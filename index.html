@@ -537,7 +537,7 @@
         <button class="ios-btn btn-reset" id="resetDefaultBtn" onclick="resetDefaultCode()">↺ Reset</button> 
         <button class="ios-btn btn-danger" id="clearEditorBtn" onclick="clearEditor()">✕ Clear</button>
       </div>
-      <p class="auto-save-note">✓ Auto-saved locally on your device</p>
+      <p class="auto-save-note">✓ Code auto-saved • Premium modes lock when app closes</p>
     </div>
 
     <div class="output">
@@ -562,7 +562,7 @@
     <div class="unlock-card">
       <div class="unlock-icon">🔒</div>
       <h4 id="modalTitle">Unlock Language</h4>
-      <p id="modalDesc">Watch 3 short video ads to permanently unlock this compiler language.</p>
+      <p id="modalDesc">Watch 3 short video ads to unlock this compiler language for this session.</p>
       
       <div class="progress-steps">
         <div class="step-box" id="step1">Ad 1</div>
@@ -591,6 +591,15 @@
     let currentUnlockedLang = 'c';
     let pendingUnlockLang = null;
     let waitingForAdCallback = false;
+
+    // 🔥 SESSION MEMORY: App band karke wapis open karne par ye automatic 0 ho jayega!
+    const adsWatchedMemory = {
+      cpp: 0,
+      javascript: 0,
+      php: 0,
+      ruby: 0,
+      go: 0
+    };
 
     // Prevent accidental WebView pull-to-refresh when dragging down at top of page
     let touchStartY = 0;
@@ -628,13 +637,14 @@
       go: "package main\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"Hello from Go Compiler!\")\n}"
     };
 
+    // Session-Only Ad Counter (Resets every time app is closed & reopened)
     function getAdsWatched(lang) {
       if (languageConfig[lang]?.free) return REQUIRED_ADS;
-      return parseInt(localStorage.getItem(`sg_ads_${lang}`) || '0', 10);
+      return adsWatchedMemory[lang] || 0;
     }
 
     function setAdsWatched(lang, count) {
-      localStorage.setItem(`sg_ads_${lang}`, String(count));
+      adsWatchedMemory[lang] = count;
     }
 
     function isLanguageUnlocked(lang) {
@@ -706,11 +716,15 @@
     }
 
     function initializeEditor() {
+      // Clear any old localStorage ad data from previous version
+      ['cpp', 'javascript', 'php', 'ruby', 'go'].forEach(l => localStorage.removeItem(`sg_ads_${l}`));
+
       if (localStorage.getItem('darkModeEnabled') === 'true') {
         document.body.classList.add('dark-mode');
         document.getElementById('darkModeToggle').innerText = '🌙 Dark';
       }
 
+      // If previous language was a locked one, reset to 'c' on fresh app open
       const savedLang = localStorage.getItem('selectedLanguage') || 'c';
       currentUnlockedLang = isLanguageUnlocked(savedLang) ? savedLang : 'c';
 
@@ -730,14 +744,11 @@
         lineWrapping: false
       });
 
-      editor.setValue(savedCode || defaultCodes[currentUnlockedLang]); 
+      // If locked language was reset to C, load C default code or saved free code
+      editor.setValue(isLanguageUnlocked(savedLang) && savedCode ? savedCode : defaultCodes[currentUnlockedLang]); 
       editor.on('change', saveCode);
 
       updateLanguageUI();
-
-      if (typeof AndroidApp !== "undefined" && AndroidApp.checkLanguageStatus) {
-        AndroidApp.checkLanguageStatus(); 
-      }
     }
     
     function changeLanguage() {
@@ -770,7 +781,7 @@
 
       document.getElementById('modalTitle').innerText = `Unlock ${cfg.icon} ${cfg.name}`;
       document.getElementById('modalDesc').innerText = 
-        `Watch ${remaining} more short video ad${remaining > 1 ? 's' : ''} to permanently unlock ${cfg.name}. (${watched}/${REQUIRED_ADS} completed)`;
+        `Watch ${remaining} more short video ad${remaining > 1 ? 's' : ''} to unlock ${cfg.name} for this session. (${watched}/${REQUIRED_ADS} completed)`;
 
       for (let i = 1; i <= 3; i++) {
         const stepEl = document.getElementById(`step${i}`);
@@ -804,10 +815,12 @@
       }
     }
 
+    // Android App calls this after rewarded ad completes
     function unlockLanguage(langId) {
       if (!languageConfig[langId]) return;
 
-      if (!waitingForAdCallback && getAdsWatched(langId) < REQUIRED_ADS) {
+      // Ignore any automatic startup calls from Android native SharedPreferences
+      if (!waitingForAdCallback) {
         updateLanguageUI();
         return;
       }
@@ -822,7 +835,7 @@
       if (watched >= REQUIRED_ADS) {
         closeUnlockModal();
         applyLanguageSwitch(langId);
-        alert(`🎉 ${languageConfig[langId].name} is now Unlocked!`);
+        alert(`🎉 ${languageConfig[langId].name} is now Unlocked for this session!`);
       } else {
         openUnlockModal(langId);
       }
